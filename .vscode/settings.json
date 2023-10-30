@@ -1,0 +1,27 @@
+{
+  "cmake.configureArgs": [
+    "-DVCPKG_TARGET_TRIPLET=x64-linux",
+    "-DVCPKG_APPLOCAL_DEPS=ON",
+    "-DX_VCPKG_APPLOCAL_DEPS_INSTALL=ON"
+  ],
+  "vcpkg.general.enable": true,
+  "vcpkg.target.hostTriplet": "x64-linux",
+  "vcpkg.target.defaultTriplet": "",
+  "vcpkg.target.useStaticLib": false,
+  "cmake.configureSettings": {
+    "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+  },
+  "vcpkg.target.installDependencies": true,
+  "vcpkg.target.preferSystemLibs": false,
+  "vcpkg.target.useManifest": false,
+  "files.associations": {
+    ".babelrc": "javascript",
+    ".huskyrc": "json",
+    ".lintstagedrc": "json",
+    "*.json": "json",
+    ".env.production.local": "env",
+    ".env.development.local": "env",
+    ".versionrc": "json",
+    "iostream": "cpp"
+  }
+}
