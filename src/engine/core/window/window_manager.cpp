@@ -1,12 +1,11 @@
-#include "WindowManager.h"
+#include "window_manager.h"
 
 WindowManager::WindowManager()
 {
   /* Initialize GLFW library */
   if (!glfwInit())
   {
-    std::cerr << "GLFW initialization failed" << std::endl;
-    throw -1;
+    throw "GLFW initialization failed";
   }
 
   /* Setup GLFW window property */
@@ -45,14 +44,6 @@ WindowManager::WindowManager()
     glfwTerminate();
     throw;
   }
-
-  /* Enable depth test */
-  glEnable(GL_DEPTH_TEST);
-
-  /* Enable blending, set blending function and equation */
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBlendEquation(GL_ADD);
 
   /* Setup viewport size */
   glViewport(0, 0, bufferWidth, bufferHeight);

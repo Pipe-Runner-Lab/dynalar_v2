@@ -1,6 +1,8 @@
 # Dynalar Rendering Engine
 
-## Setup
+# Setup
+
+## Linux
 
 Make sure `cmake` and `GCC` are installed. We are using `GDB` debugger.
 
@@ -13,7 +15,7 @@ sudo apt-get install build-essential gdb
 Vcpkg is used to manage dependencies. [Install](https://vcpkg.io/en/getting-started) it and install the dependencies.
 
 ```bash
-vcpkg install glfw3 glew opengl
+vcpkg install glfw3 glew opengl glm
 ```
 
 Other than the packages vckpg suggests to install, the following would also be needed:
@@ -22,12 +24,20 @@ Other than the packages vckpg suggests to install, the following would also be n
 sudo apt install libglfw3-dev
 ```
 
-## Important Links
+## Apple
+
+Same as above. You may need to install the following before running `vcpkg install`:
+
+```bash
+brew install pkg-config
+```
+
+# Important Links
 
 1. https://code.visualstudio.com/docs/languages/cpp
 2. https://learn.microsoft.com/en-us/vcpkg/users/buildsystems/cmake-integration
 
-## FAQ
+# FAQ
 
 - Q. CMakeLists.txt throws some errors.
   - A. Start by deleting the `build` folder and try again.

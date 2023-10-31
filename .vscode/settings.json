@@ -1,19 +1,20 @@
 {
   "cmake.configureArgs": [
-    "-DVCPKG_TARGET_TRIPLET=x64-linux",
     "-DVCPKG_APPLOCAL_DEPS=ON",
-    "-DX_VCPKG_APPLOCAL_DEPS_INSTALL=ON"
+    "-DX_VCPKG_APPLOCAL_DEPS_INSTALL=ON",
+    "-DVCPKG_MANIFEST_MODE=ON",
+    "-DVCPKG_TARGET_TRIPLET=arm64-osx"
   ],
   "vcpkg.general.enable": true,
-  "vcpkg.target.hostTriplet": "x64-linux",
-  "vcpkg.target.defaultTriplet": "",
+  "vcpkg.target.hostTriplet": "arm64-osx",
+  "vcpkg.target.defaultTriplet": "arm64-osx",
   "vcpkg.target.useStaticLib": false,
   "cmake.configureSettings": {
     "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
   },
   "vcpkg.target.installDependencies": true,
   "vcpkg.target.preferSystemLibs": false,
-  "vcpkg.target.useManifest": false,
+  "vcpkg.target.useManifest": true,
   "files.associations": {
     ".babelrc": "javascript",
     ".huskyrc": "json",
@@ -23,5 +24,7 @@
     ".env.development.local": "env",
     ".versionrc": "json",
     "iostream": "cpp"
-  }
+  },
+  "vcpkg.target.useDynamicCRT": false,
+  "cSpell.words": ["assimp", "glew", "glfw", "imgui", "imguizmo", "opengl"]
 }

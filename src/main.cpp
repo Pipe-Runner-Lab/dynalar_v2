@@ -1,26 +1,37 @@
 #include <iostream>
 #include <memory>
-#include "engine/core/window/WindowManager.h"
-#include "engine/core/gl/Renderer.h"
+#include <fmt/core.h>
+#include "engine/core/window/window_manager.h"
+#include "engine/core/gl/renderer.h"
 
-using std::unique_ptr;
+using std::shared_ptr;
 
 int main(int, char **)
 {
+    shared_ptr<WindowManager> windowManagerPtr(nullptr);
+    shared_ptr<Renderer> rendererPtr(nullptr);
 
-    WindowManager windowManager = WindowManager();
-    Renderer renderer = Renderer();
+    try
+    {
+        windowManagerPtr = std::make_shared<WindowManager>();
+        rendererPtr = std::make_shared<Renderer>();
+    }
+    catch (const char *e)
+    {
+        fmt::print(stderr, "Error: {}\n", e);
+        exit(-1);
+    }
 
-    while (!windowManager.ShouldWindowClose())
+    while (!windowManagerPtr->ShouldWindowClose())
     {
         /* Check for user events */
         glfwPollEvents();
 
         /* Clear the screen */
-        renderer.Clear();
+        rendererPtr->Clear();
 
         /* Swap front and back buffers */
-        glfwSwapBuffers(windowManager.GetWindowPtr());
+        glfwSwapBuffers(windowManagerPtr->GetWindowPtr());
     }
 
     return 0;

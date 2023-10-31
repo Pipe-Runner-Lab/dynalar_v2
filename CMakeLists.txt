@@ -20,6 +20,13 @@ set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
+# --------------------------- PREPROCESSOR FLAGS --------------------------- #
+add_compile_definitions(_DEBUG)
+
+# -------------------------------------------------------------------------- #
+#                                    VCPKG                                   #
+# -------------------------------------------------------------------------- #
+
 # OpenGL
 find_package(OpenGL REQUIRED)
 target_link_libraries(${TARGET} PRIVATE OpenGL::GL)
@@ -35,3 +42,23 @@ target_link_libraries(${TARGET} PRIVATE glfw)
 # GLM
 find_package(glm CONFIG REQUIRED)
 target_link_libraries(${TARGET} PRIVATE glm::glm)
+
+# imgui
+find_package(imgui CONFIG REQUIRED)
+target_link_libraries(${TARGET} PRIVATE imgui::imgui)
+
+# imguizmo
+find_package(imguizmo CONFIG REQUIRED)
+target_link_libraries(${TARGET} PRIVATE imguizmo::imguizmo)
+
+# Assimp
+find_package(assimp CONFIG REQUIRED)
+target_link_libraries(${TARGET} PRIVATE assimp::assimp)
+
+# fmt
+find_package(fmt CONFIG REQUIRED)
+target_link_libraries(${TARGET} PRIVATE fmt::fmt)
+
+# stb
+find_package(Stb REQUIRED)
+target_include_directories(${TARGET} PRIVATE ${Stb_INCLUDE_DIR})
