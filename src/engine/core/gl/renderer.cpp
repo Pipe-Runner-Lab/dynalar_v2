@@ -23,6 +23,11 @@ void Renderer::Clear(float r, float g, float b, float a)
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void Renderer::Draw()
+void Renderer::Draw(VertexArray &vertexArray, IndexBuffer &indexBuffer)
 {
+  vertexArray.Bind();
+  indexBuffer.Bind();
+  GL_CALL(glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr));
+  vertexArray.Unbind();
+  indexBuffer.Unbind();
 }

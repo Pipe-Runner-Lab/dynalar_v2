@@ -32,31 +32,7 @@ public:
     Thus one entine set if of 9 items, this is why stride is updated with +=
   */
   template <typename T>
-  void Push(GLuint count)
-  {
-    throw "Unknown type";
-  }
-
-  template <>
-  void Push<float>(GLuint count)
-  {
-    m_VertexBufferElements.push_back(VertexBufferElement{count, GL_FLOAT, GL_FALSE});
-    m_stride += count * VertexBufferElement::GetSize(GL_FLOAT);
-  }
-
-  template <>
-  void Push<unsigned int>(GLuint count)
-  {
-    m_VertexBufferElements.push_back(VertexBufferElement{count, GL_UNSIGNED_INT, GL_FALSE});
-    m_stride += count * VertexBufferElement::GetSize(GL_UNSIGNED_INT);
-  }
-
-  template <>
-  void Push<unsigned char>(GLuint count)
-  {
-    m_VertexBufferElements.push_back(VertexBufferElement{count, GL_UNSIGNED_BYTE, GL_TRUE});
-    m_stride += count * VertexBufferElement::GetSize(GL_UNSIGNED_BYTE);
-  }
+  void Push(GLuint count);
 
   inline const std::vector<VertexBufferElement> &GetElements() const
   {

@@ -3,14 +3,18 @@
     "-DVCPKG_APPLOCAL_DEPS=ON",
     "-DX_VCPKG_APPLOCAL_DEPS_INSTALL=ON",
     "-DVCPKG_MANIFEST_MODE=ON",
-    "-DVCPKG_TARGET_TRIPLET=arm64-osx"
+    "-DVCPKG_TARGET_TRIPLET=x64-linux"
   ],
   "vcpkg.general.enable": true,
-  "vcpkg.target.hostTriplet": "arm64-osx",
-  "vcpkg.target.defaultTriplet": "arm64-osx",
+  "vcpkg.target.hostTriplet": "",
+  // use x64-linx / arm64-osx
+  "vcpkg.target.defaultTriplet": "x64-linux",
   "vcpkg.target.useStaticLib": false,
   "cmake.configureSettings": {
     "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+  },
+  "cmake.debugConfig": {
+    "cwd": "${workspaceFolder}"
   },
   "vcpkg.target.installDependencies": true,
   "vcpkg.target.preferSystemLibs": false,
@@ -89,7 +93,24 @@
     "unordered_set": "cpp",
     "variant": "cpp",
     "vector": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "bit": "cpp",
+    "*.tcc": "cpp",
+    "chrono": "cpp",
+    "codecvt": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "functional": "cpp",
+    "iterator": "cpp",
+    "memory": "cpp",
+    "memory_resource": "cpp",
+    "numeric": "cpp",
+    "random": "cpp",
+    "type_traits": "cpp",
+    "utility": "cpp",
+    "numbers": "cpp",
+    "semaphore": "cpp",
+    "stop_token": "cpp"
   },
   "vcpkg.target.useDynamicCRT": false,
   "cSpell.words": ["assimp", "glew", "glfw", "imgui", "imguizmo", "opengl"]

@@ -16,3 +16,24 @@ unsigned int VertexBufferElement::GetSize(GLuint type)
 
   throw "Unknown type";
 }
+
+template <>
+void VertexBufferLayout::Push<float>(GLuint count)
+{
+  m_VertexBufferElements.push_back(VertexBufferElement{count, GL_FLOAT, GL_FALSE});
+  m_stride += count * VertexBufferElement::GetSize(GL_FLOAT);
+}
+
+template <>
+void VertexBufferLayout::Push<unsigned int>(GLuint count)
+{
+  m_VertexBufferElements.push_back(VertexBufferElement{count, GL_UNSIGNED_INT, GL_FALSE});
+  m_stride += count * VertexBufferElement::GetSize(GL_UNSIGNED_INT);
+}
+
+template <>
+void VertexBufferLayout::Push<unsigned char>(GLuint count)
+{
+  m_VertexBufferElements.push_back(VertexBufferElement{count, GL_UNSIGNED_BYTE, GL_TRUE});
+  m_stride += count * VertexBufferElement::GetSize(GL_UNSIGNED_BYTE);
+}

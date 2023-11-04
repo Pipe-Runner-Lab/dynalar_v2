@@ -10,7 +10,7 @@ private:
   std::vector<Mesh> m_meshes;
 
 public:
-  Model();
+  Model(std::vector<Mesh> &meshGroup);
   ~Model();
   void Draw(Renderer &renderer);
 };
