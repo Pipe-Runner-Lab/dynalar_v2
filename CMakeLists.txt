@@ -9,10 +9,11 @@ include(CTest)
 enable_testing()
 
 # Add source files
-file(GLOB_RECURSE SOURCES src/*.cpp src/*.h)
+file(GLOB_RECURSE LIB_SOURCES src/*.cpp src/*.h)
 
-# Add executable target
-add_executable(${TARGET} ${SOURCES})
+# Add library target
+# add_library(${TARGET} ${LIB_SOURCES})
+add_executable(${TARGET} ${LIB_SOURCES})
 
 target_compile_features(${TARGET} PRIVATE cxx_std_17)
 
@@ -62,3 +63,17 @@ target_link_libraries(${TARGET} PRIVATE fmt::fmt)
 # stb
 find_package(Stb REQUIRED)
 target_include_directories(${TARGET} PRIVATE ${Stb_INCLUDE_DIR})
+
+# # -------------------------------------------------------------------------- #
+# #                                 EXECUTABLE                                 #
+# # -------------------------------------------------------------------------- #
+
+# file(GLOB_RECURSE APP_SOURCES src/*.cpp src/*.h)
+
+# # Add executable target
+# add_executable(${TARGET}_app ${APP_SOURCES})
+
+# target_compile_features(${TARGET}_app PRIVATE cxx_std_17)
+
+# # Link libraries
+# target_link_libraries(${TARGET}_app PRIVATE ${TARGET})

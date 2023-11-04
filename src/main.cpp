@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <fmt/core.h>
-#include "engine/core/window/window_manager.h"
+#include "engine/window/window_manager.h"
 #include "engine/core/gl/renderer.h"
 
 #include "engine/core/gl/model.h"
