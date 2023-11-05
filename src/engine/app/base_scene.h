@@ -9,6 +9,7 @@
 #include "../core/gl/vertex_array.h"
 #include "../core/gl/vertex_buffer.h"
 #include "../core/gl/vertex_buffer_layout.h"
+#include "../core/gl/texture.h"
 #include "../window/window_manager.h"
 
 struct RenderContext

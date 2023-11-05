@@ -19,9 +19,8 @@ WindowManager::WindowManager()
 
   if (!m_window_ptr)
   {
-    std::cout << "GLFW failed to create window" << std::endl;
     glfwTerminate();
-    throw;
+    throw "GLFW failed to create window";
   }
 
   int bufferWidth, bufferHeight;
@@ -40,9 +39,8 @@ WindowManager::WindowManager()
   GLenum err = glewInit();
   if (GLEW_OK != err)
   {
-    std::cout << "GLEW initialization failed" << std::endl;
     glfwTerminate();
-    throw;
+    throw "GLEW initialization failed";
   }
 
   /* Setup viewport size */

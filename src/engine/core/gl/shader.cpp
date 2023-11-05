@@ -29,12 +29,12 @@ GLuint Shader::CompileShader(const std::string &srcCode, GLenum shaderType)
 	{
 		GLchar infoLog[1024] = {0};
 		GL_CALL(glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog));
-		fmt::print(
-				stderr,
-				"Compilation Error: {} does not exist\n", (shaderType == GL_FRAGMENT_SHADER ? "Fragment Shader" : "Vertex Shader"));
+
 		fmt::print(stderr, "{}\n", infoLog);
 
-		throw "Shader compilation failed";
+		throw fmt::format(
+				"Compilation Error: {} does not exist\n", (shaderType == GL_FRAGMENT_SHADER ? "Fragment Shader" : "Vertex Shader"));
+		;
 	}
 
 	return shader;
@@ -59,10 +59,9 @@ GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::str
 	{
 		GLchar infoLog[1024] = {0};
 		GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL, infoLog));
-		fmt::print(stderr, "Linking Error for Program ID {}\n", shaderProgramID);
 		fmt::print(stderr, "{}\n", infoLog);
 
-		throw "Shader linking failed";
+		throw fmt::format("Linking Error for Program ID {}\n", shaderProgramID);
 	}
 
 	// Validate program
@@ -72,10 +71,9 @@ GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::str
 	{
 		GLchar infoLog[1024] = {0};
 		GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL, infoLog));
-		fmt::print(stderr, "Validation Error for Program ID {}\n", shaderProgramID);
 		fmt::print(stderr, "{}\n", infoLog);
 
-		throw "Shader validation failed";
+		throw fmt::format("Validation Error for Program ID {}\n", shaderProgramID);
 	}
 
 	// Delete intermediate shader outputs
@@ -92,9 +90,7 @@ std::string Shader::ParseShader(const std::string &filename)
 
 	if (!fileStream.is_open())
 	{
-		fmt::print(stderr, "Failed to open ID {}\n", filename);
-
-		throw "Failed to read shader file";
+		throw fmt::format("Failed to read shader file {}.\n", filename);
 	}
 
 	std::string line = "";
