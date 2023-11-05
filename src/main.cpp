@@ -2,11 +2,11 @@
 #include <memory>
 #include <fmt/core.h>
 #include "engine/window/window_manager.h"
+#include "engine/window/gui.h"
 #include "engine/core/gl/renderer.h"
+#include "engine/app/scene_menu.h"
 
-#include "engine/core/gl/model.h"
-#include "engine/core/gl/mesh.h"
-#include "engine/core/gl/shader.h"
+#include "scenes/hello_triangle/scene.h"
 
 using std::shared_ptr;
 
@@ -26,33 +26,35 @@ int main(int, char **)
         exit(-1);
     }
 
-    std::vector<float> vertices = {
-        -0.5f, -0.5f, 0.0f, // 0
-        0.5f, -0.5f, 0.0f,  // 1
-        0.0f, 0.5f, 0.0f    // 2
-    };
-    std::vector<unsigned int> indices = {
-        0, 1, 2};
-    VertexBufferLayout layout;
-    layout.Push<float>(3);
-    std::vector<Mesh> meshes = {
-        Mesh(vertices, indices, layout)};
-    Model model = Model(meshes);
+    GUI gui = GUI(*windowManagerPtr);
 
-    Shader shader = Shader("assets/shaders/vertex/clip_space.vert", "assets/shaders/fragment/simple_interpolated_color.frag");
+    BaseScene *activeScenePtr = nullptr;
+    SceneMenu sceneMenu(activeScenePtr, windowManagerPtr, rendererPtr);
+    activeScenePtr = &sceneMenu;
 
-    shader.Bind();
+    sceneMenu.RegisterScene<HelloTriangleScene>("Hello Triangle");
 
     while (!windowManagerPtr->ShouldWindowClose())
     {
         /* Check for user events */
         glfwPollEvents();
 
+        /* Start the Dear ImGui frame */
+        gui.CreateFrame();
+
         /* Clear the screen */
         rendererPtr->Clear();
 
         /* Draw the model */
-        model.Draw(*rendererPtr);
+        if (activeScenePtr)
+        {
+            activeScenePtr->OnUpdate();
+            activeScenePtr->OnRender();
+            activeScenePtr->OnGUIRender();
+        }
+
+        /* Draw the GUI */
+        gui.RenderFrame();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(windowManagerPtr->GetWindowPtr());
