@@ -1,26 +1,24 @@
+#pragma once
+
 #include <functional>
-#include <memory>
 #include <vector>
+#include <string>
 #include <imgui.h>
-#include <fmt/core.h>
 #include "base_scene.h"
 
-class SceneMenu : public BaseScene
+class SceneManager
 {
-protected:
-  RenderContext m_renderContext;
-
 private:
-  BaseScene *&m_activeScenePtr;
+  RenderContext &m_renderContext;
   std::vector<
       std::pair<
           std::string,
           std::function<BaseScene *()>>>
       m_scenes;
+  BaseScene *m_activeScenePtr;
 
 public:
-  SceneMenu(BaseScene *&activeScenePtr, std::shared_ptr<WindowManager> windowManagerPtr, std::shared_ptr<Renderer> rendererPtr);
-  void OnGUIRender() override;
+  SceneManager(RenderContext &renderContext);
 
   template <typename T>
   void RegisterScene(const std::string &sceneName)
@@ -32,5 +30,18 @@ public:
         {
           return new T(m_renderContext);
         }));
+  }
+
+  void RenderSceneList();
+
+  BaseScene *GetActiveScenePtr() const
+  {
+    return m_activeScenePtr;
+  }
+
+  void DeleteActiveScenePtr()
+  {
+    delete m_activeScenePtr;
+    m_activeScenePtr = nullptr;
   }
 };

@@ -20,12 +20,10 @@ struct RenderContext
 class BaseScene
 {
 protected:
-  RenderContext *m_renderContextPtr = nullptr;
+  RenderContext &m_renderContext;
 
 public:
-  BaseScene(){};
-  BaseScene(RenderContext *renderContextPtr) : m_renderContextPtr(renderContextPtr){};
-  virtual ~BaseScene(){};
+  BaseScene(RenderContext &renderContext) : m_renderContext(renderContext){};
 
   virtual void OnUpdate(){};
   virtual void OnRender(){};
