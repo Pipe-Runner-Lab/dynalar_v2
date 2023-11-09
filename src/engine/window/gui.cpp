@@ -10,6 +10,10 @@ GUI::GUI(WindowManager &windowManager)
   ImGui::StyleColorsDark();
   ImGui_ImplGlfw_InitForOpenGL(windowManager.GetWindowPtr(), true);
   ImGui_ImplOpenGL3_Init("#version 440");
+
+  /* Set GUI scale - https://github.com/ocornut/imgui/issues/2442#issuecomment-487364993 */
+  ImGui::GetStyle().ScaleAllSizes(m_guiScale);
+  ImGui::GetIO().FontGlobalScale = m_guiScale;
 }
 
 GUI::~GUI()

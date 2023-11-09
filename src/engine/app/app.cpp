@@ -1,9 +1,10 @@
 #include "app.h"
 
-App::App() : m_renderContext(
-                 RenderContext({std::make_shared<WindowManager>(),
-                                std::make_shared<Renderer>()})),
-             m_gui(GUI(*m_renderContext.windowManagerPtr))
+App::App() : m_renderContext({std::make_shared<WindowManager>(),
+                              std::make_shared<Renderer>()}),
+             m_gui(*m_renderContext.windowManagerPtr),
+             m_fpsGraph(*m_renderContext.windowManagerPtr, m_gui.features.showFPSGraph),
+             m_menuBar(*m_renderContext.windowManagerPtr, m_gui.features)
 {
 }
 
@@ -21,6 +22,9 @@ void App::StartRenderLoop(SceneManager &m_sceneManager)
     /* Clear the screen */
     m_renderContext.rendererPtr->Clear();
 
+    /* Draw the menu bar */
+    m_menuBar.Render();
+
     /* Draw the model */
     activeScenePtr = m_sceneManager.GetActiveScenePtr();
     bool shouldDeleteScene = false;
@@ -29,14 +33,16 @@ void App::StartRenderLoop(SceneManager &m_sceneManager)
       activeScenePtr->OnUpdate();
       activeScenePtr->OnRender();
 
-      ImGui::Begin("Scene");
+      Dimensions windowDimensions = m_renderContext.windowManagerPtr->GetDimensions();
+      ImGui::SetNextWindowPos(ImVec2(windowDimensions.width - 40, 40 + 40), ImGuiCond_Always, ImVec2(1.0f, 0));
+      // TODO: Feature flag not working for some reason
+      ImGui::Begin("Stage Editor", &(m_gui.features.stageEditor), ImGuiWindowFlags_NoMove);
       shouldDeleteScene = false;
       if (ImGui::Button("<-"))
       {
         shouldDeleteScene = true;
       }
       activeScenePtr->OnGUIRender();
-      ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
       ImGui::End();
 
       if (shouldDeleteScene)
@@ -50,10 +56,20 @@ void App::StartRenderLoop(SceneManager &m_sceneManager)
       m_sceneManager.RenderSceneList();
     }
 
+    /* Draw the FPS graph */
+    m_fpsGraph.Render();
+
     /* Draw the GUI */
     m_gui.RenderFrame();
 
     /* Swap front and back buffers */
     glfwSwapBuffers(m_renderContext.windowManagerPtr->GetWindowPtr());
   }
+
+  if (activeScenePtr)
+  {
+    m_sceneManager.DeleteActiveScenePtr();
+  }
+
+  fmt::print("Closing application\n");
 }

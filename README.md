@@ -43,3 +43,10 @@ brew install pkg-config
   - A. Start by deleting the `build` folder and try again.
 - Q. Vcpkg installed libs throwing error in Cmake, looking for config.
   - Make sure to set the correct triplet for the vcpkg in settings.json. For example, `-DVCPKG_TARGET_TRIPLET=x64-linux`
+
+# TODO
+
+- [ ] Cross platform scaling
+  - [ ] DPI & Scaling
+- [ ] Remove VCPKG extension and use directly in CMake
+- [ ] Figure out how to add new cpp files correctly without needing to delete the build folder.
