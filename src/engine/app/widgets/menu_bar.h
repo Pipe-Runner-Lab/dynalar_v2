@@ -1,8 +1,8 @@
 #pragma once
 
 #include <imgui.h>
-#include "../window/gui.h"
-#include "../window/window_manager.h"
+#include "../../window/gui.h"
+#include "../../window/window_manager.h"
 
 class MenuBar
 {

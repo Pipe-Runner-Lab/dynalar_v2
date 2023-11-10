@@ -4,8 +4,8 @@
 #include "../window/gui.h"
 #include "scene_manager.h"
 #include "base_scene.h"
-#include "fps_graph.h"
-#include "menu_bar.h"
+#include "widgets/fps_graph.h"
+#include "widgets/menu_bar.h"
 
 class App
 {

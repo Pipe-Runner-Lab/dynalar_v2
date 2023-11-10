@@ -31,3 +31,8 @@ void Renderer::Draw(VertexArray &vertexArray, IndexBuffer &indexBuffer)
   vertexArray.Unbind();
   indexBuffer.Unbind();
 }
+
+glm::mat4 Renderer::ComputeMVPMatrix(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
+{
+  return projectionMatrix * viewMatrix * modelMatrix;
+}

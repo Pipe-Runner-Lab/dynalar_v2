@@ -3,7 +3,7 @@
 #include <vector>
 #include <fmt/core.h>
 #include <imgui.h>
-#include "../window/window_manager.h"
+#include "../../window/window_manager.h"
 
 // * Credit: https://github.com/CITMProject3/Project3/blob/master/FPSGraph.cpp
 class FPSGraph

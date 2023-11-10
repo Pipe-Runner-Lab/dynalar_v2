@@ -1,6 +1,6 @@
 #include "model.h"
 
-Model::Model(std::vector<Mesh> &meshGroup) : m_meshes(meshGroup)
+Model::Model(std::vector<Mesh> &meshGroup) : m_meshes(meshGroup), m_modelMatrix(glm::mat4(1.0f))
 {
 }
 

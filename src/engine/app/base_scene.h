@@ -6,11 +6,13 @@
 #include "../core/gl/model.h"
 #include "../core/gl/mesh.h"
 #include "../core/gl/shader.h"
+#include "../core/gl/camera.h"
 #include "../core/gl/vertex_array.h"
 #include "../core/gl/vertex_buffer.h"
 #include "../core/gl/vertex_buffer_layout.h"
 #include "../core/gl/texture.h"
 #include "../window/window_manager.h"
+#include "../app/widgets/properties_editor.h"
 
 struct RenderContext
 {
@@ -23,10 +25,44 @@ class BaseScene
 protected:
   RenderContext &m_renderContext;
 
+private:
+  std::vector<Camera> m_cameras;
+  int m_activeCameraIndex = 0;
+
 public:
   BaseScene(RenderContext &renderContext) : m_renderContext(renderContext){};
 
   virtual void OnUpdate(){};
   virtual void OnRender(){};
   virtual void OnGUIRender(){};
+
+protected:
+  void OnGUIRender(
+      std::shared_ptr<ObjectPropertiesEditor> objectPropertiesEditorPtr)
+  {
+    if (ImGui::BeginTabBar("Editor"))
+    {
+      objectPropertiesEditorPtr->Render();
+      ImGui::EndTabBar();
+    }
+  };
+
+protected:
+  void AddCamera(Camera camera)
+  {
+    m_cameras.push_back(std::move(camera));
+  }
+
+  Camera &GetActiveCamera()
+  {
+    return m_cameras[m_activeCameraIndex];
+  }
+
+  void SetActiveCameraIndex(int index)
+  {
+    if (index < m_cameras.size())
+    {
+      m_activeCameraIndex = index;
+    }
+  }
 };
