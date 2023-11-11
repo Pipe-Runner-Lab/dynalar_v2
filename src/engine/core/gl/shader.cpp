@@ -32,8 +32,8 @@ GLuint Shader::CompileShader(const std::string &srcCode, GLenum shaderType)
 
 		fmt::print(stderr, "{}\n", infoLog);
 
-		throw fmt::format(
-				"Compilation Error: {} does not exist\n", (shaderType == GL_FRAGMENT_SHADER ? "Fragment Shader" : "Vertex Shader"));
+		throw std::runtime_error(fmt::format(
+				"Compilation Error: {} does not exist\n", (shaderType == GL_FRAGMENT_SHADER ? "Fragment Shader" : "Vertex Shader")));
 		;
 	}
 
@@ -61,7 +61,7 @@ GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::str
 		GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL, infoLog));
 		fmt::print(stderr, "{}\n", infoLog);
 
-		throw fmt::format("Linking Error for Program ID {}\n", shaderProgramID);
+		throw std::runtime_error(fmt::format("Linking Error for Program ID {}\n", shaderProgramID));
 	}
 
 	// Validate program
@@ -73,7 +73,7 @@ GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::str
 		GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL, infoLog));
 		fmt::print(stderr, "{}\n", infoLog);
 
-		throw fmt::format("Validation Error for Program ID {}\n", shaderProgramID);
+		throw std::runtime_error(fmt::format("Validation Error for Program ID {}\n", shaderProgramID));
 	}
 
 	// Delete intermediate shader outputs
@@ -90,7 +90,7 @@ std::string Shader::ParseShader(const std::string &filename)
 
 	if (!fileStream.is_open())
 	{
-		throw fmt::format("Failed to read shader file {}.\n", filename);
+		throw std::runtime_error(fmt::format("Failed to read shader file {}.\n", filename));
 	}
 
 	std::string line = "";

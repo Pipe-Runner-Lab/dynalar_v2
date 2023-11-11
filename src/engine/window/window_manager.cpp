@@ -28,7 +28,7 @@ WindowManager::WindowManager()
   glfwGetFramebufferSize(m_windowPtr, &currentWidth, &currentHeight); // get actual sizes of the created window
 
   /* set aspect ratio */
-  currentRatio = (float)currentWidth / (float)currentHeight;
+  currentAspectRatio = (float)currentWidth / (float)currentHeight;
 
   /* Make the window's context current */
   glfwMakeContextCurrent(m_windowPtr); // tells openGL which window to use
@@ -73,6 +73,6 @@ void WindowManager::FrameBufferResizeCallback(GLFWwindow *window_ptr, int width,
 
   windowManagerPtr->currentWidth = width;
   windowManagerPtr->currentHeight = height;
-  windowManagerPtr->currentRatio = (float)width / (float)height;
+  windowManagerPtr->currentAspectRatio = (float)width / (float)height;
   glViewport(0, 0, width, height);
 }

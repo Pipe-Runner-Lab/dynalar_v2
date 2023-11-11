@@ -13,15 +13,16 @@ int main(int, char **)
     try
     {
         App app = App();
+        // Todo: Move scene manager to app
         SceneManager sceneManager(app.GetRenderContext());
         sceneManager.RegisterScene<HelloTriangleScene>("Hello Triangle");
         sceneManager.RegisterScene<HelloTextureScene>("Hello Texture");
         sceneManager.RegisterScene<Hello3DWorldScene>("Hello 3D World");
         app.StartRenderLoop(sceneManager);
     }
-    catch (const char *e)
+    catch (const std::runtime_error &e)
     {
-        fmt::print(stderr, "Error: {}\n", e);
+        fmt::print(e.what());
         exit(-1);
     }
 

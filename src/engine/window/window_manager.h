@@ -15,7 +15,7 @@ class WindowManager
 private:
   GLFWwindow *m_windowPtr;
   int currentHeight = 0, currentWidth = 0;
-  float currentRatio = 1.0f;
+  float currentAspectRatio = 1.0f;
 
 public:
   int max_fps = 60;
@@ -42,6 +42,11 @@ public:
   inline Dimensions GetDimensions()
   {
     return {currentWidth, currentHeight};
+  };
+
+  inline float GetAspectRatio()
+  {
+    return currentAspectRatio;
   };
 
 private:

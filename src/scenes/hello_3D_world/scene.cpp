@@ -11,7 +11,7 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext) : BaseScene(r
       glm::vec3(0, 1.0f, 0),
       0,
       -90,
-      glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.1f, 100.0f)));
+      glm::perspective(glm::radians(45.0f), renderContext.windowManagerPtr->GetAspectRatio(), 0.1f, 100.0f)));
 
   // set up editor callback
   m_objectPropertiesEditorPtr = std::make_shared<ObjectPropertiesEditor>(ObjectPropertiesEditor(

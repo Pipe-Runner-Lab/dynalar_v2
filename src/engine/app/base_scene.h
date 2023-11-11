@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <fmt/core.h>
 #include "../core/gl/model.h"
 #include "../core/gl/mesh.h"
 #include "../core/gl/shader.h"
@@ -45,6 +46,27 @@ protected:
     if (ImGui::BeginTabBar("Editor"))
     {
       objectPropertiesEditorPtr->Render();
+
+      if (m_cameras.size() > 0 && ImGui::BeginTabItem("Camera"))
+      {
+        if (ImGui::BeginCombo("Active Camera", fmt::format("Camera {}", m_activeCameraIndex).c_str()))
+        {
+          for (int itemIdx = 0; itemIdx < m_cameras.size(); itemIdx++)
+          {
+            const bool is_selected = (m_activeCameraIndex == itemIdx);
+            if (ImGui::Selectable(fmt::format("Camera {}", itemIdx).c_str(), is_selected))
+              m_activeCameraIndex = itemIdx;
+
+            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            if (is_selected)
+              ImGui::SetItemDefaultFocus();
+          }
+          ImGui::EndCombo();
+        }
+
+        ImGui::SeparatorText("Camera Properties");
+        ImGui::EndTabItem();
+      }
 
       if (ImGui::BeginTabItem("Input"))
       {
