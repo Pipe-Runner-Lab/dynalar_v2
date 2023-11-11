@@ -1,28 +1,28 @@
 #include "plane.h"
 
-Plane::Plane()
+Plane::Plane(float size)
 {
   std::vector<float> vertices = {
       // 0
-      10.0f, 0.0f, 10.0f,     // xyz
-      0.0f, 0.0f, 1.0f,       // normal
-      1.0f, 0.0f,             // uv
-      1.0f, 1.0f, 1.0f, 1.0f, // color
+      1.0f * size, 1.0f * size, 0.0f, // xyz
+      0.0f, 0.0f, 1.0f,               // normal
+      1.0f, 0.0f,                     // uv
+      1.0f, 1.0f, 1.0f, 1.0f,         // color
       // 1
-      10.0f, 0.0f, -10.0f,    // xyz
-      0.0f, 0.0f, 1.0f,       // normal
-      1.0f, 1.0f,             // uv
-      1.0f, 1.0f, 1.0f, 1.0f, // color
+      1.0f * size, -1.0f * size, 0.0f, // xyz
+      0.0f, 0.0f, 1.0f,                // normal
+      1.0f, 1.0f,                      // uv
+      1.0f, 1.0f, 1.0f, 1.0f,          // color
       // 2
-      -10.0f, 0.0f, -10.0f,   // xyz
-      0.0f, 0.0f, 1.0f,       // normal
-      0.0f, 1.0f,             // uv
-      1.0f, 1.0f, 1.0f, 1.0f, // color
+      -1.0f * size, -1.0f * size, 0.0f, // xyz
+      0.0f, 0.0f, 1.0f,                 // normal
+      0.0f, 1.0f,                       // uv
+      1.0f, 1.0f, 1.0f, 1.0f,           // color
       // 3
-      -10.0f, 0.0f, 10.0f,   // xyz
-      0.0f, 0.0f, 1.0f,      // normal
-      0.0f, 0.0f,            // uv
-      1.0f, 1.0f, 1.0f, 1.0f // color
+      -1.0f * size, 1.0f * size, 0.0f, // xyz
+      0.0f, 0.0f, 1.0f,                // normal
+      0.0f, 0.0f,                      // uv
+      1.0f, 1.0f, 1.0f, 1.0f           // color
   };
   std::vector<unsigned int> indices = {
       0, 1, 2,

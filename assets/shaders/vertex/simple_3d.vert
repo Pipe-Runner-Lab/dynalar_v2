@@ -8,7 +8,7 @@ layout(location=3)in vec4 color;
 out vec2 v_uv;
 out vec4 v_color;
 
-uniform mat4 u_mvp;
+uniform mat4 u_mvp=mat4(1.);
 
 void main(){
   v_uv=uv;

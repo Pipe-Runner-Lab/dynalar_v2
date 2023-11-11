@@ -5,6 +5,6 @@
 class Plane : public Model
 {
 public:
-  Plane();
+  Plane(float size = 1.0f);
   ~Plane() {}
 };
