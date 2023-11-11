@@ -1,6 +1,7 @@
 #include <vector>
 #include "../../engine/app/base_scene.h"
 #include "../../engine/app/widgets/properties_editor.h"
+#include "../../engine/app/pre_made_objects/plane.h"
 
 class Hello3DWorldScene : public BaseScene
 {

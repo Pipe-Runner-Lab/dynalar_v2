@@ -15,6 +15,7 @@ private:
   std::shared_ptr<IndexBuffer> m_indexBuffer = nullptr;
 
 public:
+  // TODO: This leads to dangling references. Fix it.
   Mesh(std::vector<float> &vertices, std::vector<unsigned int> &indices, VertexBufferLayout &layout);
   ~Mesh();
   void Draw(Renderer &renderer);

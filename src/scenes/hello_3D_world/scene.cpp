@@ -1,25 +1,13 @@
 #include "scene.h"
 
 Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext) : BaseScene(renderContext),
-                                                                     m_shader("assets/shaders/vertex/clip_space.vert", "assets/shaders/fragment/simple_interpolated_color.frag")
+                                                                     m_shader("assets/shaders/vertex/simple_3d.vert", "assets/shaders/fragment/simple_3d.frag")
 {
-  std::vector<float> vertices = {
-      -0.5f, -0.5f, 0.0f, // 0
-      0.5f, -0.5f, 0.0f,  // 1
-      0.0f, 0.5f, 0.0f    // 2
-  };
-  std::vector<unsigned int> indices = {
-      0, 1, 2};
-  VertexBufferLayout layout;
-  layout.Push<float>(3);
-  std::vector<Mesh> meshes = {
-      Mesh(vertices, indices, layout)};
-
-  m_modelPtr = std::make_unique<Model>(Model(meshes));
+  m_modelPtr = std::make_unique<Model>(Plane());
 
   // set up camera
   AddCamera(Camera(
-      glm::vec3(0, 0, 0),
+      glm::vec3(0, 2, 0),
       glm::vec3(0, 1.0f, 0),
       0,
       -90,
@@ -43,6 +31,9 @@ void Hello3DWorldScene::OnRender()
       m_modelPtr->GetModelMatrix(),
       activeCamera.GetViewMatrix(),
       activeCamera.GetProjectionMatrix());
+
+  m_shader.SetUniformMatrix4f("u_mvp", mvpMatrix);
+  m_shader.SetUniformBool("u_shouldUseTexture", false);
 
   m_modelPtr->Draw(*m_renderContext.rendererPtr);
   m_shader.Unbind();

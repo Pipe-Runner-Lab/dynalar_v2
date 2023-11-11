@@ -151,6 +151,13 @@ void Shader::SetUniformMatrix4f(const std::string &name, const glm::mat4 &matrix
 		GL_CALL(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)));
 }
 
+void Shader::SetUniformBool(const std::string &name, bool value)
+{
+	GLint location = GetUniformLocation(name);
+	if (location != -1)
+		GL_CALL(glUniform1i(location, value));
+}
+
 GLint Shader::GetUniformLocation(const std::string &name)
 {
 	GL_CALL(GLint location = glGetUniformLocation(m_shaderProgramID, name.c_str()));

@@ -7,11 +7,12 @@
 
 class Model
 {
-private:
+protected:
   std::vector<Mesh> m_meshes;
   glm::mat4 m_modelMatrix;
 
 public:
+  Model(){};
   Model(std::vector<Mesh> &meshGroup);
   ~Model();
   void Draw(Renderer &renderer);

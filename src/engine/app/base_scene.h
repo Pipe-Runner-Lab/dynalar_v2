@@ -28,6 +28,8 @@ protected:
 private:
   std::vector<Camera> m_cameras;
   int m_activeCameraIndex = 0;
+  float m_xSensitivity = 0.1f;
+  float m_ySensitivity = 0.1f;
 
 public:
   BaseScene(RenderContext &renderContext) : m_renderContext(renderContext){};
@@ -43,6 +45,15 @@ protected:
     if (ImGui::BeginTabBar("Editor"))
     {
       objectPropertiesEditorPtr->Render();
+
+      if (ImGui::BeginTabItem("Input"))
+      {
+        ImGui::SeparatorText("Mouse");
+        ImGui::SliderFloat("X Sensitivity", &m_xSensitivity, 0.01f, 10.0f);
+        ImGui::SliderFloat("Y Sensitivity", &m_ySensitivity, 0.01f, 10.0f);
+        ImGui::EndTabItem();
+      }
+
       ImGui::EndTabBar();
     }
   };
