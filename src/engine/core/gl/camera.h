@@ -15,7 +15,7 @@ private:
     float m_yaw;
     float m_pitch;
 
-    glm::mat4 m_viewMatrix;
+    glm::mat4 m_viewMatrix = glm::mat4(1.0f);
     glm::mat4 m_projectionMatrix;
 
 public:
@@ -25,12 +25,10 @@ public:
     // TODO
     Camera(glm::vec3 starPosition, glm::vec3 lookAt);
 
-    // TODO
+    // TODO set dir and compute pitch and yaw
     void LookAt(Model &model);
 
-    // TODO
     void UpdateDirection(float deltaPitch, float deltaYaw);
-
     void LookAt(float pitch, float yaw);
 
     glm::mat4 &GetViewMatrix();

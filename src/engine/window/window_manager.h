@@ -64,30 +64,30 @@ public:
     };
 
     // keyboard
-    void SetKey(unsigned int keycode, bool value) {
+    inline void SetKey(unsigned int keycode, bool value) {
         m_keys[keycode] = value;
     };
-    bool GetKey(unsigned int keycode) {
+    inline bool GetKey(unsigned int keycode) {
         return m_keys[keycode];
     };
 
     // mouse
-    void SetMouseButton(unsigned int keycode, bool value) {
+    inline void SetMouseButton(unsigned int keycode, bool value) {
         m_mouseButtons[keycode] = value;
     };
-    bool GetMouseButton(unsigned int keycode) {
+    inline bool GetMouseButton(unsigned int keycode) {
         return m_mouseButtons[keycode];
     };
-    void ResetMouse() {
+    inline void ResetMouse() {
         m_mousePosition = {0, 0};
     };
-    void HideCursor() {
+    inline void HideCursor() {
         glfwSetInputMode(m_windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     };
-    void ShowCursor() {
+    inline void ShowCursor() {
         glfwSetInputMode(m_windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     };
-    MousePositionDelta &GetMouseDelta() {
+    inline MousePositionDelta &GetMouseDelta() {
         return m_mousePositionDelta;
     };
 

@@ -8,7 +8,7 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
 
     // set up camera
     AddCamera(Camera(
-        glm::vec3(0, 2, 0), 0, -90,
+        glm::vec3(0, 0, 10), 0, -90,
         glm::perspective(glm::radians(45.0f),
                          renderContext.windowManagerPtr->GetAspectRatio(), 0.1f,
                          100.0f)));

@@ -50,3 +50,4 @@ brew install pkg-config
   - [ ] DPI & Scaling
 - [ ] Remove VCPKG extension and use directly in CMake
 - [ ] Figure out how to add new cpp files correctly without needing to delete the build folder.
+- [ ] Lift mouse settings on app level instead of per-scene level

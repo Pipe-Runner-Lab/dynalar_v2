@@ -4,13 +4,16 @@ void BaseScene::OnUpdate() {
     if (m_cameras.size() > 0) {
         WindowManager &windowManager = *m_renderContext.windowManagerPtr;
 
-        if (windowManager.GetKey(GLFW_KEY_W) &&
+        if (windowManager.GetKey(GLFW_KEY_LEFT_ALT) &&
             windowManager.GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
-            windowManager.ResetMouse();
             windowManager.HideCursor();
-            fmt::print("{} {}", windowManager.GetMouseDelta().x,
-                       windowManager.GetMouseDelta().y);
+            Camera &activeCamera = GetActiveCamera();
+            activeCamera.UpdateDirection(
+                (isInverted ? -1 : 1) * windowManager.GetMouseDelta().y *
+                    m_ySensitivity,
+                windowManager.GetMouseDelta().x * m_xSensitivity);
         } else {
+            windowManager.ResetMouse();
             windowManager.ShowCursor();
         }
     }
@@ -48,6 +51,7 @@ void BaseScene::OnGUIRender(
             ImGui::SeparatorText("Mouse");
             ImGui::SliderFloat("X Sensitivity", &m_xSensitivity, 0.01f, 10.0f);
             ImGui::SliderFloat("Y Sensitivity", &m_ySensitivity, 0.01f, 10.0f);
+            ImGui::Checkbox("Inverted", &isInverted);
             ImGui::EndTabItem();
         }
 

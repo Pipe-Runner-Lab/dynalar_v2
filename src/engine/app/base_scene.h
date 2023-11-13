@@ -38,6 +38,7 @@ private:
     int m_activeCameraIndex = 0;
     float m_xSensitivity = 0.1f;
     float m_ySensitivity = 0.1f;
+    bool isInverted = false;
 
 public:
     BaseScene(RenderContext &renderContext) : m_renderContext(renderContext){};

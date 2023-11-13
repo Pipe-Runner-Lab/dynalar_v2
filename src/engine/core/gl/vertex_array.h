@@ -1,21 +1,21 @@
 #pragma once
 
 #include <GL/glew.h>
+
 #include "../utils/error.h"
 #include "./vertex_buffer.h"
 #include "./vertex_buffer_layout.h"
 
-class VertexArray
-{
+class VertexArray {
 private:
-  GLuint m_arrayID;
+    GLuint m_arrayID;
 
 public:
-  VertexArray();
-  ~VertexArray();
+    VertexArray();
+    ~VertexArray();
 
-  void AddBuffer(const VertexBuffer &vb, const VertexBufferLayout &layout);
+    void AddBuffer(const VertexBuffer &vb, const VertexBufferLayout &layout);
 
-  void Bind() const;
-  void Unbind() const;
+    void Bind() const;
+    void Unbind() const;
 };

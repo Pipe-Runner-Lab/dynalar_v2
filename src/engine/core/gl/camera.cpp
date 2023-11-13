@@ -4,12 +4,18 @@ Camera::Camera(glm::vec3 starPosition, float startPitch, float startYaw,
                glm::mat4 projectionMatrix)
     : m_position(starPosition),
       m_up(glm::vec3(1.0f)),
-      m_front(glm::vec3(1.0f)),
+      m_front(glm::vec3(0.0f, 0.0f, -1.0f)),
       m_pitch(startPitch),
       m_yaw(startYaw),
       m_worldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
-      m_projectionMatrix(projectionMatrix),
-      m_viewMatrix(glm::lookAt(m_position, m_position + m_front, m_up)) {
+      m_projectionMatrix(projectionMatrix) {
+    LookAt(m_pitch, m_yaw);
+}
+
+void Camera::UpdateDirection(float deltaPitch, float deltaYaw) {
+    m_pitch += deltaPitch;
+    m_yaw += deltaYaw;
+
     LookAt(m_pitch, m_yaw);
 }
 
@@ -22,6 +28,8 @@ void Camera::LookAt(float pitch, float yaw) {
     glm::vec3 right = glm::normalize(glm::cross(m_front, m_worldUp));
 
     m_up = glm::normalize(glm::cross(right, m_front));
+
+    m_viewMatrix = glm::lookAt(m_position, m_position + m_front, m_up);
 }
 
 glm::mat4 &Camera::GetViewMatrix() {
