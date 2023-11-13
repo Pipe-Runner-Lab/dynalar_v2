@@ -15,6 +15,7 @@
 #include "../core/gl/vertex_array.h"
 #include "../core/gl/vertex_buffer.h"
 #include "../core/gl/vertex_buffer_layout.h"
+#include "../core/utils/logger.h"
 #include "../window/window_manager.h"
 
 // https://docs.unity3d.com/2017.3/Documentation/Manual/SceneViewNavigation.html
@@ -36,9 +37,9 @@ protected:
 private:
     std::vector<Camera> m_cameras;
     int m_activeCameraIndex = 0;
-    float m_xSensitivity = 0.1f;
-    float m_ySensitivity = 0.1f;
-    bool isInverted = false;
+    float m_xSensitivity = 0.07f;
+    float m_ySensitivity = 0.07f;
+    bool isInverted = true;
 
 public:
     BaseScene(RenderContext &renderContext) : m_renderContext(renderContext){};

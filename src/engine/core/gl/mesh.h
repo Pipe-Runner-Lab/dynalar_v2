@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "glm/gtc/matrix_transform.hpp"
 #include "index_buffer.h"
 #include "renderer.h"
 #include "vertex_array.h"

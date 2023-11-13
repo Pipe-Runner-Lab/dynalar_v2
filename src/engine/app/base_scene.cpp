@@ -8,11 +8,13 @@ void BaseScene::OnUpdate() {
             windowManager.GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
             windowManager.HideCursor();
             Camera &activeCamera = GetActiveCamera();
+            MousePositionDelta mousePositionDelta =
+                windowManager.GetMouseDelta();
             activeCamera.UpdateDirection(
-                (isInverted ? -1 : 1) * windowManager.GetMouseDelta().y *
-                    m_ySensitivity,
-                windowManager.GetMouseDelta().x * m_xSensitivity);
+                (isInverted ? -1 : 1) * mousePositionDelta.y * m_ySensitivity,
+                mousePositionDelta.x * m_xSensitivity);
         } else {
+            // TODO: Fix redundant calls to these functions
             windowManager.ResetMouse();
             windowManager.ShowCursor();
         }

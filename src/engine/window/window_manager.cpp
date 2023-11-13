@@ -73,8 +73,6 @@ void WindowManager::FrameBufferResizeCallback(GLFWwindow *window_ptr, int width,
     if (width == 0 || height == 0)
         return;
 
-    fmt::print("Window resized to {}x{}\n", width, height);
-
     WindowManager *windowManagerPtr =
         (WindowManager *)glfwGetWindowUserPointer(window_ptr);
 
@@ -108,6 +106,9 @@ void WindowManager::MouseCursorCallback(GLFWwindow *window_ptr, double xPos,
     MousePosition &lastMousePosition = windowManagerPtr->m_mousePosition;
     MousePositionDelta &mousePositionDelta =
         windowManagerPtr->m_mousePositionDelta;
+
+    fmt::print("Mouse position: ({}, {} {} {})\n", xPos, yPos,
+               lastMousePosition.x, lastMousePosition.y);
 
     // check initial movement, to avoid jerky start
     if (lastMousePosition.isInitialized) {

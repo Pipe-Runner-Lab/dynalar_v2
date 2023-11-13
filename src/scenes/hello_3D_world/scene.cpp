@@ -4,7 +4,8 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     : BaseScene(renderContext),
       m_shader("assets/shaders/vertex/simple_3d.vert",
                "assets/shaders/fragment/simple_3d.frag") {
-    m_modelPtr = std::make_unique<Model>(Plane(10));
+    m_modelPtr = std::make_unique<Model>(
+        Plane(5).Translate({0, -1.5, 5}).Rotate({-90, 0, 0}));
 
     // set up camera
     AddCamera(Camera(

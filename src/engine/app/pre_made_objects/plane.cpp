@@ -6,22 +6,22 @@ Plane::Plane(float size) {
         1.0f * size, 1.0f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                // normal
         1.0f, 0.0f,                      // uv
-        1.0f, 1.0f, 1.0f, 1.0f,          // color
+        1.0f, 1.0f, 0.0f, 1.0f,          // color
         // 1
         1.0f * size, -1.0f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                 // normal
         1.0f, 1.0f,                       // uv
-        1.0f, 1.0f, 1.0f, 1.0f,           // color
+        1.0f, 1.0f, 0.0f, 1.0f,           // color
         // 2
         -1.0f * size, -1.0f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                  // normal
         0.0f, 1.0f,                        // uv
-        1.0f, 1.0f, 1.0f, 1.0f,            // color
+        0.0f, 1.0f, 1.0f, 1.0f,            // color
         // 3
         -1.0f * size, 1.0f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                 // normal
         0.0f, 0.0f,                       // uv
-        1.0f, 1.0f, 1.0f, 1.0f            // color
+        0.0f, 1.0f, 1.0f, 1.0f            // color
     };
     std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
     VertexBufferLayout layout;

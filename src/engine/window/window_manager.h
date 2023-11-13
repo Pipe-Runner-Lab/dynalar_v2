@@ -12,9 +12,9 @@ struct Dimensions {
 };
 
 struct MousePosition {
-    bool isInitialized = false;
     double x;
     double y;
+    bool isInitialized = false;
 };
 
 struct MousePositionDelta {
@@ -79,7 +79,9 @@ public:
         return m_mouseButtons[keycode];
     };
     inline void ResetMouse() {
-        m_mousePosition = {0, 0};
+        m_mousePosition.x = 0;
+        m_mousePosition.y = 0;
+        m_mousePosition.isInitialized = false;
     };
     inline void HideCursor() {
         glfwSetInputMode(m_windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -87,8 +89,11 @@ public:
     inline void ShowCursor() {
         glfwSetInputMode(m_windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     };
-    inline MousePositionDelta &GetMouseDelta() {
-        return m_mousePositionDelta;
+    inline MousePositionDelta GetMouseDelta() {
+        MousePositionDelta mousePosition = m_mousePositionDelta;
+        m_mousePositionDelta.x = 0;
+        m_mousePositionDelta.y = 0;
+        return mousePosition;
     };
 
 private:
