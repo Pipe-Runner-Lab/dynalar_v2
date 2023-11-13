@@ -6,10 +6,12 @@ App::App()
       m_gui(*m_renderContext.windowManagerPtr),
       m_fpsGraph(*m_renderContext.windowManagerPtr,
                  m_gui.features.showFPSGraph),
-      m_menuBar(*m_renderContext.windowManagerPtr, m_gui.features) {
+      m_menuBar(*m_renderContext.windowManagerPtr, m_gui.features),
+      sceneManager(m_renderContext) {
+    file_system::create_directory("data");
 }
 
-void App::StartRenderLoop(SceneManager &m_sceneManager) {
+void App::StartRenderLoop() {
     BaseScene *activeScenePtr = nullptr;
     while (!m_renderContext.windowManagerPtr->ShouldWindowClose()) {
         /* Check for user events */
@@ -25,7 +27,7 @@ void App::StartRenderLoop(SceneManager &m_sceneManager) {
         m_menuBar.Render();
 
         /* Draw the model */
-        activeScenePtr = m_sceneManager.GetActiveScenePtr();
+        activeScenePtr = sceneManager.GetActiveScenePtr();
         bool shouldDeleteScene = false;
         if (activeScenePtr) {
             activeScenePtr->OnUpdate();
@@ -36,22 +38,32 @@ void App::StartRenderLoop(SceneManager &m_sceneManager) {
             ImGui::SetNextWindowPos(
                 ImVec2(windowDimensions.width - 40, 40 + 40), ImGuiCond_Always,
                 ImVec2(1.0f, 0));
+
             // TODO: Feature flag not working for some reason
             ImGui::Begin("Stage Editor", &(m_gui.features.stageEditor),
                          ImGuiWindowFlags_NoMove);
             shouldDeleteScene = false;
-            if (ImGui::Button("<-")) {
+
+            ImGui::PushStyleColor(ImGuiCol_Button,
+                                  (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                                  (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+                                  (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+            if (ImGui::Button(ICON_FA_CHEVRON_LEFT " Main Menu")) {
                 shouldDeleteScene = true;
             }
+            ImGui::PopStyleColor(3);
+
             activeScenePtr->OnGUIRender();
             ImGui::End();
 
             if (shouldDeleteScene) {
-                m_sceneManager.DeleteActiveScenePtr();
+                sceneManager.DeleteActiveScenePtr();
                 shouldDeleteScene = false;
             }
         } else {
-            m_sceneManager.RenderSceneList();
+            sceneManager.RenderSceneList();
         }
 
         /* Draw the FPS graph */
@@ -65,7 +77,7 @@ void App::StartRenderLoop(SceneManager &m_sceneManager) {
     }
 
     if (activeScenePtr) {
-        m_sceneManager.DeleteActiveScenePtr();
+        sceneManager.DeleteActiveScenePtr();
     }
 
     fmt::print("Closing application\n");

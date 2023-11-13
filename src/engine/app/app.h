@@ -1,6 +1,7 @@
 #include <memory>
 
 #include "../core/gl/renderer.h"
+#include "../core/utils/file_system.h"
 #include "../window/gui.h"
 #include "../window/window_manager.h"
 #include "base_scene.h"
@@ -16,9 +17,12 @@ private:
     MenuBar m_menuBar;
 
 public:
+    SceneManager sceneManager;
+
+public:
     App();
 
-    void StartRenderLoop(SceneManager &m_sceneManager);
+    void StartRenderLoop();
     inline RenderContext &GetRenderContext() {
         return m_renderContext;
     };

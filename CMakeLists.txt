@@ -24,6 +24,11 @@ include(CPack)
 # --------------------------- PREPROCESSOR FLAGS --------------------------- #
 add_compile_definitions(_DEBUG)
 
+
+# --------------------------- INCLUDE DIRECTORIES --------------------------- #
+# https://stackoverflow.com/questions/15662497/difference-between-cmake-current-source-dir-and-cmake-current-list-dir
+target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/third-party)
+
 # -------------------------------------------------------------------------- #
 #                                    VCPKG                                   #
 # -------------------------------------------------------------------------- #

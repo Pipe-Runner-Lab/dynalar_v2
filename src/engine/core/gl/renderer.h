@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 
 #include "../utils/error.h"
-#include "../utils/log.h"
 #include "index_buffer.h"
 #include "vertex_array.h"
 

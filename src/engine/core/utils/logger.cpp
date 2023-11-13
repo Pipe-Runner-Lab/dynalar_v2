@@ -1,6 +1,6 @@
-#include "log.h"
+#include "logger.h"
 
-void logging::printMatrix(glm::mat4 matrix, std::string name) {
+void logger::printMatrix(glm::mat4 matrix, std::string name) {
     fmt::print(name == "" ? "Matrix:\n" : "{}:\n", name);
     for (int i = 0; i < 4; i++) {
         fmt::print("[");

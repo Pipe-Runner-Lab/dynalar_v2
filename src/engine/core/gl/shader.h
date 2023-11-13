@@ -6,6 +6,7 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <stdexcept>
 #include <string>
 
 #include "../utils/error.h"

@@ -13,7 +13,7 @@ unsigned int VertexBufferElement::GetSize(GLuint type) {
             return 1;
     }
 
-    throw "Unknown type";
+    throw std::runtime_error("Unknown type");
 }
 
 template <>

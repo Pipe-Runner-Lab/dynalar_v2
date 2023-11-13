@@ -5,6 +5,6 @@
 #include <glm/glm.hpp>
 #include <string>
 
-namespace logging {
+namespace logger {
 void printMatrix(glm::mat4 matrix, std::string name = "");
 };

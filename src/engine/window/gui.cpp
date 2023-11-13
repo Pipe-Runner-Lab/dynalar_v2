@@ -14,6 +14,17 @@ GUI::GUI(WindowManager &windowManager) {
      * https://github.com/ocornut/imgui/issues/2442#issuecomment-487364993 */
     ImGui::GetStyle().ScaleAllSizes(m_guiScale);
     ImGui::GetIO().FontGlobalScale = m_guiScale;
+
+    /* Set GUI font */
+    io.Fonts->AddFontDefault();
+    float baseFontSize = 13.0f;
+    float iconFontSize = baseFontSize * 2.0f / 3.0f;
+    ImFontConfig icons_config;
+    icons_config.MergeMode = true;
+    icons_config.PixelSnapH = true;
+    icons_config.GlyphMinAdvanceX = iconFontSize;
+    io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, iconFontSize,
+                                 &icons_config, icons_ranges);
 }
 
 GUI::~GUI() {
