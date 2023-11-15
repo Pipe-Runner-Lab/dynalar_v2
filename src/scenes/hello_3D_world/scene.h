@@ -13,6 +13,7 @@ private:
 
 public:
     Hello3DWorldScene(RenderContext &renderContext);
+    void OnUpdate() override;
     void OnRender() override;
     void OnGUIRender() override;
 };

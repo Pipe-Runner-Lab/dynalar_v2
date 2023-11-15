@@ -1,6 +1,8 @@
 #include "plane.h"
 
-Plane::Plane(float size) {
+Plane::Plane(float size, glm::vec3 position, glm::vec3 rotation,
+             glm::vec3 scale)
+    : Model(position, rotation, scale) {
     std::vector<float> vertices = {
         // 0
         1.0f * size, 1.0f * size, 0.0f,  // xyz

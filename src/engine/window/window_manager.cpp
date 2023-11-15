@@ -107,9 +107,6 @@ void WindowManager::MouseCursorCallback(GLFWwindow *window_ptr, double xPos,
     MousePositionDelta &mousePositionDelta =
         windowManagerPtr->m_mousePositionDelta;
 
-    fmt::print("Mouse position: ({}, {} {} {})\n", xPos, yPos,
-               lastMousePosition.x, lastMousePosition.y);
-
     // check initial movement, to avoid jerky start
     if (lastMousePosition.isInitialized) {
         mousePositionDelta.x = xPos - lastMousePosition.x;

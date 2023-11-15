@@ -4,8 +4,7 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     : BaseScene(renderContext),
       m_shader("assets/shaders/vertex/simple_3d.vert",
                "assets/shaders/fragment/simple_3d.frag") {
-    m_modelPtr = std::make_unique<Model>(
-        Plane(5).Translate({0, -1.5, 5}).Rotate({-90, 0, 0}));
+    m_modelPtr = std::make_unique<Model>(Plane(5, {0, -1.5f, 5}, {-45, 0, 0}));
 
     // set up camera
     AddCamera(Camera(
@@ -19,6 +18,13 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     // set up editor callback
     m_objectPropertiesEditorPtr = std::make_shared<ObjectPropertiesEditor>(
         ObjectPropertiesEditor([&]() { ImGui::Text("Hello 3D World!"); }));
+}
+
+void Hello3DWorldScene::OnUpdate() {
+    BaseScene::OnUpdate();
+
+    glm::vec3 currentRot = m_modelPtr->GetRotation();
+    m_modelPtr->Rotate({currentRot.x, currentRot.y, currentRot.z});
 }
 
 void Hello3DWorldScene::OnRender() {
