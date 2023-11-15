@@ -14,20 +14,12 @@ protected:
     glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 
     // initial model matrix
-    glm::mat4 m_initialModelMatrix = m_modelMatrix;
-    glm::mat4 m_initialModelMatrixInverse = m_modelMatrix;
+    glm::mat4 m_initialModelMatrix = glm::mat4(1.0f);
+    glm::mat4 m_initialModelMatrixInverse = glm::mat4(1.0f);
 
-    float tx;
-    float ty;
-    float tz;
-
-    float rx;
-    float ry;
-    float rz;
-
-    float sx;
-    float sy;
-    float sz;
+    glm::vec3 m_position;
+    glm::vec3 m_rotation;
+    glm::vec3 m_scale;
 
 public:
     Model(glm::vec3 position = glm::vec3(0.0f),
@@ -39,9 +31,7 @@ public:
     ~Model();
 
     inline Model &Translate(glm::vec3 translation) {
-        tx = translation.x;
-        ty = translation.y;
-        tz = translation.z;
+        m_position += translation;
 
         m_modelMatrix *= m_initialModelMatrixInverse;
         m_modelMatrix = glm::translate(m_modelMatrix, translation);
@@ -50,16 +40,18 @@ public:
         return *this;
     }
 
+    inline Model &SetPosition(glm::vec3 position) {
+        InitializeModelMatrix(position, m_rotation, m_scale, true);
+        return *this;
+    }
+
     /// @brief Rotates the model along x, y, z axis. Rotation is applied in xyz
     /// order
     /// @param rotation A vec3 containing angles in degree for each axis
     inline Model &Rotate(glm::vec3 rotation) {
-        rx = rotation.x;
-        ry = rotation.y;
-        rz = rotation.z;
+        m_rotation += rotation;
 
-        fmt::print("rx: {}, ry: {}, rz: {}\n", rx, ry, rz);
-
+        // TODO: verify this
         m_modelMatrix = m_initialModelMatrixInverse * m_modelMatrix;
         m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(rotation.x),
                                     glm::vec3(1.0f, 0.0f, 0.0f));
@@ -72,15 +64,23 @@ public:
         return *this;
     }
 
+    inline Model &SetOrientation(glm::vec3 rotation) {
+        InitializeModelMatrix(m_position, rotation, m_scale, true);
+        return *this;
+    }
+
     inline Model &Scale(glm::vec3 scale) {
-        sx = scale.x;
-        sy = scale.y;
-        sz = scale.z;
+        m_scale += scale;
 
         m_modelMatrix *= m_initialModelMatrixInverse;
         m_modelMatrix = glm::scale(m_modelMatrix, scale);
         m_modelMatrix *= m_initialModelMatrix;
 
+        return *this;
+    }
+
+    inline Model &SetScale(glm::vec3 scale) {
+        InitializeModelMatrix(m_position, m_rotation, scale, true);
         return *this;
     }
 
@@ -90,19 +90,20 @@ public:
         return m_modelMatrix;
     }
 
-    inline glm::vec3 GetPosition() {
-        return glm::vec3(tx, ty, tz);
+    // TODO: Check const usage
+    inline glm::vec3 const &GetPosition() {
+        return m_position;
     }
 
-    inline glm::vec3 GetRotation() {
-        return glm::vec3(rx, ry, rz);
+    inline glm::vec3 const &GetRotation() {
+        return m_rotation;
     }
 
-    inline glm::vec3 GetScale() {
-        return glm::vec3(sx, sy, sz);
+    inline glm::vec3 const &GetScale() {
+        return m_scale;
     }
 
 private:
     void InitializeModelMatrix(glm::vec3 &position, glm::vec3 &rotation,
-                               glm::vec3 &scale);
+                               glm::vec3 &scale, bool forceReset = false);
 };
