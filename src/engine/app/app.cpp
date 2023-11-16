@@ -1,11 +1,10 @@
 #include "app.h"
 
 App::App()
-    : m_renderContext(
-          {std::make_shared<WindowManager>(), std::make_shared<Renderer>()}),
+    : m_renderContext({std::make_shared<WindowManager>(),
+                       std::make_shared<Renderer>(), 0, 90}),
       m_gui(*m_renderContext.windowManagerPtr),
-      m_fpsGraph(*m_renderContext.windowManagerPtr,
-                 m_gui.features.showFPSGraph),
+      m_fpsGraph(m_renderContext, m_gui.features.showFPSGraph),
       m_menuBar(*m_renderContext.windowManagerPtr, m_gui.features),
       sceneManager(m_renderContext) {
     file_system::create_directory("data");
@@ -13,6 +12,11 @@ App::App()
 
 void App::StartRenderLoop() {
     BaseScene *activeScenePtr = nullptr;
+    // lastFPSUpdateTime is used to calculate FPS while previousTime is used to
+    // limit FPS
+    double lastFPSUpdateTime = glfwGetTime();
+    double previousTime = lastFPSUpdateTime;
+    int frameCount = 0;
     while (!m_renderContext.windowManagerPtr->ShouldWindowClose()) {
         /* Check for user events */
         glfwPollEvents();
@@ -44,6 +48,7 @@ void App::StartRenderLoop() {
                          ImGuiWindowFlags_NoMove);
             shouldDeleteScene = false;
 
+            // TODO: Extract this into a function
             ImGui::PushStyleColor(ImGuiCol_Button,
                                   (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
@@ -74,6 +79,30 @@ void App::StartRenderLoop() {
 
         /* Swap front and back buffers */
         glfwSwapBuffers(m_renderContext.windowManagerPtr->GetWindowPtr());
+
+        /* Calculate FPS */
+        double currentTime = glfwGetTime();
+        frameCount++;
+        // If a second has passed.
+        if (currentTime - lastFPSUpdateTime >= 1.0) {
+            m_renderContext.fps = frameCount;
+            frameCount = 0;
+            lastFPSUpdateTime = currentTime;
+        }
+
+        /* limit frames */
+        while (currentTime < previousTime + 1.0 / m_renderContext.max_fps) {
+            // sleep for delta amount of time left
+            std::this_thread::sleep_for(std::chrono::milliseconds(
+                (int)((previousTime + 1.0 / m_renderContext.max_fps -
+                       currentTime) *
+                      1000)));
+
+            currentTime = glfwGetTime();
+        }
+
+        m_renderContext.deltaTime = currentTime - previousTime;
+        previousTime = currentTime;
     }
 
     if (activeScenePtr) {

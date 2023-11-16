@@ -37,9 +37,6 @@ private:
     MousePositionDelta m_mousePositionDelta = {0, 0};
 
 public:
-    int max_fps = 60;
-
-public:
     WindowManager();
     ~WindowManager();
 

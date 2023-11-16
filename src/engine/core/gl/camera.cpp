@@ -19,15 +19,20 @@ void Camera::UpdateDirection(float deltaPitch, float deltaYaw) {
     LookAt(m_pitch, m_yaw);
 }
 
+void Camera::UpdatePosition(glm::vec3 deltaPosition) {
+    m_position += deltaPosition;
+    m_viewMatrix = glm::lookAt(m_position, m_position + m_front, m_up);
+}
+
 void Camera::LookAt(float pitch, float yaw) {
     m_front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     m_front.y = sin(glm::radians(pitch));
     m_front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     m_front = glm::normalize(m_front);
 
-    glm::vec3 right = glm::normalize(glm::cross(m_front, m_worldUp));
+    m_right = glm::normalize(glm::cross(m_front, m_worldUp));
 
-    m_up = glm::normalize(glm::cross(right, m_front));
+    m_up = glm::normalize(glm::cross(m_right, m_front));
 
     m_viewMatrix = glm::lookAt(m_position, m_position + m_front, m_up);
 }

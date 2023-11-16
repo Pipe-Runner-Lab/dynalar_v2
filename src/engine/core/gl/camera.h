@@ -11,6 +11,7 @@ private:
     glm::vec3 m_front;
     glm::vec3 m_up;
     glm::vec3 m_worldUp;
+    glm::vec3 m_right = glm::vec3(1.0f, 0.0f, 0.0f);
 
     float m_yaw;
     float m_pitch;
@@ -29,7 +30,20 @@ public:
     void LookAt(Model &model);
 
     void UpdateDirection(float deltaPitch, float deltaYaw);
+    void UpdatePosition(glm::vec3 deltaPosition);
     void LookAt(float pitch, float yaw);
+
+    glm::vec3 &GetFront() {
+        return m_front;
+    }
+
+    glm::vec3 &GetUp() {
+        return m_up;
+    }
+
+    glm::vec3 &GetRight() {
+        return m_right;
+    }
 
     glm::mat4 &GetViewMatrix();
     glm::mat4 &GetProjectionMatrix();

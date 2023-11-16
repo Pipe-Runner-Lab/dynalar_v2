@@ -28,6 +28,9 @@ enum MouseInputMode {
 struct RenderContext {
     std::shared_ptr<WindowManager> windowManagerPtr;
     std::shared_ptr<Renderer> rendererPtr;
+    int fps = 0;
+    int max_fps = 60;
+    float deltaTime = 0.0f;
 };
 
 class BaseScene {
@@ -37,12 +40,13 @@ protected:
 private:
     std::vector<Camera> m_cameras;
     int m_activeCameraIndex = 0;
-    float m_xSensitivity = 0.07f;
-    float m_ySensitivity = 0.07f;
+    float m_xSensitivity = 8.0f;
+    float m_ySensitivity = 8.0f;
+    float m_moveSpeed = 8.0f;
     bool isInverted = true;
 
 public:
-    BaseScene(RenderContext &renderContext) : m_renderContext(renderContext){};
+    BaseScene(RenderContext &renderContext);
 
     // * Keep in mind that even if these functions are overriden, the base
     // * functions can still be called from children

@@ -1,4 +1,5 @@
 #include <memory>
+#include <thread>
 
 #include "../core/gl/renderer.h"
 #include "../core/utils/file_system.h"
