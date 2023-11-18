@@ -3,12 +3,13 @@
     "-DVCPKG_APPLOCAL_DEPS=ON",
     "-DX_VCPKG_APPLOCAL_DEPS_INSTALL=ON",
     "-DVCPKG_MANIFEST_MODE=ON",
-    "-DVCPKG_TARGET_TRIPLET=x64-linux"
+    "-DVCPKG_TARGET_TRIPLET=x64-windows"
   ],
   "vcpkg.general.enable": true,
-  "vcpkg.target.hostTriplet": "",
-  // use x64-linx / arm64-osx
-  "vcpkg.target.defaultTriplet": "x64-linux",
+  "vcpkg.target.hostTriplet": "-windows",
+  // use x64-linux / arm64-osx / x64-windows
+  // * https://github.com/microsoft/vcpkg/issues/23968
+  "vcpkg.target.defaultTriplet": "x64-windows",
   "vcpkg.target.useStaticLib": false,
   "cmake.configureSettings": {
     "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"

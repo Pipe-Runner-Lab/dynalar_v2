@@ -1,6 +1,11 @@
-#include "texture.h"
-
+/**
+ * This #define must be done before any function of stb_image is called.
+ * Since we are using the function only in this cpp file, we only need to
+ * worry about it here.
+ */
 #define STB_IMAGE_IMPLEMENTATION
+
+#include "texture.h"
 
 Texture::Texture(const std::string &filePath, bool hasAlpha) {
     GL_CALL(glGenTextures(1, &m_textureID));
