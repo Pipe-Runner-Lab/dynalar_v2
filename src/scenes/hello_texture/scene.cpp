@@ -1,7 +1,7 @@
 #include "scene.h"
 
 HelloTextureScene::HelloTextureScene(RenderContext &renderContext)
-    : BaseScene(renderContext),
+    : BaseScene(renderContext, "Hello Texture"),
       m_shader("assets/shaders/vertex/simple_uv.vert",
                "assets/shaders/fragment/simple_texture.frag"),
       m_texture("assets/textures/default.png", false) {
@@ -19,7 +19,7 @@ HelloTextureScene::HelloTextureScene(RenderContext &renderContext)
     layout.Push<float>(2);  // uv
     std::vector<Mesh> meshes = {Mesh(vertices, indices, layout)};
 
-    m_modelPtr = std::make_unique<Model>(Model(meshes));
+    m_models.push_back(std::move(Model(meshes)));
 
     m_texture.Bind();
 
@@ -29,6 +29,6 @@ HelloTextureScene::HelloTextureScene(RenderContext &renderContext)
 
 void HelloTextureScene::OnRender() {
     m_shader.Bind();
-    m_modelPtr->Draw(*m_renderContext.rendererPtr);
+    m_models[0].Draw(*m_renderContext.rendererPtr);
     m_shader.Unbind();
 }

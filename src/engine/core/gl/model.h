@@ -30,6 +30,9 @@ public:
           glm::vec3 scale = glm::vec3(1.0f));
     ~Model();
 
+    /// @brief Applies delta translation to the model
+    /// @param translation
+    /// @return the model itself
     inline Model &Translate(glm::vec3 translation) {
         m_position += translation;
 
@@ -40,13 +43,14 @@ public:
         return *this;
     }
 
+    /// @brief Sets the position of the model
     inline Model &SetPosition(glm::vec3 position) {
         InitializeModelMatrix(position, m_rotation, m_scale, true);
         return *this;
     }
 
-    /// @brief Rotates the model along x, y, z axis. Rotation is applied in xyz
-    /// order
+    /// @brief Rotates the model by delta along x, y, z axis. Rotation is
+    /// applied in xyz order
     /// @param rotation A vec3 containing angles in degree for each axis
     inline Model &Rotate(glm::vec3 rotation) {
         m_rotation += rotation;
@@ -64,6 +68,7 @@ public:
         return *this;
     }
 
+    /// @brief Sets the rotation of the model
     inline Model &SetOrientation(glm::vec3 rotation) {
         InitializeModelMatrix(m_position, rotation, m_scale, true);
         return *this;

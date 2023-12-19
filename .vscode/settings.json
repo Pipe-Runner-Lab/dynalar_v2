@@ -2,11 +2,11 @@
   "cmake.configureArgs": [
     "-DVCPKG_APPLOCAL_DEPS=ON",
     "-DX_VCPKG_APPLOCAL_DEPS_INSTALL=ON",
-    "-DVCPKG_MANIFEST_MODE=ON",
-    "-DVCPKG_TARGET_TRIPLET=x64-linux"
+    "-DVCPKG_TARGET_TRIPLET=x64-linux",
+    "-DVCPKG_MANIFEST_MODE=ON"
   ],
   "vcpkg.general.enable": true,
-  "vcpkg.target.hostTriplet": "",
+  "vcpkg.target.hostTriplet": "x64-linux",
   // use x64-linx / arm64-osx
   "vcpkg.target.defaultTriplet": "x64-linux",
   "vcpkg.target.useStaticLib": false,

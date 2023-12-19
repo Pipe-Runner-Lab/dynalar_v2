@@ -5,7 +5,6 @@
 class HelloTextureScene : public BaseScene {
 private:
     Shader m_shader;
-    std::unique_ptr<Model> m_modelPtr;
     Texture m_texture;
 
 public:

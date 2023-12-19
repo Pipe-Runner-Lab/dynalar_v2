@@ -1,7 +1,7 @@
 #include "scene.h"
 
 HelloTriangleScene::HelloTriangleScene(RenderContext &renderContext)
-    : BaseScene(renderContext),
+    : BaseScene(renderContext, "Hello Triangle"),
       m_shader("assets/shaders/vertex/clip_space.vert",
                "assets/shaders/fragment/simple_interpolated_color.frag") {
     std::vector<float> vertices = {
@@ -14,11 +14,11 @@ HelloTriangleScene::HelloTriangleScene(RenderContext &renderContext)
     layout.Push<float>(3);
     std::vector<Mesh> meshes = {Mesh(vertices, indices, layout)};
 
-    m_modelPtr = std::make_unique<Model>(Model(meshes));
+    m_models.push_back(std::move(Model(meshes)));
 }
 
 void HelloTriangleScene::OnRender() {
     m_shader.Bind();
-    m_modelPtr->Draw(*m_renderContext.rendererPtr);
+    m_models[0].Draw(*m_renderContext.rendererPtr);
     m_shader.Unbind();
 }

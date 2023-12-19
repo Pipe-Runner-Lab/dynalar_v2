@@ -7,9 +7,6 @@
 class Hello3DWorldScene : public BaseScene {
 private:
     Shader m_shader;
-    std::unique_ptr<Model> m_modelPtr;
-
-    std::shared_ptr<ObjectPropertiesEditor> m_objectPropertiesEditorPtr;
 
 public:
     Hello3DWorldScene(RenderContext &renderContext);

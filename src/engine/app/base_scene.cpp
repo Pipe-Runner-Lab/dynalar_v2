@@ -1,7 +1,76 @@
 #include "base_scene.h"
 
-BaseScene::BaseScene(RenderContext &renderContext)
-    : m_renderContext(renderContext) {
+BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
+    : m_renderContext(renderContext), m_sceneTitle(sceneTitle) {
+    m_objectPropertiesEditorPtr =
+        std::make_shared<ObjectPropertiesEditor>(ObjectPropertiesEditor([&]() {
+            ImGui::Text(m_sceneTitle.c_str());
+
+            if (ImGui::BeginCombo(
+                    "Selected Object",
+                    fmt::format("Object {}", m_activeModelIndex).c_str())) {
+                for (int itemIdx = 0; itemIdx < m_models.size(); itemIdx++) {
+                    const bool is_selected = (m_activeModelIndex == itemIdx);
+                    if (ImGui::Selectable(
+                            fmt::format("Object {}", itemIdx).c_str(),
+                            is_selected))
+                        m_activeModelIndex = itemIdx;
+
+                    // TODO: When object is selected, disable animation
+                    if (is_selected) {
+                        // disable animation
+                    } else {
+                        // enable animation
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }));
+
+    m_cameraPropertiesEditorPtr =
+        std::make_shared<CameraPropertiesEditor>(CameraPropertiesEditor([&]() {
+            if (ImGui::BeginCombo(
+                    "Active Camera",
+                    fmt::format("Camera {}", m_activeCameraIndex).c_str())) {
+                for (int itemIdx = 0; itemIdx < m_cameras.size(); itemIdx++) {
+                    const bool is_selected = (m_activeCameraIndex == itemIdx);
+                    if (ImGui::Selectable(
+                            fmt::format("Camera {}", itemIdx).c_str(),
+                            is_selected))
+                        m_activeCameraIndex = itemIdx;
+
+                    // Set the initial focus when opening the combo
+                    // (scrolling + keyboard navigation focus)
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::SeparatorText("Camera Properties");
+        }));
+
+    m_inputPropertiesEditorPtr =
+        std::make_shared<InputPropertiesEditor>(InputPropertiesEditor([&]() {
+            ImGui::SeparatorText("Mouse");
+            ImGui::SliderFloat("X Sensitivity", &m_xSensitivity, 0.01f, 30.0f);
+            ImGui::SliderFloat("Y Sensitivity", &m_ySensitivity, 0.01f, 30.0f);
+            ImGui::SliderFloat("Movement Sensitivity", &m_moveSpeed, 0.01f,
+                               30.0f);
+            ImGui::Checkbox("Inverted", &isInverted);
+        }));
+}
+
+void BaseScene::OnGUIRender() {
+    if (ImGui::BeginTabBar("Editor")) {
+        m_objectPropertiesEditorPtr->Render();
+        if (m_cameras.size() > 0) {
+            m_cameraPropertiesEditorPtr->Render();
+        }
+        m_inputPropertiesEditorPtr->Render();
+
+        ImGui::EndTabBar();
+    }
 }
 
 void BaseScene::OnUpdate() {
@@ -76,47 +145,5 @@ void BaseScene::OnUpdate() {
                                       m_renderContext.deltaTime * m_moveSpeed;
             activeCamera.UpdatePosition(positionDelta);
         }
-    }
-}
-
-void BaseScene::OnGUIRender(
-    std::shared_ptr<ObjectPropertiesEditor> objectPropertiesEditorPtr) {
-    if (ImGui::BeginTabBar("Editor")) {
-        objectPropertiesEditorPtr->Render();
-
-        if (m_cameras.size() > 0 && ImGui::BeginTabItem("Camera")) {
-            if (ImGui::BeginCombo(
-                    "Active Camera",
-                    fmt::format("Camera {}", m_activeCameraIndex).c_str())) {
-                for (int itemIdx = 0; itemIdx < m_cameras.size(); itemIdx++) {
-                    const bool is_selected = (m_activeCameraIndex == itemIdx);
-                    if (ImGui::Selectable(
-                            fmt::format("Camera {}", itemIdx).c_str(),
-                            is_selected))
-                        m_activeCameraIndex = itemIdx;
-
-                    // Set the initial focus when opening the combo
-                    // (scrolling + keyboard navigation focus)
-                    if (is_selected)
-                        ImGui::SetItemDefaultFocus();
-                }
-                ImGui::EndCombo();
-            }
-
-            ImGui::SeparatorText("Camera Properties");
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Input")) {
-            ImGui::SeparatorText("Mouse");
-            ImGui::SliderFloat("X Sensitivity", &m_xSensitivity, 0.01f, 30.0f);
-            ImGui::SliderFloat("Y Sensitivity", &m_ySensitivity, 0.01f, 30.0f);
-            ImGui::SliderFloat("Movement Sensitivity", &m_moveSpeed, 0.01f,
-                               30.0f);
-            ImGui::Checkbox("Inverted", &isInverted);
-            ImGui::EndTabItem();
-        }
-
-        ImGui::EndTabBar();
     }
 }

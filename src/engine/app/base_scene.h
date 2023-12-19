@@ -36,35 +36,43 @@ struct RenderContext {
 class BaseScene {
 protected:
     RenderContext &m_renderContext;
+    std::vector<Model> m_models;
 
 private:
     std::vector<Camera> m_cameras;
     int m_activeCameraIndex = 0;
+
+    int m_activeModelIndex = 0;
     float m_xSensitivity = 8.0f;
     float m_ySensitivity = 8.0f;
     float m_moveSpeed = 8.0f;
     bool isInverted = true;
 
+    std::string m_sceneTitle;
+
+    std::shared_ptr<ObjectPropertiesEditor> m_objectPropertiesEditorPtr;
+    std::shared_ptr<CameraPropertiesEditor> m_cameraPropertiesEditorPtr;
+    std::shared_ptr<InputPropertiesEditor> m_inputPropertiesEditorPtr;
+
 public:
-    BaseScene(RenderContext &renderContext);
+    BaseScene(RenderContext &renderContext, std::string sceneTitle);
 
     // * Keep in mind that even if these functions are overriden, the base
     // * functions can still be called from children
     virtual void OnUpdate();
     virtual void OnRender(){};
-    virtual void OnGUIRender(){};
+    virtual void OnGUIRender();
 
 protected:
-    // this has intentionally been made non overrideable with a change in
-    // signature
-    void OnGUIRender(
-        std::shared_ptr<ObjectPropertiesEditor> objectPropertiesEditorPtr);
-
     void AddCamera(Camera camera) {
         m_cameras.push_back(std::move(camera));
     }
 
     Camera &GetActiveCamera() {
+        if (m_cameras.size() == 0) {
+            throw std::runtime_error("No camera has been added to the scene");
+        }
+
         return m_cameras[m_activeCameraIndex];
     }
 
@@ -72,5 +80,23 @@ protected:
         if (index < m_cameras.size()) {
             m_activeCameraIndex = index;
         }
+    }
+
+    void AddModel(Model model) {
+        m_models.push_back(std::move(model));
+    }
+
+    void SetActiveModelIndex(int index) {
+        if (index < m_models.size()) {
+            m_activeModelIndex = index;
+        }
+    }
+
+    Model &GetActiveModel() {
+        if (m_models.size() == 0) {
+            throw std::runtime_error("No model has been added to the scene");
+        }
+
+        return m_models[m_activeModelIndex];
     }
 };

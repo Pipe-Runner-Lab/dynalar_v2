@@ -5,7 +5,6 @@
 class HelloTriangleScene : public BaseScene {
 private:
     Shader m_shader;
-    std::unique_ptr<Model> m_modelPtr;
 
 public:
     HelloTriangleScene(RenderContext &renderContext);
