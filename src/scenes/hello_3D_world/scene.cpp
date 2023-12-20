@@ -5,7 +5,7 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
       m_shader("assets/shaders/vertex/simple_3d.vert",
                "assets/shaders/fragment/simple_3d.frag") {
     AddModel(Plane(5, {0, 0, 0}, {-90, 0, 0}));
-    AddModel(Cube(2, {0, 1, 0}, {0, 0, 0}));
+    AddModel(Cube(2, {0, 1.01, 0}, {0, 0, 0}));
 
     // set up camera
     AddCamera(Camera(
