@@ -4,7 +4,7 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
     : m_renderContext(renderContext), m_sceneTitle(sceneTitle) {
     m_objectPropertiesEditorPtr =
         std::make_shared<ObjectPropertiesEditor>(ObjectPropertiesEditor([&]() {
-            ImGui::Text(m_sceneTitle.c_str());
+            ImGui::Text("%s", m_sceneTitle.c_str());
 
             if (ImGui::BeginCombo(
                     "Selected Object",
@@ -63,10 +63,14 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
 
 void BaseScene::OnGUIRender() {
     if (ImGui::BeginTabBar("Editor")) {
-        m_objectPropertiesEditorPtr->Render();
+        if (m_models.size() > 0) {
+            m_objectPropertiesEditorPtr->Render();
+        }
+
         if (m_cameras.size() > 0) {
             m_cameraPropertiesEditorPtr->Render();
         }
+
         m_inputPropertiesEditorPtr->Render();
 
         ImGui::EndTabBar();

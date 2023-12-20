@@ -5,22 +5,22 @@ Plane::Plane(float size, glm::vec3 position, glm::vec3 rotation,
     : Model(position, rotation, scale) {
     std::vector<float> vertices = {
         // 0
-        1.0f * size, 1.0f * size, 0.0f,  // xyz
+        0.5f * size, 0.5f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                // normal
         1.0f, 0.0f,                      // uv
         1.0f, 1.0f, 0.0f, 1.0f,          // color
         // 1
-        1.0f * size, -1.0f * size, 0.0f,  // xyz
+        0.5f * size, -0.5f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                 // normal
         1.0f, 1.0f,                       // uv
         1.0f, 1.0f, 0.0f, 1.0f,           // color
         // 2
-        -1.0f * size, -1.0f * size, 0.0f,  // xyz
+        -0.5f * size, -0.5f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                  // normal
         0.0f, 1.0f,                        // uv
         0.0f, 1.0f, 1.0f, 1.0f,            // color
         // 3
-        -1.0f * size, 1.0f * size, 0.0f,  // xyz
+        -0.5f * size, 0.5f * size, 0.0f,  // xyz
         0.0f, 0.0f, 1.0f,                 // normal
         0.0f, 0.0f,                       // uv
         0.0f, 1.0f, 1.0f, 1.0f            // color
