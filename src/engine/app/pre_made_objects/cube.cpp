@@ -132,12 +132,12 @@ Cube::Cube(float size, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
         1.0f, 1.0f, 0.0f, 1.0f,                  // color
     };
     std::vector<unsigned int> indices = {
-        1,  4,  7,  7,  10, 1,   // Face 1
-        22, 13, 16, 22, 16, 19,  // Face 2
-        5,  14, 23, 23, 8,  5,   // Face 3
-        20, 18, 2,  20, 2,  11,  // Face 4
-        0,  15, 3,  15, 12, 3,   // Face 5
-        6,  15, 18, 6,  18, 9,   // Face 6
+        1,  7,  4,  7,  1,  10,  // Face 1 -z
+        16, 13, 22, 22, 19, 16,  // Face 2 +z
+        5,  8,  14, 8,  23, 14,  // Face 3 +x
+        11, 17, 20, 11, 2,  17,  // Face 4 -x
+        0,  3,  12, 12, 15, 0,   // Face 5 +y
+        6,  9,  21, 21, 9,  18,  // Face 6 -y
     };
     VertexBufferLayout layout;
     layout.Push<float>(3);  // xyz

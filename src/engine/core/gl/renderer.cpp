@@ -8,6 +8,12 @@ Renderer::Renderer() {
     GL_CALL(glEnable(GL_BLEND));
     GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     GL_CALL(glBlendEquation(GL_FUNC_ADD));
+
+    /* Enable face culling */
+    // https://learnopengl.com/Advanced-OpenGL/Face-culling#:~:text=By%20default%2C%20triangles%20defined%20with%20counter%2Dclockwise%20vertices%20are%20processed%20as%20front%2Dfacing%20triangles.
+    GL_CALL(glEnable(GL_CULL_FACE));
+    GL_CALL(glCullFace(GL_BACK));
+    GL_CALL(glFrontFace(GL_CCW));
 }
 
 void Renderer::Clear() {

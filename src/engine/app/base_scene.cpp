@@ -25,6 +25,11 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                 }
                 ImGui::EndCombo();
             }
+
+            if (m_activeModelIndex < 0)
+                return;
+            Model &activeModel = GetActiveModel();
+            ImGui::Checkbox("Debug Normals", &activeModel.debugNormals);
         }));
 
     m_cameraPropertiesEditorPtr =

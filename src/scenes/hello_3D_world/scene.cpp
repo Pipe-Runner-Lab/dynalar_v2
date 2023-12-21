@@ -4,12 +4,12 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     : BaseScene(renderContext, "Hello 3D World"),
       m_shader("assets/shaders/vertex/simple_3d.vert",
                "assets/shaders/fragment/simple_3d.frag") {
-    AddModel(Plane(5, {0, 0, 0}, {-90, 0, 0}));
+    AddModel(Plane(10, {0, 0, 0}, {-90, 0, 0}));
     AddModel(Cube(2, {0, 1.01, 0}, {0, 0, 0}));
 
     // set up camera
     AddCamera(Camera(
-        glm::vec3(0, 0, 10), 0, -90,
+        glm::vec3(0, 5, 10), -30, -90,
         glm::perspective(glm::radians(45.0f),
                          renderContext.windowManagerPtr->GetAspectRatio(), 0.1f,
                          100.0f)));
@@ -39,7 +39,9 @@ void Hello3DWorldScene::OnRender() {
             activeCamera.GetProjectionMatrix());
 
         m_shader.SetUniformMatrix4f("u_mvp", mvpMatrix);
+        m_shader.SetUniformMatrix4f("u_model", model.GetModelMatrix());
         m_shader.SetUniformBool("u_shouldUseTexture", false);
+        m_shader.SetUniformBool("u_debugNormals", model.debugNormals);
         model.Draw(*m_renderContext.rendererPtr);
     }
     m_shader.Unbind();
