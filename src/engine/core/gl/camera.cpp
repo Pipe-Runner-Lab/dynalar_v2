@@ -24,6 +24,13 @@ void Camera::UpdatePosition(glm::vec3 deltaPosition) {
     m_viewMatrix = glm::lookAt(m_position, m_position + m_front, m_up);
 }
 
+/**
+ * The camera's front vector is completely controlled by yaw and pitch no matter
+ * its initialization. Also, 0 yaw and 0 pitch will lead to the camera looking
+ * at +ve x axis.
+ *
+ * Note: Camera rotation is left handed
+ */
 void Camera::LookAt(float pitch, float yaw) {
     m_front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     m_front.y = sin(glm::radians(pitch));
