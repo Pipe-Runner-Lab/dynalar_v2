@@ -144,5 +144,5 @@ Cube::Cube(float size, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
     layout.Push<float>(3);  // normal
     layout.Push<float>(2);  // uv
     layout.Push<float>(4);  // color
-    m_meshes.push_back(Mesh(vertices, indices, layout));
+    m_meshesPtr->push_back(Mesh(vertices, indices, layout));
 }

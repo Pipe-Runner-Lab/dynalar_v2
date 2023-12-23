@@ -7,7 +7,7 @@ Model::Model(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 
 Model::Model(std::vector<Mesh> &meshGroup, glm::vec3 position,
              glm::vec3 rotation, glm::vec3 scale)
-    : m_meshes(meshGroup),
+    : m_meshesPtr(std::make_shared<std::vector<Mesh>>(meshGroup)),
       m_position(position),
       m_rotation(rotation),
       m_scale(scale) {
@@ -18,7 +18,7 @@ Model::~Model() {
 }
 
 void Model::Draw(Renderer &renderer) {
-    for (auto &mesh : m_meshes)
+    for (auto &mesh : *m_meshesPtr)
         mesh.Draw(renderer);
 }
 

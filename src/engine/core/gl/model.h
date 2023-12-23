@@ -8,9 +8,13 @@
 #include "mesh.h"
 #include "renderer.h"
 
+/**
+ * Note: Rotation is right-handed
+ */
 class Model {
 protected:
-    std::vector<Mesh> m_meshes;
+    std::shared_ptr<std::vector<Mesh>> m_meshesPtr =
+        std::make_shared<std::vector<Mesh>>();
     glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 
     // initial model matrix
@@ -110,6 +114,8 @@ public:
     inline glm::vec3 const &GetScale() {
         return m_scale;
     }
+
+    static void PhongShadingConverter(std::vector<Mesh> &meshGroup){};
 
 private:
     void InitializeModelMatrix(glm::vec3 &position, glm::vec3 &rotation,
