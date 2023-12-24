@@ -6,14 +6,17 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
         std::make_shared<ObjectPropertiesEditor>(ObjectPropertiesEditor([&]() {
             ImGui::Text("%s", m_sceneTitle.c_str());
 
-            if (ImGui::BeginCombo(
-                    "Selected Object",
-                    fmt::format("Object {}", m_activeModelIndex).c_str())) {
+            if (m_activeModelIndex < 0)
+                return;
+
+            Model &activeModel = GetActiveModel();
+
+            if (ImGui::BeginCombo("Selected Object",
+                                  activeModel.title.c_str())) {
                 for (int itemIdx = 0; itemIdx < m_models.size(); itemIdx++) {
                     const bool is_selected = (m_activeModelIndex == itemIdx);
-                    if (ImGui::Selectable(
-                            fmt::format("Object {}", itemIdx).c_str(),
-                            is_selected))
+                    if (ImGui::Selectable(m_models[itemIdx].title.c_str(),
+                                          is_selected))
                         m_activeModelIndex = itemIdx;
 
                     // TODO: When object is selected, disable animation
@@ -26,10 +29,16 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                 ImGui::EndCombo();
             }
 
-            if (m_activeModelIndex < 0)
-                return;
-            Model &activeModel = GetActiveModel();
             ImGui::Checkbox("Debug Normals", &activeModel.debugNormals);
+
+            ImGui::SeparatorText("Object Properties");
+            ImGui::DragFloat3("Position",
+                              glm::value_ptr(activeModel.GetPosition()), 0.1f);
+            ImGui::DragFloat3("Rotation",
+                              glm::value_ptr(activeModel.GetRotation()), 0.1f,
+                              -360.0f, 360.0f);
+            ImGui::DragFloat3("Scale", glm::value_ptr(activeModel.GetScale()),
+                              0.1f, 0.001f);
         }));
 
     m_cameraPropertiesEditorPtr =

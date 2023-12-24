@@ -19,7 +19,7 @@ HelloTextureScene::HelloTextureScene(RenderContext &renderContext)
     layout.Push<float>(2);  // uv
     std::vector<Mesh> meshes = {Mesh(vertices, indices, layout)};
 
-    m_models.push_back(std::move(Model(meshes)));
+    m_models.push_back(std::move(Model("Triangle", meshes)));
 
     m_texture.Bind();
 

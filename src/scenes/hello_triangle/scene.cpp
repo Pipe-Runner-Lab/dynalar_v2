@@ -14,7 +14,7 @@ HelloTriangleScene::HelloTriangleScene(RenderContext &renderContext)
     layout.Push<float>(3);
     std::vector<Mesh> meshes = {Mesh(vertices, indices, layout)};
 
-    m_models.push_back(std::move(Model(meshes)));
+    m_models.push_back(std::move(Model("Triangle", meshes)));
 }
 
 void HelloTriangleScene::OnRender() {
