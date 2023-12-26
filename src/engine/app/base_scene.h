@@ -68,7 +68,11 @@ public:
     virtual void OnGUIRender();
 
 protected:
-    void AddCamera(Camera camera) {
+    void AddCamera(Camera &camera) {
+        m_cameras.push_back(std::move(camera));
+    }
+
+    void AddCamera(Camera &&camera) {
         m_cameras.push_back(std::move(camera));
     }
 
