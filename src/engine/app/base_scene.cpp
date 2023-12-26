@@ -16,15 +16,13 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                 for (int itemIdx = 0; itemIdx < m_models.size(); itemIdx++) {
                     const bool is_selected = (m_activeModelIndex == itemIdx);
                     if (ImGui::Selectable(m_models[itemIdx].title.c_str(),
-                                          is_selected))
+                                          is_selected)) {
                         m_activeModelIndex = itemIdx;
-
-                    // TODO: When object is selected, disable animation
-                    if (is_selected) {
-                        // disable animation
-                    } else {
-                        // enable animation
+                        m_activeMeshIndex = 0;
                     }
+
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
                 }
                 ImGui::EndCombo();
             }
@@ -39,6 +37,50 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                               -360.0f, 360.0f);
             ImGui::DragFloat3("Scale", glm::value_ptr(activeModel.GetScale()),
                               0.1f, 0.001f);
+
+            ImGui::SeparatorText("Mesh Properties");
+            std::vector<Mesh> &meshes = activeModel.GetMeshes();
+
+            if (meshes.size() <= 0) {
+                ImGui::Text("No meshes");
+                return;
+            }
+
+            if (ImGui::BeginCombo(
+                    "Selected Mesh",
+                    fmt::format("Mesh {}", m_activeMeshIndex).c_str())) {
+                for (int itemIdx = 0; itemIdx < meshes.size(); itemIdx++) {
+                    const bool is_selected = (m_activeMeshIndex == itemIdx);
+                    if (ImGui::Selectable(
+                            fmt::format("Mesh {}", itemIdx).c_str()),
+                        is_selected)
+                        m_activeMeshIndex = itemIdx;
+
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            Mesh &activeMesh = meshes[m_activeMeshIndex];
+            std::shared_ptr<Material> materialPtr = activeMesh.GetMaterialPtr();
+            if (materialPtr) {
+                ImGui::Text("Name: %s", materialPtr->name.c_str());
+
+                switch (materialPtr->type) {
+                    case MaterialType::MESH_BASIC_MATERIAL: {
+                        std::shared_ptr<MeshBasicMaterial> material =
+                            std::static_pointer_cast<MeshBasicMaterial>(
+                                materialPtr);
+                        ImGui::Text("Type: Mesh Basic Material");
+                        ImGui::ColorEdit4("Albedo",
+                                          glm::value_ptr(material->albedo));
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
         }));
 
     m_cameraPropertiesEditorPtr =

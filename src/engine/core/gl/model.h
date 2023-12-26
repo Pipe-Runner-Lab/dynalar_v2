@@ -1,29 +1,42 @@
 #pragma once
 
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
+#include <assimp/Importer.hpp>
 #include <glm/glm.hpp>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <vector>
 
 #include "mesh.h"
 #include "renderer.h"
+#include "shader.h"
+#include "texture.h"
 
 /**
  * Note: Rotation is right-handed
+ * Note: Copying a model is not allowed.
+ * https://ptspts.blogspot.com/2017/02/fast-vector-append.html
  */
 class Model {
 protected:
-    std::shared_ptr<std::vector<Mesh>> m_meshesPtr =
-        std::make_shared<std::vector<Mesh>>();
+    std::shared_ptr<std::vector<Mesh>> m_meshesPtr;
     glm::mat4 m_modelMatrix;
 
     glm::vec3 m_position;
     glm::vec3 m_rotation;
     glm::vec3 m_scale;
 
+    std::string m_directory = "";
+    std::string m_path = "";
+
 public:
     std::string title;
     bool debugNormals = false;
+    // we will use texture path as key (or anything unique)
+    std::map<std::string, std::shared_ptr<Texture>> textures;
 
 public:
     Model(std::string title, glm::vec3 position = glm::vec3(0.0f),
@@ -35,7 +48,29 @@ public:
           glm::vec3 rotation = glm::vec3(0.0f),
           glm::vec3 scale = glm::vec3(1.0f));
 
+    /// @brief This constructor is used for loading models from file
+    /// @param title - title of the model
+    /// @param path - path to the model file
+    /// @param position - position of the model
+    /// @param rotation - rotation of the model
+    /// @param scale - scale of the model
+    /// @return
+    Model(std::string title, std::string path,
+          glm::vec3 position = glm::vec3(0.0f),
+          glm::vec3 rotation = glm::vec3(0.0f),
+          glm::vec3 scale = glm::vec3(1.0f));
+
+    Model(Model &other) = delete;
+
+    Model(Model &&other);
+
     ~Model();
+
+    void processNode(aiNode *node, const aiScene *scene);
+    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+    std::vector<Texture> loadMaterialTextures(aiMaterial *mat,
+                                              aiTextureType type,
+                                              std::string typeName);
 
     /// @brief Applies delta translation to the model
     /// @param translation
@@ -75,7 +110,9 @@ public:
         return *this;
     }
 
-    void Draw(Renderer &renderer);
+    void Draw(Renderer &renderer, Shader &shader, glm::mat4 vpMatrix);
+
+    void Draw(Renderer &renderer, Shader &shader);
 
     inline glm::mat4 &GetModelMatrix() {
         m_modelMatrix = glm::mat4(1.0f);
@@ -100,6 +137,10 @@ public:
 
     inline glm::vec3 &GetScale() {
         return m_scale;
+    }
+
+    inline std::vector<Mesh> &GetMeshes() {
+        return *m_meshesPtr;
     }
 
     static void PhongShadingConverter(std::vector<Mesh> &meshGroup){};

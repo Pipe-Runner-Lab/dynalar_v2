@@ -2,7 +2,12 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-Texture::Texture(const std::string &filePath, bool hasAlpha) {
+Texture::Texture(const std::string &filePath, bool hasAlpha)
+    : Texture(filePath, TextureType::DIFFUSE, hasAlpha) {
+}
+
+Texture::Texture(const std::string &filePath, TextureType type, bool hasAlpha)
+    : m_type(type) {
     GL_CALL(glGenTextures(1, &m_textureID));
     // Bind(0, false);
     GL_CALL(glBindTexture(GL_TEXTURE_2D, m_textureID))

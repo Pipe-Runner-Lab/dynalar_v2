@@ -20,4 +20,7 @@ public:
     static glm::mat4 ComputeMVPMatrix(glm::mat4 &modelMatrix,
                                       glm::mat4 &viewMatrix,
                                       glm::mat4 &projectionMatrix);
+
+    static glm::mat4 ComputeMVPMatrix(glm::mat4 &vpMatrix,
+                                      glm::mat4 &modelMatrix);
 };

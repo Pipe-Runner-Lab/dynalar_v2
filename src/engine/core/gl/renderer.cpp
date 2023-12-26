@@ -40,3 +40,8 @@ glm::mat4 Renderer::ComputeMVPMatrix(glm::mat4 &modelMatrix,
                                      glm::mat4 &projectionMatrix) {
     return projectionMatrix * viewMatrix * modelMatrix;
 }
+
+glm::mat4 Renderer::ComputeMVPMatrix(glm::mat4 &vpMatrix,
+                                     glm::mat4 &modelMatrix) {
+    return vpMatrix * modelMatrix;
+}

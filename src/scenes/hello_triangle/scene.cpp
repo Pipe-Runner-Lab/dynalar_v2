@@ -12,13 +12,14 @@ HelloTriangleScene::HelloTriangleScene(RenderContext &renderContext)
     std::vector<unsigned int> indices = {0, 1, 2};
     VertexBufferLayout layout;
     layout.Push<float>(3);
-    std::vector<Mesh> meshes = {Mesh(vertices, indices, layout)};
+    std::vector<Mesh> meshes;
+    meshes.push_back(Mesh(vertices, indices, layout));
 
-    m_models.push_back(std::move(Model("Triangle", meshes)));
+    m_models.push_back(Model("Triangle", meshes));
 }
 
 void HelloTriangleScene::OnRender() {
     m_shader.Bind();
-    m_models[0].Draw(*m_renderContext.rendererPtr);
+    m_models[0].Draw(*m_renderContext.rendererPtr, m_shader);
     m_shader.Unbind();
 }

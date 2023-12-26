@@ -8,6 +8,7 @@
 
 #include "../app/widgets/properties_editor.h"
 #include "../core/gl/camera.h"
+#include "../core/gl/material.h"
 #include "../core/gl/mesh.h"
 #include "../core/gl/model.h"
 #include "../core/gl/shader.h"
@@ -43,6 +44,8 @@ private:
     int m_activeCameraIndex = 0;
 
     int m_activeModelIndex = 0;
+    int m_activeMeshIndex = 0;
+
     float m_xSensitivity = 8.0f;
     float m_ySensitivity = 8.0f;
     float m_moveSpeed = 8.0f;

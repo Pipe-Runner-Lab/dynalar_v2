@@ -22,7 +22,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # --------------------------- PREPROCESSOR FLAGS --------------------------- #
-add_compile_definitions(_DEBUG)
+add_compile_definitions($<$<CONFIG:Debug>:_DEBUG>)
 
 
 # --------------------------- INCLUDE DIRECTORIES --------------------------- #
@@ -68,6 +68,13 @@ target_link_libraries(${TARGET} PRIVATE fmt::fmt)
 # stb
 find_package(Stb REQUIRED)
 target_include_directories(${TARGET} PRIVATE ${Stb_INCLUDE_DIR})
+
+# # -------------------------------------------------------------------------- #
+# #                            SANITIZER SETTINGS                              #
+# # -------------------------------------------------------------------------- #
+# TODO: Explore more into these options
+# target_link_options(${TARGET} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
+# target_compile_options(${TARGET} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
 
 # # -------------------------------------------------------------------------- #
 # #                                 EXECUTABLE                                 #

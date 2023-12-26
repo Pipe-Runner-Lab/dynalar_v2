@@ -5,8 +5,6 @@
 #include "scenes/hello_texture/scene.h"
 #include "scenes/hello_triangle/scene.h"
 
-using std::shared_ptr;
-
 int main(int, char **) {
     try {
         App app = App();

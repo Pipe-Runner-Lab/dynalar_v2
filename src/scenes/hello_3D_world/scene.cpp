@@ -4,137 +4,108 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     : BaseScene(renderContext, "Hello 3D World"),
       m_shader("assets/shaders/vertex/simple_3d.vert",
                "assets/shaders/fragment/simple_3d.frag") {
-    AddModel(Plane("Ground Plane", {0, 0, 0}, {-90, 0, 0}, {10, 10, 1}));
-    AddModel(Cube("Cube 1", {0, 1.01, 0}, {0, 0, 0}, {2, 2, 2}));
+    AddModel(Plane("Ground Plane", {0, 0, 0}, {-90, 0, 0}, {10, 10, 1},
+                   {0.0, 1.0, 0.0, 1.0}));
+    AddModel(Cube("Cube 1", {0, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
+                  {1.0, 0.0, 0.0, 1.0}));
 
     std::vector<float> vertices = {
         // 0 - +y
-        -0.5f, 0.5f, 0.5f,       // xyz
-        0.0f, 1.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, 0.5f, 0.5f,  // xyz
+        0.0f, 1.0f, 0.0f,   // normal
+        1.0f, 0.0f,         // uv
         // 0 - +z
-        -0.5f, 0.5f, 0.5f,       // xyz
-        0.0f, 0.0f, 1.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, 0.5f, 0.5f,  // xyz
+        0.0f, 0.0f, 1.0f,   // normal
+        1.0f, 0.0f,         // uv
         // 0 - -x
-        -0.5f, 0.5f, 0.5f,       // xyz
-        -1.0f, 0.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
-
+        -0.5f, 0.5f, 0.5f,  // xyz
+        -1.0f, 0.0f, 0.0f,  // normal
+        1.0f, 0.0f,         // uv
         // 1 - +y
-        0.5f, 0.5f, 0.5f,        // xyz
-        0.0f, 1.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, 0.5f, 0.5f,  // xyz
+        0.0f, 1.0f, 0.0f,  // normal
+        1.0f, 0.0f,        // uv
         // 1 - +z
-        0.5f, 0.5f, 0.5f,        // xyz
-        0.0f, 0.0f, 1.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, 0.5f, 0.5f,  // xyz
+        0.0f, 0.0f, 1.0f,  // normal
+        1.0f, 0.0f,        // uv
         // 1 - +x
-        0.5f, 0.5f, 0.5f,        // xyz
-        1.0f, 0.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
-
+        0.5f, 0.5f, 0.5f,  // xyz
+        1.0f, 0.0f, 0.0f,  // normal
+        1.0f, 0.0f,        // uv
         // 2 - -y
-        0.5f, -0.5f, 0.5f,       // xyz
-        0.0f, -1.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, -0.5f, 0.5f,  // xyz
+        0.0f, -1.0f, 0.0f,  // normal
+        1.0f, 0.0f,         // uv
         // 2 - +z
-        0.5f, -0.5f, 0.5f,       // xyz
-        0.0f, 0.0f, 1.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, -0.5f, 0.5f,  // xyz
+        0.0f, 0.0f, 1.0f,   // normal
+        1.0f, 0.0f,         // uv
         // 2 - +x
-        0.5f, -0.5f, 0.5f,       // xyz
-        1.0f, 0.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
-
+        0.5f, -0.5f, 0.5f,  // xyz
+        1.0f, 0.0f, 0.0f,   // normal
+        1.0f, 0.0f,         // uv
         // 3 - -y
-        -0.5f, -0.5f, 0.5f,      // xyz
-        0.0f, -1.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, -0.5f, 0.5f,  // xyz
+        0.0f, -1.0f, 0.0f,   // normal
+        1.0f, 0.0f,          // uv
         // 3 - +z
-        -0.5f, -0.5f, 0.5f,      // xyz
-        0.0f, 0.0f, 1.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, -0.5f, 0.5f,  // xyz
+        0.0f, 0.0f, 1.0f,    // normal
+        1.0f, 0.0f,          // uv
         // 3 - -x
-        -0.5f, -0.5f, 0.5f,      // xyz
-        -1.0f, 0.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
-
+        -0.5f, -0.5f, 0.5f,  // xyz
+        -1.0f, 0.0f, 0.0f,   // normal
+        1.0f, 0.0f,          // uv
         // 4 - +y
-        0.5f, 0.5f, -0.5f,       // xyz
-        0.0f, 1.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, 0.5f, -0.5f,  // xyz
+        0.0f, 1.0f, 0.0f,   // normal
+        1.0f, 0.0f,         // uv
         // 4 - -z
-        0.5f, 0.5f, -0.5f,       // xyz
-        0.0f, 0.0f, -1.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, 0.5f, -0.5f,  // xyz
+        0.0f, 0.0f, -1.0f,  // normal
+        1.0f, 0.0f,         // uv
         // 4 - +x
-        0.5f, 0.5f, -0.5f,       // xyz
-        1.0f, 0.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
-
+        0.5f, 0.5f, -0.5f,  // xyz
+        1.0f, 0.0f, 0.0f,   // normal
+        1.0f, 0.0f,         // uv
         // 5 - +y
-        -0.5f, 0.5f, -0.5f,      // xyz
-        0.0f, 1.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, 0.5f, -0.5f,  // xyz
+        0.0f, 1.0f, 0.0f,    // normal
+        1.0f, 0.0f,          // uv
         // 5 - -z
-        -0.5f, 0.5f, -0.5f,      // xyz
-        0.0f, 0.0f, -1.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, 0.5f, -0.5f,  // xyz
+        0.0f, 0.0f, -1.0f,   // normal
+        1.0f, 0.0f,          // uv
         // 5 - -x
-        -0.5f, 0.5f, -0.5f,      // xyz
-        -1.0f, 0.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
-
+        -0.5f, 0.5f, -0.5f,  // xyz
+        -1.0f, 0.0f, 0.0f,   // normal
+        1.0f, 0.0f,          // uv
         // 6 - -y
-        -0.5f, -0.5f, -0.5f,     // xyz
-        0.0f, -1.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, -0.5f, -0.5f,  // xyz
+        0.0f, -1.0f, 0.0f,    // normal
+        1.0f, 0.0f,           // uv
         // 6 - -z
-        -0.5f, -0.5f, -0.5f,     // xyz
-        0.0f, 0.0f, -1.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        -0.5f, -0.5f, -0.5f,  // xyz
+        0.0f, 0.0f, -1.0f,    // normal
+        1.0f, 0.0f,           // uv
         // 6 - -x
-        -0.5f, -0.5f, -0.5f,     // xyz
-        -1.0f, 0.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
-
+        -0.5f, -0.5f, -0.5f,  // xyz
+        -1.0f, 0.0f, 0.0f,    // normal
+        1.0f, 0.0f,           // uv
         // 7 - -y
-        0.5f, -0.5f, -0.5f,      // xyz
-        0.0f, -1.0f, 0.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, -0.5f, -0.5f,  // xyz
+        0.0f, -1.0f, 0.0f,   // normal
+        1.0f, 0.0f,          // uv
         // 7 - -z
-        0.5f, -0.5f, -0.5f,      // xyz
-        0.0f, 0.0f, -1.0f,       // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, -0.5f, -0.5f,  // xyz
+        0.0f, 0.0f, -1.0f,   // normal
+        1.0f, 0.0f,          // uv
         // 7 - +x
-        0.5f, -0.5f, -0.5f,      // xyz
-        1.0f, 0.0f, 0.0f,        // normal
-        1.0f, 0.0f,              // uv
-        1.0f, 1.0f, 0.0f, 1.0f,  // color
+        0.5f, -0.5f, -0.5f,  // xyz
+        1.0f, 0.0f, 0.0f,    // normal
+        1.0f, 0.0f,          // uv
     };
     std::vector<unsigned int> indices = {
         1,  7,  4,  7,  1,  10,  // Face 1 +z
@@ -148,8 +119,11 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     layout.Push<float>(3);  // xyz
     layout.Push<float>(3);  // normal
     layout.Push<float>(2);  // uv
-    layout.Push<float>(4);  // color
-    std::vector<Mesh> meshGroup = {Mesh(vertices, indices, layout)};
+    std::vector<Mesh> meshGroup;
+    std::shared_ptr<MeshBasicMaterial> material =
+        std::make_shared<MeshBasicMaterial>();
+    material->albedo = {0.0, 0.0, 1.0, 1.0};
+    meshGroup.push_back(Mesh(vertices, indices, layout, material));
     AddModel(Model("Cube 2", meshGroup, {-2.5, 1.01, 0}, {0, 0, 0}, {2, 2, 2}));
 
     // set up camera
@@ -177,17 +151,11 @@ void Hello3DWorldScene::OnRender() {
     m_shader.Bind();
 
     Camera &activeCamera = GetActiveCamera();
+    glm::mat4 vpMatrix =
+        activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
 
     for (auto &model : m_models) {
-        glm::mat4 mvpMatrix = Renderer::ComputeMVPMatrix(
-            model.GetModelMatrix(), activeCamera.GetViewMatrix(),
-            activeCamera.GetProjectionMatrix());
-
-        m_shader.SetUniformMatrix4f("u_mvp", mvpMatrix);
-        m_shader.SetUniformMatrix4f("u_model", model.GetModelMatrix());
-        m_shader.SetUniformBool("u_shouldUseTexture", false);
-        m_shader.SetUniformBool("u_debugNormals", model.debugNormals);
-        model.Draw(*m_renderContext.rendererPtr);
+        model.Draw(*m_renderContext.rendererPtr, m_shader, vpMatrix);
     }
     m_shader.Unbind();
 }
