@@ -122,9 +122,10 @@ Cube::Cube(std::string title, glm::vec3 position, glm::vec3 rotation,
     layout.Push<float>(2);  // uv
 
     // material
-    std::shared_ptr<MeshBasicMaterial> material =
+    std::shared_ptr<MeshBasicMaterial> materialPtr =
         std::make_shared<MeshBasicMaterial>();
-    material->albedo = color;
+    materialPtr->albedo = color;
+    m_materialPtrs.push_back(materialPtr);
 
-    m_meshesPtr->push_back(Mesh(vertices, indices, layout, material));
+    m_meshesPtr->push_back(Mesh(vertices, indices, layout));
 }

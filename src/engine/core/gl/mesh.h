@@ -16,25 +16,21 @@
 // uploads data to the GPU
 class Mesh {
 private:
-    std::shared_ptr<VertexArray> m_vertexArrayPtr = nullptr;
-    std::shared_ptr<IndexBuffer> m_indexBufferPtr = nullptr;
-    std::shared_ptr<Material> m_materialPtr;
+    std::vector<float> m_vertices;
+    std::vector<unsigned int> m_indices;
+    VertexBufferLayout m_layout;  // TODO: Not used anywhere, remove?
+    std::unique_ptr<VertexArray> m_vertexArrayPtr = nullptr;
+    std::unique_ptr<IndexBuffer> m_indexBufferPtr = nullptr;
 
 public:
     // TODO: This leads to dangling references. Fix it.
     Mesh(std::vector<float> &vertices, std::vector<unsigned int> &indices,
          VertexBufferLayout &layout);
-    Mesh(std::vector<float> &vertices, std::vector<unsigned int> &indices,
-         VertexBufferLayout &layout, std::shared_ptr<Material> material);
 
     Mesh(const Mesh &other) = delete;
 
     Mesh(Mesh &&other);
 
     ~Mesh();
-    void Draw(Renderer &renderer, Shader &shader);
-
-    inline std::shared_ptr<Material> GetMaterialPtr() {
-        return m_materialPtr;
-    }
+    void Draw(Renderer &renderer);
 };

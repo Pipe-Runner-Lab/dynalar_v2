@@ -3,8 +3,8 @@
 BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
     : m_renderContext(renderContext), m_sceneTitle(sceneTitle) {
     m_objectPropertiesEditorPtr =
-        std::make_shared<ObjectPropertiesEditor>(ObjectPropertiesEditor([&]() {
-            ImGui::Text("%s", m_sceneTitle.c_str());
+        std::make_unique<ObjectPropertiesEditor>(ObjectPropertiesEditor([&]() {
+            ImGui::Text("Scene Title: %s", m_sceneTitle.c_str());
 
             if (m_activeModelIndex < 0)
                 return;
@@ -62,8 +62,14 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                 ImGui::EndCombo();
             }
 
+            if (activeModel.GetMaterials().size() == 0) {
+                ImGui::Text("No material");
+                return;
+            }
+
             Mesh &activeMesh = meshes[m_activeMeshIndex];
-            std::shared_ptr<Material> materialPtr = activeMesh.GetMaterialPtr();
+            std::shared_ptr<Material> materialPtr =
+                activeModel.GetMaterials()[m_activeMeshIndex];
             if (materialPtr) {
                 ImGui::Text("Name: %s", materialPtr->name.c_str());
 
@@ -84,7 +90,7 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
         }));
 
     m_cameraPropertiesEditorPtr =
-        std::make_shared<CameraPropertiesEditor>(CameraPropertiesEditor([&]() {
+        std::make_unique<CameraPropertiesEditor>(CameraPropertiesEditor([&]() {
             if (ImGui::BeginCombo(
                     "Active Camera",
                     fmt::format("Camera {}", m_activeCameraIndex).c_str())) {
@@ -107,7 +113,7 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
         }));
 
     m_inputPropertiesEditorPtr =
-        std::make_shared<InputPropertiesEditor>(InputPropertiesEditor([&]() {
+        std::make_unique<InputPropertiesEditor>(InputPropertiesEditor([&]() {
             ImGui::SeparatorText("Mouse");
             ImGui::SliderFloat("X Sensitivity", &m_xSensitivity, 0.01f, 30.0f);
             ImGui::SliderFloat("Y Sensitivity", &m_ySensitivity, 0.01f, 30.0f);

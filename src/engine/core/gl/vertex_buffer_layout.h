@@ -23,6 +23,7 @@ private:
 public:
     VertexBufferLayout();
 
+    VertexBufferLayout(VertexBufferLayout&& other);
     /*
       Each push is done for one type of item
       push(3) 3 for vertex
@@ -34,7 +35,7 @@ public:
     template <typename T>
     void Push(GLuint count);
 
-    inline const std::vector<VertexBufferElement> &GetElements() const {
+    inline const std::vector<VertexBufferElement>& GetElements() const {
         return m_VertexBufferElements;
     };
 

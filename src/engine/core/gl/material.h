@@ -26,6 +26,10 @@ public:
 
 class MeshBasicMaterial : public Material {
 public:
+    /**
+     * We are using shared pointers here since the the model owns the textures,
+     * but we also have cases of null textures, so we can't use references.
+     */
     std::shared_ptr<Texture> diffuseMap = nullptr;  // aka albedoMap
     std::shared_ptr<Texture> normalMap = nullptr;
     std::shared_ptr<Texture> specularMap = nullptr;

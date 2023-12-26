@@ -12,13 +12,24 @@ Model::Model(std::string title, glm::vec3 position, glm::vec3 rotation,
 Model::Model(std::string title, std::vector<Mesh> &meshGroup,
              glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
     : title(title),
-      m_meshesPtr(std::make_shared<std::vector<Mesh>>()),
+      m_meshesPtr(std::make_shared<std::vector<Mesh>>(std::move(meshGroup))),
       m_position(position),
       m_rotation(rotation),
       m_scale(scale) {
-    for (auto &mesh : meshGroup)
-        // Notice that this is lvalue reference, hence std::move is needed
-        m_meshesPtr->push_back(std::move(mesh));
+}
+
+Model::Model(std::string title, std::vector<Mesh> &meshGroup,
+             std::vector<std::shared_ptr<Material>> &materialPtrs,
+             glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+    : title(title),
+      m_meshesPtr(std::make_shared<std::vector<Mesh>>(std::move(meshGroup))),
+      //   m_materialPtrs(std::move(materialPtrs)),
+      m_position(position),
+      m_rotation(rotation),
+      m_scale(scale) {
+    for (int idx = 0; idx < materialPtrs.size(); idx++) {
+        m_materialPtrs.push_back(materialPtrs[idx]);
+    }
 }
 
 Model::Model(std::string title, std::string path, glm::vec3 position,
@@ -62,7 +73,8 @@ Model::Model(Model &&other)
       m_position(std::move(other.m_position)),
       m_rotation(std::move(other.m_rotation)),
       m_scale(std::move(other.m_scale)),
-      m_meshesPtr(std::move(other.m_meshesPtr)){};
+      m_meshesPtr(std::move(other.m_meshesPtr)),
+      m_materialPtrs(std::move(other.m_materialPtrs)){};
 
 Model::~Model() {
 }
@@ -76,11 +88,27 @@ void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 vpMatrix) {
     shader.SetUniformBool("u_shouldUseTexture", false);
     shader.SetUniformBool("u_debugNormals", debugNormals);
 
-    for (auto &mesh : *m_meshesPtr)
-        mesh.Draw(renderer, shader);
+    Draw(renderer, shader);
 }
 
 void Model::Draw(Renderer &renderer, Shader &shader) {
-    for (auto &mesh : *m_meshesPtr)
-        mesh.Draw(renderer, shader);
+    bool hasMaterial = m_materialPtrs.size() > 0;
+
+    if (hasMaterial && m_materialPtrs.size() != m_meshesPtr->size()) {
+        throw std::runtime_error(
+            fmt::format("Material count ({}) does not match mesh count ({}).\n",
+                        m_materialPtrs.size(), m_meshesPtr->size()));
+    }
+
+    for (int meshIdx = 0; meshIdx < m_meshesPtr->size(); meshIdx++) {
+        if (hasMaterial) {
+            m_materialPtrs[meshIdx]->Bind(shader);
+        }
+
+        m_meshesPtr->at(meshIdx).Draw(renderer);
+
+        if (hasMaterial) {
+            m_materialPtrs[meshIdx]->Unbind(shader);
+        }
+    }
 }

@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "material.h"
 #include "mesh.h"
 #include "renderer.h"
 #include "shader.h"
@@ -32,11 +33,14 @@ protected:
     std::string m_directory = "";
     std::string m_path = "";
 
+    std::vector<std::shared_ptr<Material>> m_materialPtrs;
+
 public:
     std::string title;
     bool debugNormals = false;
     // we will use texture path as key (or anything unique)
-    std::map<std::string, std::shared_ptr<Texture>> textures;
+    std::map<std::string, std::shared_ptr<Texture>> texturePtrCache;
+    // the key is the index of the mesh in the model
 
 public:
     Model(std::string title, glm::vec3 position = glm::vec3(0.0f),
@@ -48,19 +52,19 @@ public:
           glm::vec3 rotation = glm::vec3(0.0f),
           glm::vec3 scale = glm::vec3(1.0f));
 
+    Model(std::string title, std::vector<Mesh> &meshGroup,
+          std::vector<std::shared_ptr<Material>> &materialPtrs,
+          glm::vec3 position = glm::vec3(0.0f),
+          glm::vec3 rotation = glm::vec3(0.0f),
+          glm::vec3 scale = glm::vec3(1.0f));
+
     /// @brief This constructor is used for loading models from file
-    /// @param title - title of the model
-    /// @param path - path to the model file
-    /// @param position - position of the model
-    /// @param rotation - rotation of the model
-    /// @param scale - scale of the model
-    /// @return
     Model(std::string title, std::string path,
           glm::vec3 position = glm::vec3(0.0f),
           glm::vec3 rotation = glm::vec3(0.0f),
           glm::vec3 scale = glm::vec3(1.0f));
 
-    Model(Model &other) = delete;
+    Model(const Model &other) = delete;
 
     Model(Model &&other);
 
@@ -143,5 +147,10 @@ public:
         return *m_meshesPtr;
     }
 
+    inline std::vector<std::shared_ptr<Material>> &GetMaterials() {
+        return m_materialPtrs;
+    }
+
+    // TODO: Implement this
     static void PhongShadingConverter(std::vector<Mesh> &meshGroup){};
 };

@@ -20,6 +20,7 @@
 #include "../window/window_manager.h"
 
 // https://docs.unity3d.com/2017.3/Documentation/Manual/SceneViewNavigation.html
+// TODO: Either use or remove
 enum MouseInputMode {
     MOVE,
     ORBIT,
@@ -27,8 +28,8 @@ enum MouseInputMode {
 };
 
 struct RenderContext {
-    std::shared_ptr<WindowManager> windowManagerPtr;
-    std::shared_ptr<Renderer> rendererPtr;
+    std::unique_ptr<WindowManager> windowManagerPtr;
+    std::unique_ptr<Renderer> rendererPtr;
     int fps = 0;
     int max_fps = 60;
     float deltaTime = 0.0f;
@@ -53,9 +54,9 @@ private:
 
     std::string m_sceneTitle;
 
-    std::shared_ptr<ObjectPropertiesEditor> m_objectPropertiesEditorPtr;
-    std::shared_ptr<CameraPropertiesEditor> m_cameraPropertiesEditorPtr;
-    std::shared_ptr<InputPropertiesEditor> m_inputPropertiesEditorPtr;
+    std::unique_ptr<ObjectPropertiesEditor> m_objectPropertiesEditorPtr;
+    std::unique_ptr<CameraPropertiesEditor> m_cameraPropertiesEditorPtr;
+    std::unique_ptr<InputPropertiesEditor> m_inputPropertiesEditorPtr;
 
 public:
     BaseScene(RenderContext &renderContext, std::string sceneTitle);
@@ -85,7 +86,11 @@ protected:
         }
     }
 
-    void AddModel(Model model) {
+    void AddModel(Model &model) {
+        m_models.push_back(std::move(model));
+    }
+
+    void AddModel(Model &&model) {
         m_models.push_back(std::move(model));
     }
 

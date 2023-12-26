@@ -3,6 +3,11 @@
 VertexBufferLayout::VertexBufferLayout() : m_stride(0) {
 }
 
+VertexBufferLayout::VertexBufferLayout(VertexBufferLayout&& other)
+    : m_VertexBufferElements(std::move(other.m_VertexBufferElements)),
+      m_stride(other.m_stride) {
+}
+
 unsigned int VertexBufferElement::GetSize(GLuint type) {
     switch (type) {
         case (GL_FLOAT):

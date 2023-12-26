@@ -1,8 +1,8 @@
 #include "app.h"
 
 App::App()
-    : m_renderContext({std::make_shared<WindowManager>(),
-                       std::make_shared<Renderer>(), 0, 90}),
+    : m_renderContext({std::make_unique<WindowManager>(),
+                       std::make_unique<Renderer>(), 0, 90}),
       m_gui(*m_renderContext.windowManagerPtr),
       m_fpsGraph(m_renderContext, m_gui.features.showFPSGraph),
       m_menuBar(*m_renderContext.windowManagerPtr, m_gui.features),
