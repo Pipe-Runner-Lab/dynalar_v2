@@ -18,6 +18,8 @@
 #include "../core/gl/vertex_buffer_layout.h"
 #include "../core/utils/logger.h"
 #include "../window/window_manager.h"
+#include "lights/ambient_light.h"
+#include "lights/base_light.h"
 
 // https://docs.unity3d.com/2017.3/Documentation/Manual/SceneViewNavigation.html
 // TODO: Either use or remove
@@ -35,10 +37,16 @@ struct RenderContext {
     float deltaTime = 0.0f;
 };
 
+struct LightsContainer {
+    unsigned int ambientLightCount = 0;
+    std::vector<std::unique_ptr<BaseLight>> m_lightPtrs;
+};
+
 class BaseScene {
 protected:
     RenderContext &m_renderContext;
     std::vector<Model> m_models;
+    LightsContainer m_lightsContainer;
 
 private:
     std::vector<Camera> m_cameras;
@@ -46,6 +54,7 @@ private:
 
     int m_activeModelIndex = 0;
     int m_activeMeshIndex = 0;
+    int m_activeLightIndex = 0;
 
     float m_xSensitivity = 8.0f;
     float m_ySensitivity = 8.0f;
@@ -57,6 +66,7 @@ private:
     std::unique_ptr<ObjectPropertiesEditor> m_objectPropertiesEditorPtr;
     std::unique_ptr<CameraPropertiesEditor> m_cameraPropertiesEditorPtr;
     std::unique_ptr<InputPropertiesEditor> m_inputPropertiesEditorPtr;
+    std::unique_ptr<LightPropertiesEditor> m_lightPropertiesEditorPtr;
 
 public:
     BaseScene(RenderContext &renderContext, std::string sceneTitle);
@@ -98,10 +108,17 @@ protected:
         m_models.push_back(std::move(model));
     }
 
-    void SetActiveModelIndex(int index) {
-        if (index < m_models.size()) {
-            m_activeModelIndex = index;
+    void AddLight(std::unique_ptr<BaseLight> &&lightPtr) {
+        if (lightPtr->type == LightType::AMBIENT_LIGHT) {
+            m_lightsContainer.ambientLightCount++;
+
+            if (m_lightsContainer.ambientLightCount > 1) {
+                throw std::runtime_error(
+                    "Only one ambient light can be added to the scene");
+            }
         }
+
+        m_lightsContainer.m_lightPtrs.push_back(std::move(lightPtr));
     }
 
     Model &GetActiveModel() {
@@ -110,5 +127,13 @@ protected:
         }
 
         return m_models[m_activeModelIndex];
+    }
+
+    std::unique_ptr<BaseLight> &GetActiveLightPtr() {
+        if (m_lightsContainer.m_lightPtrs.size() == 0) {
+            throw std::runtime_error("No light has been added to the scene");
+        }
+
+        return m_lightsContainer.m_lightPtrs[m_activeLightIndex];
     }
 };

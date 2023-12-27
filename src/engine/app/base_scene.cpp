@@ -112,6 +112,44 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
             ImGui::SeparatorText("Camera Properties");
         }));
 
+    m_lightPropertiesEditorPtr =
+        std::make_unique<LightPropertiesEditor>(LightPropertiesEditor([&]() {
+            BaseLight *activeLightPtr = GetActiveLightPtr().get();
+            auto &lightPtrs = m_lightsContainer.m_lightPtrs;
+
+            if (ImGui::BeginCombo("Selected Light",
+                                  activeLightPtr->name.c_str())) {
+                for (int itemIdx = 0; itemIdx < lightPtrs.size(); itemIdx++) {
+                    const bool is_selected = (m_activeLightIndex == itemIdx);
+                    if (ImGui::Selectable(lightPtrs[itemIdx]->name.c_str(),
+                                          is_selected)) {
+                        m_activeLightIndex = itemIdx;
+                    }
+
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::SeparatorText("Light Properties");
+
+            switch (activeLightPtr->type) {
+                case LightType::AMBIENT_LIGHT: {
+                    auto lightPtr = static_cast<AmbientLight *>(activeLightPtr);
+                    ImGui::Text("Type: Ambient Light");
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            ImGui::SliderFloat("Intensity", &activeLightPtr->GetIntensity(),
+                               0.0f, 1.0f);
+            ImGui::ColorEdit3("Color",
+                              glm::value_ptr(activeLightPtr->GetColor()));
+        }));
+
     m_inputPropertiesEditorPtr =
         std::make_unique<InputPropertiesEditor>(InputPropertiesEditor([&]() {
             ImGui::SeparatorText("Mouse");
@@ -131,6 +169,10 @@ void BaseScene::OnGUIRender() {
 
         if (m_cameras.size() > 0) {
             m_cameraPropertiesEditorPtr->Render();
+        }
+
+        if (m_lightsContainer.m_lightPtrs.size() > 0) {
+            m_lightPropertiesEditorPtr->Render();
         }
 
         m_inputPropertiesEditorPtr->Render();

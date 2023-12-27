@@ -1,7 +1,7 @@
 #include "properties_editor.h"
 
 ObjectPropertiesEditor::ObjectPropertiesEditor(std::function<void()> renderCb)
-    : m_renderCb(renderCb) {
+    : BasePropertiesEditor(renderCb) {
 }
 
 void ObjectPropertiesEditor::SetAdditionalRenderCallback(
@@ -18,7 +18,7 @@ void ObjectPropertiesEditor::Render() {
 }
 
 CameraPropertiesEditor::CameraPropertiesEditor(std::function<void()> renderCb)
-    : m_renderCb(renderCb) {
+    : BasePropertiesEditor(renderCb) {
 }
 
 void CameraPropertiesEditor::Render() {
@@ -29,11 +29,22 @@ void CameraPropertiesEditor::Render() {
 }
 
 InputPropertiesEditor::InputPropertiesEditor(std::function<void()> renderCb)
-    : m_renderCb(renderCb) {
+    : BasePropertiesEditor(renderCb) {
 }
 
 void InputPropertiesEditor::Render() {
     if (ImGui::BeginTabItem("Input")) {
+        m_renderCb();
+        ImGui::EndTabItem();
+    }
+}
+
+LightPropertiesEditor::LightPropertiesEditor(std::function<void()> renderCb)
+    : BasePropertiesEditor(renderCb) {
+}
+
+void LightPropertiesEditor::Render() {
+    if (ImGui::BeginTabItem("Lights")) {
         m_renderCb();
         ImGui::EndTabItem();
     }
