@@ -148,6 +148,10 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                                0.0f, 1.0f);
             ImGui::ColorEdit3("Color",
                               glm::value_ptr(activeLightPtr->GetColor()));
+            if (activeLightPtr->m_lightModelPtr != nullptr) {
+                ImGui::Checkbox("Render Light Model",
+                                &activeLightPtr->render_model);
+            }
         }));
 
     m_inputPropertiesEditorPtr =

@@ -114,7 +114,7 @@ public:
         return *this;
     }
 
-    void Draw(Renderer &renderer, Shader &shader, glm::mat4 vpMatrix);
+    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix);
 
     void Draw(Renderer &renderer, Shader &shader);
 

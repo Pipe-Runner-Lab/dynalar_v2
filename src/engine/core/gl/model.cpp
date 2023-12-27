@@ -79,8 +79,8 @@ Model::Model(Model &&other)
 Model::~Model() {
 }
 
-void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 vpMatrix) {
-    glm::mat4 modelMatrix = GetModelMatrix();
+void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix) {
+    glm::mat4 &modelMatrix = GetModelMatrix();
 
     shader.SetUniformMatrix4f(
         "u_mvp", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));

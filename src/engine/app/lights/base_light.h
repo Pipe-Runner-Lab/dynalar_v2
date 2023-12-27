@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
+#include "../../core/gl/model.h"
+#include "../../core/gl/renderer.h"
 #include "../../core/gl/shader.h"
 
 enum class LightType {
@@ -16,6 +18,8 @@ class BaseLight {
 public:
     std::string name;
     LightType type;
+    bool render_model = false;
+    std::unique_ptr<Model> m_lightModelPtr = nullptr;
 
 protected:
     glm::vec3 m_color;
@@ -40,4 +44,8 @@ public:
 
     virtual void Bind(Shader& shader) = 0;
     virtual void Unbind(Shader& shader) = 0;
+    virtual void Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {
+        if (m_lightModelPtr == nullptr || !render_model)
+            return;
+    };
 };

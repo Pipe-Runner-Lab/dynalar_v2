@@ -39,7 +39,16 @@ struct RenderContext {
 
 struct LightsContainer {
     unsigned int ambientLightCount = 0;
+    unsigned int pointLightCount = 0;
     std::vector<std::unique_ptr<BaseLight>> m_lightPtrs;
+
+    void Bind(Shader &shader) {
+        shader.SetUniform1i("u_numPointLights", pointLightCount);
+    }
+
+    void Unbind(Shader &shader) {
+        shader.SetUniform1i("u_numPointLights", 0);
+    }
 };
 
 class BaseScene {

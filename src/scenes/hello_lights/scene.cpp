@@ -50,9 +50,20 @@ void HelloLightsScene::OnRender() {
     glm::mat4 vpMatrix =
         activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
 
+    m_lightsContainer.Bind(m_shader);
+    for (auto &light : m_lightsContainer.m_lightPtrs) {
+        light->Bind(m_shader);
+        light->Draw(*m_renderContext.rendererPtr, m_shader, vpMatrix);
+    }
+
     for (auto &model : m_models) {
         model.Draw(*m_renderContext.rendererPtr, m_shader, vpMatrix);
     }
+
+    for (auto &light : m_lightsContainer.m_lightPtrs) {
+        light->Unbind(m_shader);
+    }
+    m_lightsContainer.Unbind(m_shader);
     m_shader.Unbind();
 }
 
