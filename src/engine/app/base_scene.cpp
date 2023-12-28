@@ -140,6 +140,13 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                     ImGui::Text("Type: Ambient Light");
                     break;
                 }
+                case LightType::POINT_LIGHT: {
+                    auto lightPtr = static_cast<PointLight *>(activeLightPtr);
+                    ImGui::Text("Type: PointLight Light");
+                    ImGui::DragFloat3("Position",
+                                      glm::value_ptr(lightPtr->position), 0.1f);
+                    break;
+                }
                 default:
                     break;
             }

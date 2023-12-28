@@ -20,6 +20,7 @@
 #include "../window/window_manager.h"
 #include "lights/ambient_light.h"
 #include "lights/base_light.h"
+#include "lights/point_light.h"
 
 // https://docs.unity3d.com/2017.3/Documentation/Manual/SceneViewNavigation.html
 // TODO: Either use or remove
@@ -44,10 +45,40 @@ struct LightsContainer {
 
     void Bind(Shader &shader) {
         shader.SetUniform1i("u_numPointLights", pointLightCount);
+
+        int pointLightIdx = 0;
+        for (auto &lightPtr : m_lightPtrs) {
+            switch (lightPtr->type) {
+                case LightType::AMBIENT_LIGHT:
+                    lightPtr->Bind(shader);
+                    break;
+                case LightType::POINT_LIGHT:
+                    lightPtr->Bind(shader, pointLightIdx);
+                    pointLightIdx++;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     void Unbind(Shader &shader) {
         shader.SetUniform1i("u_numPointLights", 0);
+
+        int pointLightIdx = 0;
+        for (auto &lightPtr : m_lightPtrs) {
+            switch (lightPtr->type) {
+                case LightType::AMBIENT_LIGHT:
+                    lightPtr->Unbind(shader);
+                    break;
+                case LightType::POINT_LIGHT:
+                    lightPtr->Unbind(shader, pointLightIdx);
+                    pointLightIdx++;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 };
 
@@ -118,13 +149,22 @@ protected:
     }
 
     void AddLight(std::unique_ptr<BaseLight> &&lightPtr) {
-        if (lightPtr->type == LightType::AMBIENT_LIGHT) {
-            m_lightsContainer.ambientLightCount++;
+        switch (lightPtr->type) {
+            case LightType::AMBIENT_LIGHT: {
+                m_lightsContainer.ambientLightCount++;
 
-            if (m_lightsContainer.ambientLightCount > 1) {
-                throw std::runtime_error(
-                    "Only one ambient light can be added to the scene");
-            }
+                if (m_lightsContainer.ambientLightCount > 1) {
+                    throw std::runtime_error(
+                        "Only one ambient light can be added to the scene");
+                }
+                break;
+            };
+            case LightType::POINT_LIGHT: {
+                m_lightsContainer.pointLightCount++;
+                break;
+            };
+            default:
+                break;
         }
 
         m_lightsContainer.m_lightPtrs.push_back(std::move(lightPtr));
