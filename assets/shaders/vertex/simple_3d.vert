@@ -7,13 +7,13 @@ layout(location=2)in vec2 uv;
 out vec2 v_uv;
 out vec4 v_color;
 
-uniform mat4 u_mvp=mat4(1.);
+uniform mat4 u_mvpMatrix=mat4(1.);
 uniform mat4 u_model=mat4(1.);
 uniform bool u_debugNormals=false;
 
 void main(){
   v_uv=uv;
-  gl_Position=u_mvp*vec4(pos,1.);
+  gl_Position=u_mvpMatrix*vec4(pos,1.);
   // gl_Position=vec4(pos,1.);
   
   if(u_debugNormals){

@@ -4,20 +4,22 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
     : BaseScene(renderContext, "Hello Lights"),
       m_shader("assets/shaders/vertex/light_3d.vert",
                "assets/shaders/fragment/light_3d.frag") {
-    AddModel(Plane("Ground Plane", {0, 0, 0}, {-90, 0, 0}, {10, 10, 1},
-                   {0.4, 0.3, 0.15, 1.0}));
-    AddModel(Plane("Left Wall", {-5, 5, 0}, {0, 90, 0}, {10, 10, 1},
-                   {0.27, 0.32, 0.33, 1.0}));
-    AddModel(Plane("Right Wall", {5, 5, 0}, {0, -90, 0}, {10, 10, 1},
-                   {0.27, 0.32, 0.33, 1.0}));
-    AddModel(Plane("Back Wall", {0, 5, -5}, {0, 0, 0}, {10, 10, 1},
-                   {0.27, 0.32, 0.33, 1.0}));
-    AddModel(Cube("Red Cube", {0, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
-                  {1.0, 0.0, 0.0, 1.0}));
-    AddModel(Cube("Blue Cube", {-2.5, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
-                  {0.0, 0.0, 1.0, 1.0}));
-    AddModel(Cube("Green Cube", {2.5, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
-                  {0.0, 1.0, 0.0, 1.0}));
+    // AddModel(Plane("Ground Plane", {0, 0, 0}, {-90, 0, 0}, {10, 10, 1},
+    //                {0.4, 0.3, 0.15, 1.0}));
+    // AddModel(Plane("Left Wall", {-5, 5, 0}, {0, 90, 0}, {10, 10, 1},
+    //                {0.27, 0.32, 0.33, 1.0}));
+    // AddModel(Plane("Right Wall", {5, 5, 0}, {0, -90, 0}, {10, 10, 1},
+    //                {0.27, 0.32, 0.33, 1.0}));
+    // AddModel(Plane("Back Wall", {0, 5, -5}, {0, 0, 0}, {10, 10, 1},
+    //                {0.27, 0.32, 0.33, 1.0}));
+    // AddModel(Cube("Red Cube", {0, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
+    //               {1.0, 0.0, 0.0, 1.0}));
+    // AddModel(Cube("Blue Cube", {-2.5, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
+    //               {0.0, 0.0, 1.0, 1.0}));
+    // AddModel(Cube("Green Cube", {2.5, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
+    //               {0.0, 1.0, 0.0, 1.0}));
+    AddModel(Model("Bag", "assets/models/backpack/backpack.obj", {0, 0, 0},
+                   {0, 0, 0}, {1, 1, 1}));
 
     // set up camera
     AddCamera(Camera(
@@ -52,6 +54,9 @@ void HelloLightsScene::OnRender() {
     Camera &activeCamera = GetActiveCamera();
     glm::mat4 vpMatrix =
         activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
+    m_shader.SetUniform3f("u_viewPos", activeCamera.GetPosition().x,
+                          activeCamera.GetPosition().y,
+                          activeCamera.GetPosition().z);
 
     m_lightsContainer.Bind(m_shader);
     for (auto &lightPtr : m_lightsContainer.m_lightPtrs) {

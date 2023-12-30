@@ -33,16 +33,20 @@ public:
     void UpdatePosition(glm::vec3 deltaPosition);
     void LookAt(float pitch, float yaw);
 
-    glm::vec3 &GetFront() {
+    inline glm::vec3 &GetFront() {
         return m_front;
     }
 
-    glm::vec3 &GetUp() {
+    inline glm::vec3 &GetUp() {
         return m_up;
     }
 
-    glm::vec3 &GetRight() {
+    inline glm::vec3 &GetRight() {
         return m_right;
+    }
+
+    inline glm::vec3 &GetPosition() {
+        return m_position;
     }
 
     glm::mat4 &GetViewMatrix();

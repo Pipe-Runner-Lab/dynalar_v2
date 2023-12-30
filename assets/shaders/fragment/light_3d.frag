@@ -1,6 +1,7 @@
 #version 330
 
 const int MAX_POINT_LIGHTS=4;
+float specularStrength=.7;
 
 struct MeshBaseMaterial{
   vec4 albedo;
@@ -33,6 +34,7 @@ uniform MeshBaseMaterial u_material;
 // lights
 uniform AmbientLight u_ambientLight;
 uniform int u_numPointLights;
+uniform vec3 u_viewPos;
 uniform PointLight u_pointLights[MAX_POINT_LIGHTS];
 
 void main(){
@@ -41,20 +43,28 @@ void main(){
     return;
   }
   
-  vec4 ambient=vec4(u_ambientLight.color*u_ambientLight.intensity,1.f);
+  vec3 normal=normalize(v_normal);
+  vec3 viewDir=normalize(u_viewPos-v_fragPos);
   
-  vec4 diffuse=vec4(0.f);
+  vec3 ambient=u_ambientLight.color*u_ambientLight.intensity;
+  
+  vec3 diffuse=vec3(0.f);
+  vec3 specular=vec3(0.f);
   for(int i=0;i<u_numPointLights;i++){
     PointLight pointLight=u_pointLights[i];
     vec3 lightDir=normalize(pointLight.position-v_fragPos);
-    float diffuseFactor=max(dot(v_normal,lightDir),0.f);
-    diffuse+=vec4(pointLight.color*pointLight.intensity*diffuseFactor,1.f);
+    float diffuseFactor=max(dot(normal,lightDir),0.f);
+    diffuse+=pointLight.color*pointLight.intensity*diffuseFactor;
+    
+    vec3 reflectDir=reflect(-lightDir,normal);
+    float specularFactor=pow(max(dot(viewDir,reflectDir),0.),32);
+    specular+=pointLight.color*specularStrength*specularFactor;
   }
   
   if(u_shouldUseTexture){
-    pixelColor=ambient*texture2D(u_textureSampler,v_uv);
+    pixelColor=vec4(ambient,1.)*texture2D(u_textureSampler,v_uv);
   }
   else{
-    pixelColor=(diffuse+ambient)*u_material.albedo;
+    pixelColor=vec4((diffuse+ambient+specular)*u_material.albedo.xyz,1.);
   }
 }

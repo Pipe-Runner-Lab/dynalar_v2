@@ -34,7 +34,13 @@ Model::Model(std::string title, std::vector<Mesh> &meshGroup,
 
 Model::Model(std::string title, std::string path, glm::vec3 position,
              glm::vec3 rotation, glm::vec3 scale)
-    : m_path(path), m_directory(path.substr(0, path.find_last_of('/'))) {
+    : m_path(path),
+      m_directory(path.substr(0, path.find_last_of('/'))),
+      title(title),
+      m_position(position),
+      m_rotation(rotation),
+      m_scale(scale),
+      m_meshesPtr(std::make_shared<std::vector<Mesh>>()) {
     Assimp::Importer importer;
     const aiScene *scene =
         importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -52,7 +58,7 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        m_meshesPtr->push_back(processMesh(mesh, scene));
+        processMesh(mesh, scene);
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
@@ -60,7 +66,47 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
     }
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+void Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture> textures;
+
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        // vertex positions
+        vertices.push_back(mesh->mVertices[i].x);
+        vertices.push_back(mesh->mVertices[i].y);
+        vertices.push_back(mesh->mVertices[i].z);
+
+        // vertex normals
+        vertices.push_back(mesh->mNormals[i].x);
+        vertices.push_back(mesh->mNormals[i].y);
+        vertices.push_back(mesh->mNormals[i].z);
+
+        // vertex texture coordinates (uv)
+        if (mesh->mTextureCoords[0]) {  // does the mesh contain texture
+                                        // coordinates?
+            vertices.push_back(mesh->mTextureCoords[0][i].x);
+            vertices.push_back(mesh->mTextureCoords[0][i].y);
+        } else {  // if no texture coordinates, set them to 0
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+        }
+    }
+    // process indices
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+        aiFace face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++)
+            indices.push_back(face.mIndices[j]);
+    }
+
+    VertexBufferLayout layout;
+    layout.Push<float>(3);  // position
+    layout.Push<float>(3);  // normal
+    layout.Push<float>(2);  // texture coordinates
+
+    m_materialPtrs.push_back(std::make_shared<MeshBasicMaterial>());
+
+    m_meshesPtr->push_back(Mesh(vertices, indices, layout));
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
@@ -83,8 +129,8 @@ void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix) {
     glm::mat4 &modelMatrix = GetModelMatrix();
 
     shader.SetUniformMatrix4f(
-        "u_mvp", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
-    shader.SetUniformMatrix4f("u_model", modelMatrix);
+        "u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
+    shader.SetUniformMatrix4f("u_mMatrix", modelMatrix);
     shader.SetUniformBool("u_shouldUseTexture", false);
     shader.SetUniformBool("u_debugNormals", debugNormals);
 

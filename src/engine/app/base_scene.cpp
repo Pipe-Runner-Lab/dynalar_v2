@@ -18,7 +18,6 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                     if (ImGui::Selectable(m_models[itemIdx].title.c_str(),
                                           is_selected)) {
                         m_activeModelIndex = itemIdx;
-                        m_activeMeshIndex = 0;
                     }
 
                     if (is_selected)
