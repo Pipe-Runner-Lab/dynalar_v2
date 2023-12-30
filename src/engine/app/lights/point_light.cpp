@@ -8,7 +8,7 @@ PointLight::PointLight(const glm::vec3 color, float intensity,
 PointLight::PointLight(std::string name, const glm::vec3 color, float intensity,
                        glm::vec3 position)
     : BaseLight(
-          name, LightType::POINT_LIGHT, color, intensity,
+          name, LightType::POINT, color, intensity,
           std::make_shared<Cube>(name, glm::vec3(0.0f), glm::vec3(0.5f),
                                  glm::vec4(color.r, color.g, color.b, 1.0f))),
       position(position) {

@@ -5,6 +5,8 @@ float specularStrength=.7;
 
 struct MeshBaseMaterial{
   vec4 albedo;
+  sampler2D albedoMaps[10];
+  sampler2D specularMaps[10];
 };
 
 struct AmbientLight{

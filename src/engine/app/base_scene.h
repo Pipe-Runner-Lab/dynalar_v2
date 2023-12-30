@@ -49,10 +49,10 @@ struct LightsContainer {
         int pointLightIdx = 0;
         for (auto &lightPtr : m_lightPtrs) {
             switch (lightPtr->type) {
-                case LightType::AMBIENT_LIGHT:
+                case LightType::AMBIENT:
                     lightPtr->Bind(shader);
                     break;
-                case LightType::POINT_LIGHT:
+                case LightType::POINT:
                     lightPtr->Bind(shader, pointLightIdx);
                     pointLightIdx++;
                     break;
@@ -68,10 +68,10 @@ struct LightsContainer {
         int pointLightIdx = 0;
         for (auto &lightPtr : m_lightPtrs) {
             switch (lightPtr->type) {
-                case LightType::AMBIENT_LIGHT:
+                case LightType::AMBIENT:
                     lightPtr->Unbind(shader);
                     break;
-                case LightType::POINT_LIGHT:
+                case LightType::POINT:
                     lightPtr->Unbind(shader, pointLightIdx);
                     pointLightIdx++;
                     break;
@@ -150,7 +150,7 @@ protected:
 
     void AddLight(std::unique_ptr<BaseLight> &&lightPtr) {
         switch (lightPtr->type) {
-            case LightType::AMBIENT_LIGHT: {
+            case LightType::AMBIENT: {
                 m_lightsContainer.ambientLightCount++;
 
                 if (m_lightsContainer.ambientLightCount > 1) {
@@ -159,7 +159,7 @@ protected:
                 }
                 break;
             };
-            case LightType::POINT_LIGHT: {
+            case LightType::POINT: {
                 m_lightsContainer.pointLightCount++;
                 break;
             };

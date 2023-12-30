@@ -6,7 +6,7 @@ AmbientLight::AmbientLight(const glm::vec3 color, float intensity)
 
 AmbientLight::AmbientLight(std::string name, const glm::vec3 color,
                            float intensity)
-    : BaseLight(name, LightType::AMBIENT_LIGHT, color, intensity) {
+    : BaseLight(name, LightType::AMBIENT, color, intensity) {
 }
 
 void AmbientLight::Bind(Shader& shader, int idx) {

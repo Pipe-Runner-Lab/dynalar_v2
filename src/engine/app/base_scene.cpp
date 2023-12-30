@@ -134,12 +134,12 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
             ImGui::SeparatorText("Light Properties");
 
             switch (activeLightPtr->type) {
-                case LightType::AMBIENT_LIGHT: {
+                case LightType::AMBIENT: {
                     auto lightPtr = static_cast<AmbientLight *>(activeLightPtr);
                     ImGui::Text("Type: Ambient Light");
                     break;
                 }
-                case LightType::POINT_LIGHT: {
+                case LightType::POINT: {
                     auto lightPtr = static_cast<PointLight *>(activeLightPtr);
                     ImGui::Text("Type: PointLight Light");
                     ImGui::DragFloat3("Position",

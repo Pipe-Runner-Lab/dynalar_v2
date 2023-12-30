@@ -8,10 +8,10 @@
 #include "../../core/gl/shader.h"
 
 enum class LightType {
-    POINT_LIGHT,
-    DIRECTIONAL_LIGHT,
-    SPOT_LIGHT,
-    AMBIENT_LIGHT,
+    POINT,
+    DIRECTIONAL,
+    SPOT,
+    AMBIENT,
 };
 
 class BaseLight {

@@ -8,7 +8,8 @@
 
 #include "../utils/error.h"
 
-enum class TextureType { DIFFUSE, SPECULAR, NORMAL, HEIGHT };
+// The int values are in correspondence with the values of aiTextureType
+enum class TextureType { DIFFUSE = 1, SPECULAR = 2, NORMAL = 6, HEIGHT = 5 };
 
 /**
  * Note: Copying a texture is not allowed. This is because texture automatically
@@ -17,10 +18,12 @@ enum class TextureType { DIFFUSE, SPECULAR, NORMAL, HEIGHT };
 class Texture {
 private:
     GLuint m_textureID;
-    TextureType m_type = TextureType::DIFFUSE;
     std::string m_filePath;
     unsigned char *m_localBuffer;
     int m_width, m_height, m_bpp;  // BPP => Bits Per Pixel
+
+public:
+    TextureType type = TextureType::DIFFUSE;
 
 public:
     Texture(const std::string &filePath, bool hasAlpha = true);

@@ -3,7 +3,9 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
+#include <vector>
 
+#include "../utils/error.h"
 #include "shader.h"
 #include "texture.h"
 
@@ -18,8 +20,18 @@ public:
     std::string name;
     MaterialType type;
 
+    // protected:
+    //     static int MAX_TEXTURE_SLOT;
+
 public:
-    Material(std::string name, MaterialType type) : name(name), type(type){};
+    // TODO: Optimize this for single call
+    Material(std::string name, MaterialType type)
+        : name(name),
+          type(type){
+              //     GL_CALL(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS,
+              //                           &Material::MAX_TEXTURE_SLOT));
+          };
+
     virtual void Bind(Shader& shader){};
     virtual void Unbind(Shader& shader){};
 };
@@ -27,17 +39,14 @@ public:
 class MeshBasicMaterial : public Material {
 public:
     /**
-     * We are using shared pointers here since the the model owns the textures,
-     * but we also have cases of null textures, so we can't use references.
+     * We are using shared pointers here since the the model owns the
+     * textures, but we also have cases of null textures, so we can't use
+     * references.
      */
-    std::shared_ptr<Texture> diffuseMap = nullptr;  // aka albedoMap
-    std::shared_ptr<Texture> normalMap = nullptr;
-    std::shared_ptr<Texture> specularMap = nullptr;
-    std::shared_ptr<Texture> alphaMap = nullptr;
-    std::shared_ptr<Texture> displacementMap = nullptr;
-    std::shared_ptr<Texture> roughnessMap = nullptr;
-    std::shared_ptr<Texture> metalnessMap = nullptr;
-    std::shared_ptr<Texture> aoMap = nullptr;
+    std::vector<std::shared_ptr<Texture>> diffuseMaps;  // aka albedoMap
+    std::vector<std::shared_ptr<Texture>> specularMaps;
+    std::vector<std::shared_ptr<Texture>> normalMaps;
+    std::vector<std::shared_ptr<Texture>> heightMaps;
 
     glm::vec4 albedo = glm::vec4(1.0f);  // base color
     float opacity = 1.0f;
@@ -51,4 +60,27 @@ public:
 
     void Bind(Shader& shader) override;
     void Unbind(Shader& shader) override;
+
+    inline void AddTexture(std::shared_ptr<Texture> texturePtr) {
+        if (texturePtr == nullptr) {
+            throw std::runtime_error("Texture pointer is null");
+        }
+
+        switch (texturePtr->type) {
+            case TextureType::DIFFUSE:
+                diffuseMaps.push_back(texturePtr);
+                break;
+            case TextureType::SPECULAR:
+                specularMaps.push_back(texturePtr);
+                break;
+            case TextureType::NORMAL:
+                normalMaps.push_back(texturePtr);
+                break;
+            case TextureType::HEIGHT:
+                heightMaps.push_back(texturePtr);
+                break;
+            default:
+                throw std::runtime_error("Texture type not supported");
+        }
+    }
 };

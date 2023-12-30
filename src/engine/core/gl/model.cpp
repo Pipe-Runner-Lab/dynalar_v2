@@ -85,6 +85,10 @@ void Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         // vertex texture coordinates (uv)
         if (mesh->mTextureCoords[0]) {  // does the mesh contain texture
                                         // coordinates?
+            // a vertex can contain up to 8 different texture coordinates. We
+            // thus make the assumption that we won't use models where a vertex
+            // can have multiple texture coordinates so we always take the first
+            // set (0).
             vertices.push_back(mesh->mTextureCoords[0][i].x);
             vertices.push_back(mesh->mTextureCoords[0][i].y);
         } else {  // if no texture coordinates, set them to 0
@@ -104,14 +108,47 @@ void Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     layout.Push<float>(3);  // normal
     layout.Push<float>(2);  // texture coordinates
 
-    m_materialPtrs.push_back(std::make_shared<MeshBasicMaterial>());
+    // if material exists, load textures, else use default material
+    if (mesh->mMaterialIndex >= 0) {
+        aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+        m_materialPtrs.push_back(loadMaterialTextures(material));
+
+    } else {
+        m_materialPtrs.push_back(std::make_shared<MeshBasicMaterial>());
+    }
 
     m_meshesPtr->push_back(Mesh(vertices, indices, layout));
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
-                                                 aiTextureType type,
-                                                 std::string typeName) {
+std::shared_ptr<Material> Model::loadMaterialTextures(aiMaterial *mat) {
+    std::shared_ptr<MeshBasicMaterial> materialPtr =
+        std::make_shared<MeshBasicMaterial>();
+
+    aiTextureType textureTypes[2] = {aiTextureType_DIFFUSE,
+                                     aiTextureType_SPECULAR};
+
+    // iterate over all texture types
+    for (auto &textureType : textureTypes) {
+        for (unsigned int i = 0; i < mat->GetTextureCount(textureType); i++) {
+            std::shared_ptr<Texture> texturePtr = nullptr;
+            aiString str;
+            mat->GetTexture(textureType, i, &str);
+            std::string texturePath = str.C_Str();
+
+            // if texture in cache, use it, else create it and add to cache
+            if (texturePtrCache.find(texturePath) != texturePtrCache.end()) {
+                texturePtr = texturePtrCache[texturePath];
+            } else {
+                texturePtr = std::make_shared<Texture>(
+                    texturePath, TextureType(textureType));
+                texturePtrCache[texturePath] = texturePtr;
+            }
+
+            materialPtr->AddTexture(texturePtr);
+        }
+    }
+
+    return materialPtr;
 }
 
 Model::Model(Model &&other)

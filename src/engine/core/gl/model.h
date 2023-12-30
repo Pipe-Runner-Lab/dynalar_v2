@@ -72,9 +72,7 @@ public:
 
     void processNode(aiNode *node, const aiScene *scene);
     void processMesh(aiMesh *mesh, const aiScene *scene);
-    std::vector<Texture> loadMaterialTextures(aiMaterial *mat,
-                                              aiTextureType type,
-                                              std::string typeName);
+    std::shared_ptr<Material> loadMaterialTextures(aiMaterial *aiMatrix3x3);
 
     /// @brief Applies delta translation to the model
     /// @param translation

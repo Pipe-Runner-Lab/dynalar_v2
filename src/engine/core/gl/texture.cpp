@@ -6,8 +6,10 @@ Texture::Texture(const std::string &filePath, bool hasAlpha)
     : Texture(filePath, TextureType::DIFFUSE, hasAlpha) {
 }
 
+// TODO: Remove hasAlpha parameter and refer the following code
+// https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/model.h
 Texture::Texture(const std::string &filePath, TextureType type, bool hasAlpha)
-    : m_type(type) {
+    : type(type) {
     GL_CALL(glGenTextures(1, &m_textureID));
     // Bind(0, false);
     GL_CALL(glBindTexture(GL_TEXTURE_2D, m_textureID))
