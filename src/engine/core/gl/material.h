@@ -48,11 +48,11 @@ public:
     std::vector<std::shared_ptr<Texture>> normalMaps;
     std::vector<std::shared_ptr<Texture>> heightMaps;
 
-    glm::vec4 albedo = glm::vec4(1.0f);  // base color
+    glm::vec3 albedo = glm::vec3(1.0f);    // base color
+    glm::vec3 specular = glm::vec3(1.0f);  // reflection color
     float opacity = 1.0f;
     float roughness = 0.5f;
-    float metalness = 0.5f;
-    float ao = 1.0f;
+    int metalness = 32;
 
     MeshBasicMaterial() : MeshBasicMaterial("Material"){};
     MeshBasicMaterial(std::string name)

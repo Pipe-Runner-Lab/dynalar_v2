@@ -78,8 +78,14 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
                             std::static_pointer_cast<MeshBasicMaterial>(
                                 materialPtr);
                         ImGui::Text("Type: Mesh Basic Material");
-                        ImGui::ColorEdit4("Albedo",
+                        ImGui::ColorEdit3("Albedo",
                                           glm::value_ptr(material->albedo));
+                        ImGui::ColorEdit3("Specular",
+                                          glm::value_ptr(material->specular));
+                        ImGui::SliderInt("Metalness", &material->metalness, 0.0,
+                                         64.0);
+                        ImGui::SliderFloat("Opacity", &material->opacity, 0.0f,
+                                           1.0f);
                         break;
                     }
                     default:
@@ -135,28 +141,32 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
 
             switch (activeLightPtr->type) {
                 case LightType::AMBIENT: {
-                    auto lightPtr = static_cast<AmbientLight *>(activeLightPtr);
                     ImGui::Text("Type: Ambient Light");
                     break;
                 }
                 case LightType::POINT: {
                     auto lightPtr = static_cast<PointLight *>(activeLightPtr);
                     ImGui::Text("Type: PointLight Light");
-                    ImGui::DragFloat3("Position",
-                                      glm::value_ptr(lightPtr->position), 0.1f);
+                    ImGui::DragFloat3(
+                        "Position", glm::value_ptr(lightPtr->m_position), 0.1f);
+                    ImGui::SliderFloat("Diffuse Intensity",
+                                       &lightPtr->m_diffuseIntensity, 0.0f,
+                                       1.0f);
+                    ImGui::SliderFloat("Specular Intensity",
+                                       &lightPtr->m_specularIntensity, 0.0f,
+                                       1.0f);
                     break;
                 }
                 default:
                     break;
             }
 
-            ImGui::SliderFloat("Intensity", &activeLightPtr->GetIntensity(),
-                               0.0f, 1.0f);
-            ImGui::ColorEdit3("Color",
-                              glm::value_ptr(activeLightPtr->GetColor()));
+            ImGui::SliderFloat("Ambient Intensity",
+                               &activeLightPtr->m_ambientIntensity, 0.0f, 1.0f);
+            ImGui::ColorEdit3("Color", glm::value_ptr(activeLightPtr->m_color));
             if (activeLightPtr->m_lightModelPtr != nullptr) {
                 ImGui::Checkbox("Render Light Model",
-                                &activeLightPtr->render_model);
+                                &activeLightPtr->m_render_model);
             }
         }));
 

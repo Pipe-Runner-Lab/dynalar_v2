@@ -15,15 +15,17 @@ enum class LightType {
 };
 
 class BaseLight {
+    friend class BaseScene;
+
 public:
     std::string name;
     LightType type;
-    bool render_model = false;
     std::shared_ptr<Model> m_lightModelPtr = nullptr;
 
 protected:
+    bool m_render_model = false;
     glm::vec3 m_color;
-    float m_intensity;
+    float m_ambientIntensity;
 
 public:
     BaseLight(LightType type, const glm::vec3& color, float intensity,
@@ -33,24 +35,21 @@ public:
 
     BaseLight(std::string name, LightType type, const glm::vec3& color,
               float intensity, std::shared_ptr<Model> lightModelPtr = nullptr)
-        : m_intensity(intensity),
+        : m_ambientIntensity(intensity),
           m_color(color),
           name(name),
           type(type),
           m_lightModelPtr(std::move(lightModelPtr)) {
     }
 
-    inline glm::vec3& GetColor() {
-        return m_color;
-    };
-    inline float& GetIntensity() {
-        return m_intensity;
+    inline float& GetAmbientIntensity() {
+        return m_ambientIntensity;
     };
 
     virtual void Bind(Shader& shader, int idx = 0) = 0;
     virtual void Unbind(Shader& shader, int idx = 0) = 0;
     virtual void Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {
-        if (m_lightModelPtr == nullptr || !render_model)
+        if (m_lightModelPtr == nullptr || !m_render_model)
             return;
     };
 };

@@ -122,7 +122,7 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     std::vector<Mesh> meshGroup;
     std::shared_ptr<MeshBasicMaterial> material =
         std::make_shared<MeshBasicMaterial>();
-    material->albedo = {0.0, 0.0, 1.0, 1.0};
+    material->albedo = {0.0, 0.0, 1.0};
     meshGroup.push_back(Mesh(vertices, indices, layout));
     std::vector<std::shared_ptr<Material>> materialPtrs = {material};
     AddModel(Model("Cube 2", meshGroup, materialPtrs, {-2.5, 1.01, 0},

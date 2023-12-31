@@ -113,5 +113,13 @@
     "stop_token": "cpp"
   },
   "vcpkg.target.useDynamicCRT": false,
-  "cSpell.words": ["assimp", "glew", "glfw", "imgui", "imguizmo", "opengl"]
+  "cSpell.words": [
+    "assimp",
+    "glew",
+    "glfw",
+    "imgui",
+    "imguizmo",
+    "metalness",
+    "opengl"
+  ]
 }

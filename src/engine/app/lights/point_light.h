@@ -4,12 +4,19 @@
 #include "base_light.h"
 
 class PointLight : public BaseLight {
-public:
-    glm::vec3 position;
+    friend class BaseScene;
+
+private:
+    float m_diffuseIntensity;
+    float m_specularIntensity;
+    glm::vec3 m_position;
 
 public:
-    PointLight(const glm::vec3 color, float intensity, glm::vec3 position);
-    PointLight(std::string name, const glm::vec3 color, float intensity,
+    PointLight(const glm::vec3 color, float ambientIntensity,
+               float diffuseIntensity, float specularIntensity,
+               glm::vec3 position);
+    PointLight(std::string name, const glm::vec3 color, float ambientIntensity,
+               float diffuseIntensity, float specularIntensity,
                glm::vec3 position);
 
     void Bind(Shader& shader, int idx = 0) override;

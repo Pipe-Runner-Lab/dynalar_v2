@@ -33,8 +33,8 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
     // set up lights
     AddLight(std::make_unique<AmbientLight>(glm::vec3(1, 1, 1), 0.3f));
     AddLight(std::make_unique<PointLight>("Point Light 1",
-                                          glm::vec3(0.68, 0.75, 0.55), 0.7f,
-                                          glm::vec3(0, 5, 0)));
+                                          glm::vec3(0.68, 0.75, 0.55), 0.1f,
+                                          0.7f, 0.8f, glm::vec3(0, 5, 0)));
 }
 
 void HelloLightsScene::OnUpdate() {
