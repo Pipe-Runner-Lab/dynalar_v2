@@ -14,6 +14,9 @@ Renderer::Renderer() {
     GL_CALL(glEnable(GL_CULL_FACE));
     GL_CALL(glCullFace(GL_BACK));
     GL_CALL(glFrontFace(GL_CCW));
+
+    std::string glVersion = (char *)glGetString(GL_VERSION);
+    fmt::print("Renderer using OpenGL version: {}", glVersion);
 }
 
 void Renderer::Clear() {

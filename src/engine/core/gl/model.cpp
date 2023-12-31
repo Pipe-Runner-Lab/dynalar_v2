@@ -133,7 +133,7 @@ std::shared_ptr<Material> Model::loadMaterialTextures(aiMaterial *mat) {
             std::shared_ptr<Texture> texturePtr = nullptr;
             aiString str;
             mat->GetTexture(textureType, i, &str);
-            std::string texturePath = str.C_Str();
+            std::string texturePath = m_directory + "/" + str.C_Str();
 
             // if texture in cache, use it, else create it and add to cache
             if (texturePtrCache.find(texturePath) != texturePtrCache.end()) {

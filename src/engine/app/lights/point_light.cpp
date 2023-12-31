@@ -15,21 +15,19 @@ PointLight::PointLight(std::string name, const glm::vec3 color, float intensity,
 }
 
 void PointLight::Bind(Shader& shader, int idx) {
-    shader.SetUniform3f("u_pointLights[" + std::to_string(idx) + "].position",
+    shader.SetUniform3f(fmt::format("u_pointLights[{}].position", idx),
                         position.x, position.y, position.z);
-    shader.SetUniform3f("u_pointLights[" + std::to_string(idx) + "].color",
-                        m_color.r, m_color.g, m_color.b);
-    shader.SetUniform1f("u_pointLights[" + std::to_string(idx) + "].intensity",
+    shader.SetUniform3f(fmt::format("u_pointLights[{}].color", idx), m_color.r,
+                        m_color.g, m_color.b);
+    shader.SetUniform1f(fmt::format("u_pointLights[{}].intensity", idx),
                         m_intensity);
 }
 
 void PointLight::Unbind(Shader& shader, int idx) {
-    shader.SetUniform3f("u_pointLights[" + std::to_string(idx) + "].position",
-                        0, 0, 0);
-    shader.SetUniform3f("u_pointLights[" + std::to_string(idx) + "].color", 0,
-                        0, 0);
-    shader.SetUniform1f("u_pointLights[" + std::to_string(idx) + "].intensity",
-                        0.0f);
+    shader.SetUniform3f(fmt::format("u_pointLights[{}].position", idx), 0, 0,
+                        0);
+    shader.SetUniform3f(fmt::format("u_pointLights[{}].color", idx), 0, 0, 0);
+    shader.SetUniform1f(fmt::format("u_pointLights[{}].intensity", idx), 0.0f);
 }
 
 void PointLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {

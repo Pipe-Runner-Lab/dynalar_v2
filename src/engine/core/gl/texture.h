@@ -2,7 +2,6 @@
 
 #include <GL/glew.h>
 #include <fmt/core.h>
-#include <stb_image.h>
 
 #include <string>
 

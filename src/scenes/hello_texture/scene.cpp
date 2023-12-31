@@ -4,7 +4,7 @@ HelloTextureScene::HelloTextureScene(RenderContext &renderContext)
     : BaseScene(renderContext, "Hello Texture"),
       m_shader("assets/shaders/vertex/simple_uv.vert",
                "assets/shaders/fragment/simple_texture.frag"),
-      m_texture("assets/textures/default.png", false) {
+      m_texture("assets/textures/default.jpg") {
     std::vector<float> vertices = {
         -0.5f, -0.5f, 0.0f,  // 0 - xyz
         0.0f,  0.0f,         // 0 - uv

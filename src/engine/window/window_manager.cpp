@@ -10,8 +10,8 @@ WindowManager::WindowManager() {
     }
 
     /* Setup GLFW window property */
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);  // Set major version to 3
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // Set minor version to 3
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // Set major version to 4
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);  // Set minor version to 1
     glfwWindowHint(GLFW_OPENGL_PROFILE,
                    GLFW_OPENGL_CORE_PROFILE);  // Set profile to core
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,

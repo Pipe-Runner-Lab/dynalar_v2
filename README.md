@@ -43,6 +43,8 @@ brew install pkg-config
   - A. Start by deleting the `build` folder and try again.
 - Q. Vcpkg installed libs throwing error in Cmake, looking for config.
   - Make sure to set the correct triplet for the vcpkg in settings.json. For example, `-DVCPKG_TARGET_TRIPLET=x64-linux`
+- Q. How to check OpenGL version supported by Nvidia GPU?
+  - A. `glxinfo | grep "OpenGL version"` or `glxinfo | grep OpenGL`
 
 # TODO
 
