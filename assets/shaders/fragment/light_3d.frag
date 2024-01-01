@@ -56,9 +56,15 @@ void main(){
   vec3 diffuse=vec3(0.f);
   vec3 specular=vec3(0.f);
   
+  // ambient light
   // TODO: Add support for ambient maps
-  ambient=u_ambientLight.color*u_ambientLight.ambientIntensity;
+  if(u_material.numDiffuseMaps>0){
+    ambient+=u_ambientLight.color*u_ambientLight.ambientIntensity*texture2D(u_material.diffuseMaps[0],v_uv).xyz;
+  }else{
+    ambient+=u_ambientLight.color*u_ambientLight.ambientIntensity*u_material.albedo;
+  }
   
+  // point light
   for(int i=0;i<u_numPointLights;i++){
     PointLight pointLight=u_pointLights[i];
     vec3 lightDir=normalize(pointLight.position-v_fragPos);

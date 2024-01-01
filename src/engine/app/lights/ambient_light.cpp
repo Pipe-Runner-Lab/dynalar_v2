@@ -12,7 +12,7 @@ AmbientLight::AmbientLight(std::string name, const glm::vec3 color,
 void AmbientLight::Bind(Shader& shader, int idx) {
     shader.SetUniform3f("u_ambientLight.color", m_color.r, m_color.g,
                         m_color.b);
-    shader.SetUniform1f("u_ambientLight.intensity", m_ambientIntensity);
+    shader.SetUniform1f("u_ambientLight.ambientIntensity", m_ambientIntensity);
 }
 
 void AmbientLight::Unbind(Shader& shader, int idx) {

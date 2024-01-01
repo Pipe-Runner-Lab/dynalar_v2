@@ -168,7 +168,6 @@ void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix) {
     shader.SetUniformMatrix4f(
         "u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
     shader.SetUniformMatrix4f("u_mMatrix", modelMatrix);
-    shader.SetUniformBool("u_shouldUseTexture", false);
     shader.SetUniformBool("u_debugNormals", debugNormals);
 
     Draw(renderer, shader);
@@ -184,6 +183,12 @@ void Model::Draw(Renderer &renderer, Shader &shader) {
     }
 
     for (int meshIdx = 0; meshIdx < m_meshesPtr->size(); meshIdx++) {
+        if (wireframe) {
+            GL_CALL(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+        } else {
+            GL_CALL(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+        }
+
         if (hasMaterial) {
             m_materialPtrs[meshIdx]->Bind(shader);
         }

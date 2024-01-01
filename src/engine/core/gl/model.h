@@ -38,6 +38,7 @@ protected:
 public:
     std::string title;
     bool debugNormals = false;
+    bool wireframe = false;
     // we will use texture path as key (or anything unique)
     std::map<std::string, std::shared_ptr<Texture>> texturePtrCache;
     // the key is the index of the mesh in the model

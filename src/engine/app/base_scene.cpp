@@ -27,6 +27,7 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
             }
 
             ImGui::Checkbox("Debug Normals", &activeModel.debugNormals);
+            ImGui::Checkbox("Wireframe", &activeModel.wireframe);
 
             ImGui::SeparatorText("Object Properties");
             ImGui::DragFloat3("Position",
