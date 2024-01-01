@@ -6,6 +6,8 @@
 #include "model.h"
 
 class Camera {
+    friend class BaseScene;
+
 private:
     glm::vec3 m_position;
     glm::vec3 m_front;

@@ -18,7 +18,7 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
     //               {0.0, 0.0, 1.0, 1.0}));
     // AddModel(Cube("Green Cube", {2.5, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
     //               {0.0, 1.0, 0.0, 1.0}));
-    AddModel(Model("Bag", "assets/models/woman/Marina_1276.obj", {0, 0, 0},
+    AddModel(Model("Bag", "assets/models/backpack/backpack.obj", {0, 0, 0},
                    {0, 0, 0}, {1, 1, 1}));
 
     // set up camera

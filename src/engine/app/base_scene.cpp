@@ -116,6 +116,13 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
             }
 
             ImGui::SeparatorText("Camera Properties");
+
+            Camera &activeCamera = GetActiveCamera();
+
+            ImGui::DragFloat3("Position",
+                              glm::value_ptr(activeCamera.GetPosition()), 0.1f);
+            ImGui::DragFloat("Yaw", &activeCamera.m_yaw, 0.1f);
+            ImGui::DragFloat("Pitch", &activeCamera.m_pitch, 0.1f);
         }));
 
     m_lightPropertiesEditorPtr =
