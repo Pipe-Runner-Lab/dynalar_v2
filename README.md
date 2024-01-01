@@ -36,6 +36,7 @@ brew install pkg-config
 
 1. https://code.visualstudio.com/docs/languages/cpp
 2. https://learn.microsoft.com/en-us/vcpkg/users/buildsystems/cmake-integration
+3. https://github.com/KhronosGroup/glTF-Sample-Assets
 
 # FAQ
 

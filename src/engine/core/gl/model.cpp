@@ -42,8 +42,12 @@ Model::Model(std::string title, std::string path, glm::vec3 position,
       m_scale(scale),
       m_meshesPtr(std::make_shared<std::vector<Mesh>>()) {
     Assimp::Importer importer;
-    const aiScene *scene =
-        importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+    // TODO: This is a hacky solution for now
+    bool isGLTF = path.substr(path.find_last_of('.') + 1) == "gltf";
+
+    const aiScene *scene = importer.ReadFile(
+        path, aiProcess_Triangulate | (isGLTF ? 0 : aiProcess_FlipUVs));
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !scene->mRootNode) {
