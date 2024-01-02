@@ -21,6 +21,7 @@
 #include "lights/ambient_light.h"
 #include "lights/base_light.h"
 #include "lights/point_light.h"
+#include "lights/spot_light.h"
 
 // https://docs.unity3d.com/2017.3/Documentation/Manual/SceneViewNavigation.html
 // TODO: Either use or remove
@@ -41,12 +42,15 @@ struct RenderContext {
 struct LightsContainer {
     unsigned int ambientLightCount = 0;
     unsigned int pointLightCount = 0;
+    unsigned int spotLightCount = 0;
     std::vector<std::unique_ptr<BaseLight>> m_lightPtrs;
 
     void Bind(Shader &shader) {
         shader.SetUniform1i("u_numPointLights", pointLightCount);
+        shader.SetUniform1i("u_numSpotLights", spotLightCount);
 
         int pointLightIdx = 0;
+        int spotLightIdx = 0;
         for (auto &lightPtr : m_lightPtrs) {
             switch (lightPtr->type) {
                 case LightType::AMBIENT:
@@ -55,6 +59,10 @@ struct LightsContainer {
                 case LightType::POINT:
                     lightPtr->Bind(shader, pointLightIdx);
                     pointLightIdx++;
+                    break;
+                case LightType::SPOT:
+                    lightPtr->Bind(shader, spotLightIdx);
+                    spotLightIdx++;
                     break;
                 default:
                     break;

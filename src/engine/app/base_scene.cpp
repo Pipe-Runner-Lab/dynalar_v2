@@ -125,58 +125,82 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
             ImGui::DragFloat("Pitch", &activeCamera.m_pitch, 0.1f);
         }));
 
-    m_lightPropertiesEditorPtr =
-        std::make_unique<LightPropertiesEditor>(LightPropertiesEditor([&]() {
-            BaseLight *activeLightPtr = GetActiveLightPtr().get();
-            auto &lightPtrs = m_lightsContainer.m_lightPtrs;
+    m_lightPropertiesEditorPtr = std::make_unique<
+        LightPropertiesEditor>(LightPropertiesEditor([&]() {
+        BaseLight *activeLightPtr = GetActiveLightPtr().get();
+        auto &lightPtrs = m_lightsContainer.m_lightPtrs;
 
-            if (ImGui::BeginCombo("Selected Light",
-                                  activeLightPtr->name.c_str())) {
-                for (int itemIdx = 0; itemIdx < lightPtrs.size(); itemIdx++) {
-                    const bool is_selected = (m_activeLightIndex == itemIdx);
-                    if (ImGui::Selectable(lightPtrs[itemIdx]->name.c_str(),
-                                          is_selected)) {
-                        m_activeLightIndex = itemIdx;
-                    }
-
-                    if (is_selected)
-                        ImGui::SetItemDefaultFocus();
+        if (ImGui::BeginCombo("Selected Light", activeLightPtr->name.c_str())) {
+            for (int itemIdx = 0; itemIdx < lightPtrs.size(); itemIdx++) {
+                const bool is_selected = (m_activeLightIndex == itemIdx);
+                if (ImGui::Selectable(lightPtrs[itemIdx]->name.c_str(),
+                                      is_selected)) {
+                    m_activeLightIndex = itemIdx;
                 }
-                ImGui::EndCombo();
-            }
 
-            ImGui::SeparatorText("Light Properties");
-
-            switch (activeLightPtr->type) {
-                case LightType::AMBIENT: {
-                    ImGui::Text("Type: Ambient Light");
-                    break;
-                }
-                case LightType::POINT: {
-                    auto lightPtr = static_cast<PointLight *>(activeLightPtr);
-                    ImGui::Text("Type: PointLight Light");
-                    ImGui::DragFloat3(
-                        "Position", glm::value_ptr(lightPtr->m_position), 0.1f);
-                    ImGui::SliderFloat("Diffuse Intensity",
-                                       &lightPtr->m_diffuseIntensity, 0.0f,
-                                       1.0f);
-                    ImGui::SliderFloat("Specular Intensity",
-                                       &lightPtr->m_specularIntensity, 0.0f,
-                                       1.0f);
-                    break;
-                }
-                default:
-                    break;
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
             }
+            ImGui::EndCombo();
+        }
 
-            ImGui::SliderFloat("Ambient Intensity",
-                               &activeLightPtr->m_ambientIntensity, 0.0f, 1.0f);
-            ImGui::ColorEdit3("Color", glm::value_ptr(activeLightPtr->m_color));
-            if (activeLightPtr->m_lightModelPtr != nullptr) {
-                ImGui::Checkbox("Render Light Model",
-                                &activeLightPtr->m_render_model);
+        ImGui::SeparatorText("Light Properties");
+
+        switch (activeLightPtr->type) {
+            case LightType::AMBIENT: {
+                ImGui::Text("Type: Ambient Light");
+                break;
             }
-        }));
+            case LightType::POINT: {
+                auto lightPtr = static_cast<PointLight *>(activeLightPtr);
+                ImGui::Text("Type: PointLight Light");
+                ImGui::DragFloat3("Position",
+                                  glm::value_ptr(lightPtr->m_position), 0.1f);
+                ImGui::SliderFloat("Diffuse Intensity",
+                                   &lightPtr->m_diffuseIntensity, 0.0f, 1.0f);
+                ImGui::SliderFloat("Specular Intensity",
+                                   &lightPtr->m_specularIntensity, 0.0f, 1.0f);
+                ImGui::SliderFloat("Constant", &lightPtr->m_constant, 0.0f,
+                                   1.0f);
+                ImGui::SliderFloat("Linear", &lightPtr->m_linear, 0.0f, 1.0f);
+                ImGui::SliderFloat("Quadratic", &lightPtr->m_quadratic, 0.0f,
+                                   1.0f);
+                break;
+            }
+            case LightType::SPOT: {
+                auto lightPtr = static_cast<SpotLight *>(activeLightPtr);
+                ImGui::Text("Type: Spot Light");
+                ImGui::DragFloat3("Position",
+                                  glm::value_ptr(lightPtr->m_position), 0.1f);
+                ImGui::DragFloat3("Direction",
+                                  glm::value_ptr(lightPtr->m_direction), 0.1f);
+                ImGui::SliderFloat("Diffuse Intensity",
+                                   &lightPtr->m_diffuseIntensity, 0.0f, 1.0f);
+                ImGui::SliderFloat("Specular Intensity",
+                                   &lightPtr->m_specularIntensity, 0.0f, 1.0f);
+                ImGui::SliderFloat("Constant", &lightPtr->m_constant, 0.0f,
+                                   1.0f);
+                ImGui::SliderFloat("Linear", &lightPtr->m_linear, 0.0f, 1.0f);
+                ImGui::SliderFloat("Quadratic", &lightPtr->m_quadratic, 0.0f,
+                                   1.0f);
+                ImGui::SliderFloat("Cutoff Angle", &lightPtr->m_cutoff, 0.0f,
+                                   90.0f);
+                ImGui::SliderFloat("Outer Cutoff Angle",
+                                   &lightPtr->m_outerCutoff, 0.0f, 90.0f);
+                break;
+            }
+            default:
+                break;
+        }
+
+        ImGui::SliderFloat("Ambient Intensity",
+                           &activeLightPtr->m_ambientIntensity, 0.0f, 1.0f);
+        ImGui::ColorEdit3("Color", glm::value_ptr(activeLightPtr->m_color));
+        if (activeLightPtr->m_lightModelPtr != nullptr) {
+            ImGui::Checkbox("Render Light Model",
+                            &activeLightPtr->m_render_model);
+        }
+    }));
 
     m_inputPropertiesEditorPtr =
         std::make_unique<InputPropertiesEditor>(InputPropertiesEditor([&]() {

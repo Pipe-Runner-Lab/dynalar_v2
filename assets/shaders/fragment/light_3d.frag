@@ -1,6 +1,7 @@
 #version 410 core
 
 const int MAX_POINT_LIGHTS=4;
+const int MAX_SPOT_LIGHTS=4;
 
 struct MeshBaseMaterial{
   vec3 albedo;
@@ -24,6 +25,23 @@ struct PointLight{
   float diffuseIntensity;
   float specularIntensity;
   vec3 position;
+  float constant;
+  float linear;
+  float quadratic;
+};
+
+struct SpotLight{
+  vec3 color;
+  float ambientIntensity;
+  float diffuseIntensity;
+  float specularIntensity;
+  vec3 position;
+  vec3 direction;
+  float constant;
+  float linear;
+  float quadratic;
+  float cutoff;
+  float outerCutoff;
 };
 
 out vec4 pixelColor;
@@ -38,10 +56,12 @@ uniform bool u_debugNormals=false;
 uniform MeshBaseMaterial u_material;
 
 // lights
+uniform vec3 u_viewPos;
 uniform AmbientLight u_ambientLight;
 uniform int u_numPointLights;
-uniform vec3 u_viewPos;
 uniform PointLight u_pointLights[MAX_POINT_LIGHTS];
+uniform int u_numSpotLights;
+uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
 
 void main(){
   if(u_debugNormals){
@@ -73,6 +93,10 @@ void main(){
     vec3 reflectDir=reflect(-lightDir,normal);
     float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
     
+    // attenuation
+    float distance=length(pointLight.position-v_fragPos);
+    float attenuation=1./(pointLight.constant+pointLight.linear*distance+pointLight.quadratic*distance*distance);
+    
     // TODO Add support for ambient maps
     // TODO: currently only using 1st diffuse map
     if(u_material.numDiffuseMaps>0){
@@ -98,8 +122,67 @@ void main(){
     else{
       specular+=pointLight.color*pointLight.specularIntensity*specularFactor*u_material.specular;
     }
+    
+    ambient*=attenuation;
+    diffuse*=attenuation;
+    specular*=attenuation;
+  }
+  
+  // spot light
+  for(int i=0;i<u_numSpotLights;i++){
+    SpotLight spotLight=u_spotLights[i];
+    vec3 lightDir=normalize(spotLight.position-v_fragPos);
+    float diffuseFactor=max(dot(normal,lightDir),0.f);
+    
+    vec3 reflectDir=reflect(-lightDir,normal);
+    float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
+    
+    // attenuation
+    float distance=length(spotLight.position-v_fragPos);
+    float attenuation=1./(spotLight.constant+spotLight.linear*distance+spotLight.quadratic*distance*distance);
+    
+    float theta=dot(lightDir,normalize(-spotLight.direction));
+    float epsilon=spotLight.cutoff-spotLight.outerCutoff;
+    float intensity=clamp((theta-spotLight.outerCutoff)/epsilon,0.,1.);
+    
+    // process diffuse and specular only if within cutoff
+    if(theta>spotLight.cutoff){
+      if(u_material.numDiffuseMaps>0){
+        for(int j=0;j<u_material.numDiffuseMaps;j++){
+          diffuse+=spotLight.color*spotLight.diffuseIntensity*diffuseFactor*texture2D(u_material.diffuseMaps[j],v_uv).xyz;
+        }
+      }
+      else{
+        diffuse+=spotLight.color*spotLight.diffuseIntensity*diffuseFactor*u_material.albedo;
+      }
+      
+      if(u_material.numSpecularMaps>0){
+        for(int j=0;j<u_material.numSpecularMaps;j++){
+          specular+=spotLight.color*spotLight.specularIntensity*specularFactor*texture2D(u_material.specularMaps[j],v_uv).xyz;
+        }
+      }
+      else{
+        specular+=spotLight.color*spotLight.specularIntensity*specularFactor*u_material.specular;
+      }
+      
+      diffuse*=attenuation*intensity;
+      specular*=attenuation*intensity;
+    }
+    
+    // process ambient irrespective of cutoff
+    if(u_material.numDiffuseMaps>0){
+      ambient+=spotLight.color*spotLight.ambientIntensity*texture2D(u_material.diffuseMaps[0],v_uv).xyz;
+    }else{
+      ambient+=spotLight.color*spotLight.ambientIntensity*u_material.albedo;
+    }
+    
+    ambient*=attenuation;
   }
   
   // TODO: Opactiy map needs to be accounted for
   pixelColor=vec4((diffuse+ambient+specular),u_material.opacity);
+  
+  // gamma correction
+  float gamma=2.2;
+  pixelColor.rgb=pow(pixelColor.rgb,vec3(1./gamma));
 }
