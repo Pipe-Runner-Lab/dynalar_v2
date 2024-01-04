@@ -18,7 +18,7 @@ SpotLight::SpotLight(std::string name, const glm::vec3 color, float ambientInten
       m_specularIntensity(specularIntensity),
       m_position(position),
       m_direction(direction),
-      m_cutoff(cutoff),
+      m_innerCutoff(cutoff),
       m_outerCutoff(outerCutoff),
       m_constant(constant),
       m_linear(linear),
@@ -37,7 +37,7 @@ void SpotLight::Bind(Shader& shader, int idx) {
     shader.SetUniform1f(fmt::format("u_spotLights[{}].specularIntensity", idx),
                         m_specularIntensity);
 
-    shader.SetUniform1f(fmt::format("u_spotLights[{}].cutoff", idx), m_cutoff);
+    shader.SetUniform1f(fmt::format("u_spotLights[{}].innerCutoff", idx), m_innerCutoff);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].outerCutoff", idx), m_outerCutoff);
 
     shader.SetUniform1f(fmt::format("u_spotLights[{}].constant", idx), m_constant);
@@ -53,7 +53,7 @@ void SpotLight::Unbind(Shader& shader, int idx) {
     shader.SetUniform1f(fmt::format("u_spotLights[{}].diffuseIntensity", idx), 0.0f);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].specularIntensity", idx), 0.0f);
 
-    shader.SetUniform1f(fmt::format("u_spotLights[{}].cutoff", idx), 0.0f);
+    shader.SetUniform1f(fmt::format("u_spotLights[{}].innerCutoff", idx), 0.0f);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].outerCutoff", idx), 0.0f);
 
     shader.SetUniform1f(fmt::format("u_spotLights[{}].constant", idx), 0.0f);
@@ -78,6 +78,6 @@ void SpotLight::RenderEditorProperties() {
     ImGui::SliderFloat("Constant", &m_constant, 0.0f, 1.0f);
     ImGui::SliderFloat("Linear", &m_linear, 0.0f, 1.0f);
     ImGui::SliderFloat("Quadratic", &m_quadratic, 0.0f, 1.0f);
-    ImGui::SliderFloat("Cutoff Angle", &m_cutoff, 0.0f, 90.0f);
+    ImGui::SliderFloat("Inner Cutoff Angle", &m_innerCutoff, 0.0f, 90.0f);
     ImGui::SliderFloat("Outer Cutoff Angle", &m_outerCutoff, 0.0f, 90.0f);
 }

@@ -12,7 +12,7 @@ private:
     glm::vec3 m_position;
     // TODO: Add support for orientation
     glm::vec3 m_direction;
-    float m_cutoff;       // deg
+    float m_innerCutoff;  // deg
     float m_outerCutoff;  // deg
 
     // attenuation
