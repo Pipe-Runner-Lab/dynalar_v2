@@ -9,12 +9,8 @@
 #include "../../engine/app/widgets/properties_editor.h"
 
 class HelloLightsScene : public BaseScene {
-private:
-    Shader m_shader;
-
 public:
     HelloLightsScene(RenderContext &renderContext);
     void OnUpdate() override;
     void OnRender() override;
-    void OnGUIRender() override;
 };

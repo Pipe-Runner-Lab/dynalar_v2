@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <string>
 
+#include "../../app/widgets/properties_editor.h"
 #include "../../core/gl/model.h"
 #include "../../core/gl/renderer.h"
 #include "../../core/gl/shader.h"
@@ -14,13 +15,14 @@ enum class LightType {
     AMBIENT,
 };
 
-class BaseLight {
+class BaseLight : public EditorProperties {
     friend class BaseScene;
 
 public:
     std::string name;
     LightType type;
     std::shared_ptr<Model> m_lightModelPtr = nullptr;
+    bool enabled = true;
 
 protected:
     bool m_render_model = false;
@@ -33,8 +35,8 @@ public:
         : BaseLight("Light", type, color, intensity, lightModelPtr) {
     }
 
-    BaseLight(std::string name, LightType type, const glm::vec3& color,
-              float intensity, std::shared_ptr<Model> lightModelPtr = nullptr)
+    BaseLight(std::string name, LightType type, const glm::vec3& color, float intensity,
+              std::shared_ptr<Model> lightModelPtr = nullptr)
         : m_ambientIntensity(intensity),
           m_color(color),
           name(name),
@@ -52,4 +54,8 @@ public:
         if (m_lightModelPtr == nullptr || !m_render_model)
             return;
     };
+
+    /* ---------------------------- EDITOR PROPERTIES --------------------------- */
+public:
+    void RenderEditorProperties() override;
 };

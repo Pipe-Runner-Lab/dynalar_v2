@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "../../app/widgets/properties_editor.h"
 #include "material.h"
 #include "mesh.h"
 #include "renderer.h"
@@ -21,7 +22,11 @@
  * Note: Copying a model is not allowed.
  * https://ptspts.blogspot.com/2017/02/fast-vector-append.html
  */
-class Model {
+class Model : public EditorProperties {
+    friend class BaseScene;
+    friend class PointLight;
+    friend class SpotLight;
+
 protected:
     std::shared_ptr<std::vector<Mesh>> m_meshesPtr;
     glm::mat4 m_modelMatrix;
@@ -45,25 +50,19 @@ public:
 
 public:
     Model(std::string title, glm::vec3 position = glm::vec3(0.0f),
-          glm::vec3 rotation = glm::vec3(0.0f),
-          glm::vec3 scale = glm::vec3(1.0f));
+          glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f));
 
-    Model(std::string title, std::vector<Mesh> &meshGroup,
-          glm::vec3 position = glm::vec3(0.0f),
-          glm::vec3 rotation = glm::vec3(0.0f),
-          glm::vec3 scale = glm::vec3(1.0f));
+    Model(std::string title, std::vector<Mesh> &meshGroup, glm::vec3 position = glm::vec3(0.0f),
+          glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f));
 
     Model(std::string title, std::vector<Mesh> &meshGroup,
           std::vector<std::shared_ptr<Material>> &materialPtrs,
-          glm::vec3 position = glm::vec3(0.0f),
-          glm::vec3 rotation = glm::vec3(0.0f),
+          glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f),
           glm::vec3 scale = glm::vec3(1.0f));
 
     /// @brief This constructor is used for loading models from file
-    Model(std::string title, std::string path,
-          glm::vec3 position = glm::vec3(0.0f),
-          glm::vec3 rotation = glm::vec3(0.0f),
-          glm::vec3 scale = glm::vec3(1.0f));
+    Model(std::string title, std::string path, glm::vec3 position = glm::vec3(0.0f),
+          glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f));
 
     Model(const Model &other) = delete;
 
@@ -120,36 +119,21 @@ public:
     inline glm::mat4 &GetModelMatrix() {
         m_modelMatrix = glm::mat4(1.0f);
         m_modelMatrix = glm::translate(m_modelMatrix, m_position);
-        m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_rotation.x),
-                                    glm::vec3(1.0f, 0.0f, 0.0f));
-        m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_rotation.y),
-                                    glm::vec3(0.0f, 1.0f, 0.0f));
-        m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_rotation.z),
-                                    glm::vec3(0.0f, 0.0f, 1.0f));
+        m_modelMatrix =
+            glm::rotate(m_modelMatrix, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        m_modelMatrix =
+            glm::rotate(m_modelMatrix, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        m_modelMatrix =
+            glm::rotate(m_modelMatrix, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
         m_modelMatrix = glm::scale(m_modelMatrix, m_scale);
         return m_modelMatrix;
     }
 
-    inline glm::vec3 &GetPosition() {
-        return m_position;
-    }
+    /* ---------------------------- EDITOR PROPERTIES --------------------------- */
+public:
+    int m_selectedMeshIdx = 0;
+    int m_selectedMaterialIdx = 0;
 
-    inline glm::vec3 &GetRotation() {
-        return m_rotation;
-    }
-
-    inline glm::vec3 &GetScale() {
-        return m_scale;
-    }
-
-    inline std::vector<Mesh> &GetMeshes() {
-        return *m_meshesPtr;
-    }
-
-    inline std::vector<std::shared_ptr<Material>> &GetMaterials() {
-        return m_materialPtrs;
-    }
-
-    // TODO: Implement this
-    static void PhongShadingConverter(std::vector<Mesh> &meshGroup){};
+public:
+    void RenderEditorProperties() override;
 };

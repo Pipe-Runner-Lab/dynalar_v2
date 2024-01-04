@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "../../app/widgets/properties_editor.h"
 #include "../utils/error.h"
 #include "shader.h"
 #include "texture.h"
@@ -15,7 +16,7 @@ enum class MaterialType {
     PBR,
 };
 
-class Material {
+class Material : public EditorProperties {
 public:
     std::string name;
     MaterialType type;
@@ -55,8 +56,7 @@ public:
     int metalness = 32;
 
     MeshBasicMaterial() : MeshBasicMaterial("Material"){};
-    MeshBasicMaterial(std::string name)
-        : Material(name, MaterialType::MESH_BASIC_MATERIAL){};
+    MeshBasicMaterial(std::string name) : Material(name, MaterialType::MESH_BASIC_MATERIAL){};
 
     void Bind(Shader& shader) override;
     void Unbind(Shader& shader) override;
@@ -83,4 +83,8 @@ public:
                 throw std::runtime_error("Texture type not supported");
         }
     }
+
+    /* ---------------------------- EDITOR PROPERTIES --------------------------- */
+public:
+    void RenderEditorProperties() override;
 };

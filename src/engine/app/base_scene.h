@@ -40,33 +40,27 @@ struct RenderContext {
 };
 
 struct LightsContainer {
-    unsigned int ambientLightCount = 0;
-    unsigned int pointLightCount = 0;
-    unsigned int spotLightCount = 0;
+    unsigned int lightCounts[3] = {0, 0, 0};
     std::vector<std::unique_ptr<BaseLight>> m_lightPtrs;
 
-    void Bind(Shader &shader) {
-        shader.SetUniform1i("u_numPointLights", pointLightCount);
-        shader.SetUniform1i("u_numSpotLights", spotLightCount);
+    void IncreaseLightCount(LightType type) {
+        lightCounts[(int)type]++;
 
-        int pointLightIdx = 0;
-        int spotLightIdx = 0;
+        if (lightCounts[(int)LightType::AMBIENT] > 1)
+            throw std::runtime_error("Only one ambient light can be added to the scene");
+    }
+
+    void Bind(Shader &shader) {
+        shader.SetUniform1i("u_numPointLights", lightCounts[(int)LightType::POINT]);
+        shader.SetUniform1i("u_numSpotLights", lightCounts[(int)LightType::SPOT]);
+
+        int lightIndices[3] = {0, 0, 0};
         for (auto &lightPtr : m_lightPtrs) {
-            switch (lightPtr->type) {
-                case LightType::AMBIENT:
-                    lightPtr->Bind(shader);
-                    break;
-                case LightType::POINT:
-                    lightPtr->Bind(shader, pointLightIdx);
-                    pointLightIdx++;
-                    break;
-                case LightType::SPOT:
-                    lightPtr->Bind(shader, spotLightIdx);
-                    spotLightIdx++;
-                    break;
-                default:
-                    break;
-            }
+            if (!lightPtr->enabled)
+                continue;
+
+            lightPtr->Bind(shader, lightIndices[(int)lightPtr->type]);
+            lightIndices[(int)lightPtr->type]++;
         }
     }
 
@@ -95,12 +89,13 @@ protected:
     RenderContext &m_renderContext;
     std::vector<Model> m_models;
     LightsContainer m_lightsContainer;
+    std::vector<Camera> m_cameras;
+    std::vector<Shader> m_shaders;
 
 private:
-    std::vector<Camera> m_cameras;
     int m_activeCameraIndex = 0;
 
-    int m_activeModelIndex = 0;
+    int m_selectedModelIndex = 0;
     int m_activeMeshIndex = 0;
     int m_activeLightIndex = 0;
 
@@ -157,36 +152,19 @@ protected:
     }
 
     void AddLight(std::unique_ptr<BaseLight> &&lightPtr) {
-        switch (lightPtr->type) {
-            case LightType::AMBIENT: {
-                m_lightsContainer.ambientLightCount++;
-
-                if (m_lightsContainer.ambientLightCount > 1) {
-                    throw std::runtime_error(
-                        "Only one ambient light can be added to the scene");
-                }
-                break;
-            };
-            case LightType::POINT: {
-                m_lightsContainer.pointLightCount++;
-                break;
-            };
-            default:
-                break;
-        }
-
+        m_lightsContainer.IncreaseLightCount(lightPtr->type);
         m_lightsContainer.m_lightPtrs.push_back(std::move(lightPtr));
     }
 
-    Model &GetActiveModel() {
+    Model &GetSelectedModel() {
         if (m_models.size() == 0) {
             throw std::runtime_error("No model has been added to the scene");
         }
 
-        return m_models[m_activeModelIndex];
+        return m_models[m_selectedModelIndex];
     }
 
-    std::unique_ptr<BaseLight> &GetActiveLightPtr() {
+    std::unique_ptr<BaseLight> &GetSelectedLightPtr() {
         if (m_lightsContainer.m_lightPtrs.size() == 0) {
             throw std::runtime_error("No light has been added to the scene");
         }

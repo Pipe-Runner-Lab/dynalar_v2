@@ -10,4 +10,8 @@ public:
 
     void Bind(Shader& shader, int idx = 0) override;
     void Unbind(Shader& shader, int idx = 0) override;
+
+    /* ---------------------------- EDITOR PROPERTIES --------------------------- */
+public:
+    void RenderEditorProperties() override;
 };

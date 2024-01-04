@@ -2,6 +2,7 @@
 
 const int MAX_POINT_LIGHTS=4;
 const int MAX_SPOT_LIGHTS=4;
+const int MAX_TEXTURES=10;
 
 struct MeshBaseMaterial{
   vec3 albedo;
@@ -9,9 +10,9 @@ struct MeshBaseMaterial{
   float opacity;
   int metalness;
   int numDiffuseMaps;
-  sampler2D diffuseMaps[10];
+  sampler2D diffuseMaps[MAX_TEXTURES];
   int numSpecularMaps;
-  sampler2D specularMaps[10];
+  sampler2D specularMaps[MAX_TEXTURES];
 };
 
 struct AmbientLight{
@@ -100,32 +101,28 @@ void main(){
     // TODO Add support for ambient maps
     // TODO: currently only using 1st diffuse map
     if(u_material.numDiffuseMaps>0){
-      ambient+=pointLight.color*pointLight.ambientIntensity*texture2D(u_material.diffuseMaps[0],v_uv).xyz;
+      ambient+=(pointLight.color*pointLight.ambientIntensity*texture2D(u_material.diffuseMaps[0],v_uv).xyz*attenuation);
     }else{
-      ambient+=pointLight.color*pointLight.ambientIntensity*u_material.albedo;
+      ambient+=(pointLight.color*pointLight.ambientIntensity*u_material.albedo*attenuation);
     }
     
     if(u_material.numDiffuseMaps>0){
       for(int j=0;j<u_material.numDiffuseMaps;j++){
-        diffuse+=pointLight.color*pointLight.diffuseIntensity*diffuseFactor*texture2D(u_material.diffuseMaps[j],v_uv).xyz;
+        diffuse+=(pointLight.color*pointLight.diffuseIntensity*diffuseFactor*texture2D(u_material.diffuseMaps[j],v_uv).xyz*attenuation);
       }
     }
     else{
-      diffuse+=pointLight.color*pointLight.diffuseIntensity*diffuseFactor*u_material.albedo;
+      diffuse+=(pointLight.color*pointLight.diffuseIntensity*diffuseFactor*u_material.albedo*attenuation);
     }
     
     if(u_material.numSpecularMaps>0){
       for(int j=0;j<u_material.numSpecularMaps;j++){
-        specular+=pointLight.color*pointLight.specularIntensity*specularFactor*texture2D(u_material.specularMaps[j],v_uv).xyz;
+        specular+=(pointLight.color*pointLight.specularIntensity*specularFactor*texture2D(u_material.specularMaps[j],v_uv).xyz*attenuation);
       }
     }
     else{
-      specular+=pointLight.color*pointLight.specularIntensity*specularFactor*u_material.specular;
+      specular+=(pointLight.color*pointLight.specularIntensity*specularFactor*u_material.specular*attenuation);
     }
-    
-    ambient*=attenuation;
-    diffuse*=attenuation;
-    specular*=attenuation;
   }
   
   // spot light
@@ -141,42 +138,37 @@ void main(){
     float distance=length(spotLight.position-v_fragPos);
     float attenuation=1./(spotLight.constant+spotLight.linear*distance+spotLight.quadratic*distance*distance);
     
+    float phi=cos(radians(spotLight.cutoff));
+    float gamma=cos(radians(spotLight.outerCutoff));
     float theta=dot(lightDir,normalize(-spotLight.direction));
-    float epsilon=spotLight.cutoff-spotLight.outerCutoff;
-    float intensity=clamp((theta-spotLight.outerCutoff)/epsilon,0.,1.);
-    
-    // process diffuse and specular only if within cutoff
-    if(theta>spotLight.cutoff){
-      if(u_material.numDiffuseMaps>0){
-        for(int j=0;j<u_material.numDiffuseMaps;j++){
-          diffuse+=spotLight.color*spotLight.diffuseIntensity*diffuseFactor*texture2D(u_material.diffuseMaps[j],v_uv).xyz;
-        }
-      }
-      else{
-        diffuse+=spotLight.color*spotLight.diffuseIntensity*diffuseFactor*u_material.albedo;
-      }
-      
-      if(u_material.numSpecularMaps>0){
-        for(int j=0;j<u_material.numSpecularMaps;j++){
-          specular+=spotLight.color*spotLight.specularIntensity*specularFactor*texture2D(u_material.specularMaps[j],v_uv).xyz;
-        }
-      }
-      else{
-        specular+=spotLight.color*spotLight.specularIntensity*specularFactor*u_material.specular;
-      }
-      
-      diffuse*=attenuation*intensity;
-      specular*=attenuation*intensity;
-    }
+    float epsilon=phi-gamma;
+    float intensity=clamp((theta-gamma)/epsilon,0.,1.);
     
     // process ambient irrespective of cutoff
     if(u_material.numDiffuseMaps>0){
-      ambient+=spotLight.color*spotLight.ambientIntensity*texture2D(u_material.diffuseMaps[0],v_uv).xyz;
+      ambient+=(spotLight.color*spotLight.ambientIntensity*texture2D(u_material.diffuseMaps[0],v_uv).xyz*attenuation);
     }else{
-      ambient+=spotLight.color*spotLight.ambientIntensity*u_material.albedo;
+      ambient+=(spotLight.color*spotLight.ambientIntensity*u_material.albedo*attenuation);
     }
     
-    ambient*=attenuation;
+    // process diffuse and specular only if within cutoff
+    if(u_material.numDiffuseMaps>0){
+      for(int j=0;j<u_material.numDiffuseMaps;j++){
+        diffuse+=(spotLight.color*spotLight.diffuseIntensity*diffuseFactor*texture2D(u_material.diffuseMaps[j],v_uv).xyz*intensity*attenuation);
+      }
+    }
+    else{
+      diffuse+=(spotLight.color*spotLight.diffuseIntensity*diffuseFactor*u_material.albedo*intensity*attenuation);
+    }
+    
+    if(u_material.numSpecularMaps>0){
+      for(int j=0;j<u_material.numSpecularMaps;j++){
+        specular+=(spotLight.color*spotLight.specularIntensity*specularFactor*texture2D(u_material.specularMaps[j],v_uv).xyz*intensity*attenuation);
+      }
+    }
+    else{
+      specular+=(spotLight.color*spotLight.specularIntensity*specularFactor*u_material.specular*intensity*attenuation);
+    }
   }
   
   // TODO: Opactiy map needs to be accounted for

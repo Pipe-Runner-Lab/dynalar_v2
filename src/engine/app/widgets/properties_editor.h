@@ -43,3 +43,8 @@ public:
     InputPropertiesEditor(std::function<void()> renderCb);
     void Render();
 };
+
+class EditorProperties {
+public:
+    virtual void RenderEditorProperties() = 0;
+};

@@ -1,7 +1,6 @@
 #include "model.h"
 
-Model::Model(std::string title, glm::vec3 position, glm::vec3 rotation,
-             glm::vec3 scale)
+Model::Model(std::string title, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
     : title(title),
       m_position(position),
       m_rotation(rotation),
@@ -9,8 +8,8 @@ Model::Model(std::string title, glm::vec3 position, glm::vec3 rotation,
       m_meshesPtr(std::make_shared<std::vector<Mesh>>()) {
 }
 
-Model::Model(std::string title, std::vector<Mesh> &meshGroup,
-             glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+Model::Model(std::string title, std::vector<Mesh> &meshGroup, glm::vec3 position,
+             glm::vec3 rotation, glm::vec3 scale)
     : title(title),
       m_meshesPtr(std::make_shared<std::vector<Mesh>>(std::move(meshGroup))),
       m_position(position),
@@ -19,8 +18,8 @@ Model::Model(std::string title, std::vector<Mesh> &meshGroup,
 }
 
 Model::Model(std::string title, std::vector<Mesh> &meshGroup,
-             std::vector<std::shared_ptr<Material>> &materialPtrs,
-             glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+             std::vector<std::shared_ptr<Material>> &materialPtrs, glm::vec3 position,
+             glm::vec3 rotation, glm::vec3 scale)
     : title(title),
       m_meshesPtr(std::make_shared<std::vector<Mesh>>(std::move(meshGroup))),
       //   m_materialPtrs(std::move(materialPtrs)),
@@ -32,8 +31,8 @@ Model::Model(std::string title, std::vector<Mesh> &meshGroup,
     }
 }
 
-Model::Model(std::string title, std::string path, glm::vec3 position,
-             glm::vec3 rotation, glm::vec3 scale)
+Model::Model(std::string title, std::string path, glm::vec3 position, glm::vec3 rotation,
+             glm::vec3 scale)
     : m_path(path),
       m_directory(path.substr(0, path.find_last_of('/'))),
       title(title),
@@ -46,13 +45,11 @@ Model::Model(std::string title, std::string path, glm::vec3 position,
     // TODO: This is a hacky solution for now
     bool isGLTF = path.substr(path.find_last_of('.') + 1) == "gltf";
 
-    const aiScene *scene = importer.ReadFile(
-        path, aiProcess_Triangulate | (isGLTF ? 0 : aiProcess_FlipUVs));
+    const aiScene *scene =
+        importer.ReadFile(path, aiProcess_Triangulate | (isGLTF ? 0 : aiProcess_FlipUVs));
 
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
-        !scene->mRootNode) {
-        throw std::runtime_error(
-            fmt::format("Assimp error - {}.\n", importer.GetErrorString()));
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        throw std::runtime_error(fmt::format("Assimp error - {}.\n", importer.GetErrorString()));
     }
 
     processNode(scene->mRootNode, scene);
@@ -125,11 +122,9 @@ void Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 }
 
 std::shared_ptr<Material> Model::loadMaterialTextures(aiMaterial *mat) {
-    std::shared_ptr<MeshBasicMaterial> materialPtr =
-        std::make_shared<MeshBasicMaterial>();
+    std::shared_ptr<MeshBasicMaterial> materialPtr = std::make_shared<MeshBasicMaterial>();
 
-    aiTextureType textureTypes[2] = {aiTextureType_DIFFUSE,
-                                     aiTextureType_SPECULAR};
+    aiTextureType textureTypes[2] = {aiTextureType_DIFFUSE, aiTextureType_SPECULAR};
 
     // iterate over all texture types
     for (auto &textureType : textureTypes) {
@@ -143,8 +138,7 @@ std::shared_ptr<Material> Model::loadMaterialTextures(aiMaterial *mat) {
             if (texturePtrCache.find(texturePath) != texturePtrCache.end()) {
                 texturePtr = texturePtrCache[texturePath];
             } else {
-                texturePtr = std::make_shared<Texture>(
-                    texturePath, TextureType(textureType));
+                texturePtr = std::make_shared<Texture>(texturePath, TextureType(textureType));
                 texturePtrCache[texturePath] = texturePtr;
             }
 
@@ -169,8 +163,7 @@ Model::~Model() {
 void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix) {
     glm::mat4 &modelMatrix = GetModelMatrix();
 
-    shader.SetUniformMatrix4f(
-        "u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
+    shader.SetUniformMatrix4f("u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
     shader.SetUniformMatrix4f("u_mMatrix", modelMatrix);
     shader.SetUniformBool("u_debugNormals", debugNormals);
 
@@ -202,5 +195,48 @@ void Model::Draw(Renderer &renderer, Shader &shader) {
         if (hasMaterial) {
             m_materialPtrs[meshIdx]->Unbind(shader);
         }
+    }
+}
+
+void Model::RenderEditorProperties() {
+    ImGui::Checkbox("Debug Normals", &debugNormals);
+    ImGui::Checkbox("Wireframe", &wireframe);
+
+    ImGui::SeparatorText("Object Properties");
+    ImGui::DragFloat3("Position", glm::value_ptr(m_position), 0.1f);
+    ImGui::DragFloat3("Rotation", glm::value_ptr(m_rotation), 0.1f, -360.0f, 360.0f);
+    ImGui::DragFloat3("Scale", glm::value_ptr(m_scale), 0.1f, 0.001f);
+
+    ImGui::SeparatorText("Mesh Properties");
+    std::vector<Mesh> &meshes = *m_meshesPtr;
+
+    if (meshes.size() <= 0) {
+        ImGui::Text("No meshes");
+        return;
+    }
+
+    if (ImGui::BeginCombo("Selected Mesh", fmt::format("Mesh {}", m_selectedMeshIdx).c_str())) {
+        for (int itemIdx = 0; itemIdx < meshes.size(); itemIdx++) {
+            const bool is_selected = (m_selectedMeshIdx == itemIdx);
+            if (ImGui::Selectable(fmt::format("Mesh {}", itemIdx).c_str()), is_selected)
+                m_selectedMeshIdx = itemIdx;
+
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    if (m_materialPtrs.size() == 0) {
+        ImGui::Text("No material attached to the model!");
+        return;
+    }
+
+    Mesh &activeMesh = meshes[m_selectedMeshIdx];
+    std::shared_ptr<Material> materialPtr = m_materialPtrs[m_selectedMeshIdx];
+    if (materialPtr) {
+        materialPtr->RenderEditorProperties();
+    } else {
+        ImGui::Text("No material attached to the mesh!");
     }
 }
