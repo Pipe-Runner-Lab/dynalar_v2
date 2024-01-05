@@ -1,5 +1,6 @@
 #version 410 core
 
+const int MAX_DIRECTIONAL_LIGHTS=4;
 const int MAX_POINT_LIGHTS=4;
 const int MAX_SPOT_LIGHTS=4;
 const int MAX_TEXTURES=10;
@@ -18,6 +19,14 @@ struct MeshBaseMaterial{
 struct AmbientLight{
   vec3 color;
   float ambientIntensity;
+};
+
+struct DirectionalLight{
+  vec3 color;
+  float ambientIntensity;
+  float diffuseIntensity;
+  float specularIntensity;
+  vec3 direction;
 };
 
 struct PointLight{
@@ -58,7 +67,10 @@ uniform MeshBaseMaterial u_material;
 
 // lights
 uniform vec3 u_viewPos;
+uniform int u_numAmbientLights;
 uniform AmbientLight u_ambientLight;
+uniform int u_numDirectionalLights;
+uniform DirectionalLight u_directionalLights[MAX_DIRECTIONAL_LIGHTS];
 uniform int u_numPointLights;
 uniform PointLight u_pointLights[MAX_POINT_LIGHTS];
 uniform int u_numSpotLights;
@@ -104,6 +116,18 @@ vec3 ComputeSpecularComponent(vec3 color,float specularIntensity,float specularF
 
 vec3 ComputeAmbientLight(AmbientLight ambientLight){
   return ComputeAmbientComponent(ambientLight.color,ambientLight.ambientIntensity);
+}
+
+vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 viewDir){
+  vec3 lightDir=normalize(-directionalLight.direction);
+  float diffuseFactor=max(dot(normal,lightDir),0.f);
+  
+  vec3 reflectDir=reflect(-lightDir,normal);
+  float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
+  
+  return(ComputeAmbientComponent(directionalLight.color,directionalLight.ambientIntensity)+
+  ComputeDiffuseComponent(directionalLight.color,directionalLight.diffuseIntensity,diffuseFactor)+
+  ComputeSpecularComponent(directionalLight.color,directionalLight.specularIntensity,specularFactor));
 }
 
 vec3 ComputePointLight(PointLight pointLight,vec3 normal,vec3 viewDir){
@@ -157,7 +181,14 @@ void main(){
   
   // ambient light
   // TODO: Add support for ambient maps
-  cumulative+=ComputeAmbientLight(u_ambientLight);
+  if(u_numAmbientLights==1){
+    cumulative+=ComputeAmbientLight(u_ambientLight);
+  }
+  
+  // directional light
+  for(int i=0;i<u_numDirectionalLights;i++){
+    cumulative+=ComputeDirectionalLight(u_directionalLights[i],normal,viewDir);
+  }
   
   // point light
   for(int i=0;i<u_numPointLights;i++){

@@ -20,6 +20,7 @@
 #include "../window/window_manager.h"
 #include "lights/ambient_light.h"
 #include "lights/base_light.h"
+#include "lights/directional_light.h"
 #include "lights/point_light.h"
 #include "lights/spot_light.h"
 
@@ -51,10 +52,12 @@ struct LightsContainer {
     }
 
     void Bind(Shader &shader) {
+        shader.SetUniform1i("u_numAmbientLights", lightCounts[(int)LightType::AMBIENT]);
+        shader.SetUniform1i("u_numDirectionalLights", lightCounts[(int)LightType::DIRECTIONAL]);
         shader.SetUniform1i("u_numPointLights", lightCounts[(int)LightType::POINT]);
         shader.SetUniform1i("u_numSpotLights", lightCounts[(int)LightType::SPOT]);
 
-        int lightIndices[3] = {0, 0, 0};
+        int lightIndices[4] = {0, 0, 0, 0};
         for (auto &lightPtr : m_lightPtrs) {
             if (!lightPtr->enabled)
                 continue;
@@ -65,7 +68,10 @@ struct LightsContainer {
     }
 
     void Unbind(Shader &shader) {
+        shader.SetUniform1i("u_numAmbientLights", 0);
+        shader.SetUniform1i("u_numDirectionalLights", 0);
         shader.SetUniform1i("u_numPointLights", 0);
+        shader.SetUniform1i("u_numSpotLights", 0);
 
         int pointLightIdx = 0;
         for (auto &lightPtr : m_lightPtrs) {

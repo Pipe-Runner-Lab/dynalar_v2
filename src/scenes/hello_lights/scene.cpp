@@ -7,13 +7,14 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
                            "assets/shaders/fragment/light_3d.frag");
 
     AddModel(Plane("Ground Plane", {0, 0, 0}, {-90, 0, 0}, {10, 10, 1}, {0.4, 0.3, 0.15, 1.0}));
-    // AddModel(Plane("Left Wall", {-5, 5, 0}, {0, 90, 0}, {10, 10, 1},
-    //                {0.27, 0.32, 0.33, 1.0}));
     AddModel(Plane("Right Wall", {5, 5, 0}, {0, -90, 0}, {10, 10, 1}, {0.27, 0.32, 0.33, 1.0}));
     AddModel(Plane("Back Wall", {0, 5, -5}, {0, 0, 0}, {10, 10, 1}, {0.27, 0.32, 0.33, 1.0}));
     AddModel(Cube("Base", {0, 1.01, 0}, {0, 0, 0}, {4, 2, 4}, {0.18, 0.102, 0.102, 1.0}));
     AddModel(Model("Helmet", "assets/models/flight_helmet/FlightHelmet.gltf", {0, 2, 0},
                    {0, -90, 0}, {4, 4, 4}));
+
+    // AddModel(Model("sponza", "assets/models/sponza/Sponza.gltf", {0, 0, 0}, {0, 0, 0}, {1, 1,
+    // 1}));
 
     // set up camera
     AddCamera(
@@ -25,14 +26,13 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
 
     // set up lights
     AddLight(std::make_unique<AmbientLight>(glm::vec3(1, 1, 1), 0.034f));
-    AddLight(std::make_unique<PointLight>("Point Light 1", glm::vec3(1, 1, 1), 0.0f, 0.5f, 0.4f,
-                                          glm::vec3(-2.6, 6.2, 2.9)));
-    AddLight(std::make_unique<SpotLight>("Spot Light 1", glm::vec3(0.93, 0.95, 0.45), 0.0f, 0.5f,
-                                         0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
-                                         25.0f));
-    // AddLight(std::make_unique<SpotLight>(
-    //     "Torch Light", glm::vec3(1, 1, 1), 0.0f, 0.5f, 0.4f,
-    //     m_cameras[0].GetPosition(), m_cameras[0].GetFront(), 12.5f, 15.0f));
+    // AddLight(std::make_unique<PointLight>("Point Light 1", glm::vec3(1, 1, 1), 0.0f, 0.5f, 0.4f,
+    //                                       glm::vec3(-2.6, 6.2, 2.9)));
+    // AddLight(std::make_unique<SpotLight>("Spot Light 1", glm::vec3(0.93, 0.95, 0.45), 0.0f, 0.5f,
+    //                                      0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
+    //                                      25.0f));
+    AddLight(std::make_unique<DirectionalLight>("Directional Light", glm::vec3(1, 1, 1), 0.0f, 0.5f,
+                                                0.4f, glm::vec3(-1, -1, -1)));
 }
 
 void HelloLightsScene::OnUpdate() {
