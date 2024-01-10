@@ -15,11 +15,11 @@ HelloTriangleScene::HelloTriangleScene(RenderContext &renderContext)
     std::vector<Mesh> meshes;
     meshes.push_back(Mesh(vertices, indices, layout));
 
-    m_models.push_back(Model("Triangle", meshes));
+    m_modelPtrs.push_back(std::make_unique<Model>("Triangle", meshes));
 }
 
 void HelloTriangleScene::OnRender() {
     m_shader.Bind();
-    m_models[0].Draw(*m_renderContext.rendererPtr, m_shader);
+    m_modelPtrs[0]->Draw(*m_renderContext.rendererPtr, m_shader);
     m_shader.Unbind();
 }

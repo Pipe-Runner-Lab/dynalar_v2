@@ -6,6 +6,8 @@
 
 #include <array>
 
+#include "../core/utils/error.h"
+
 struct Dimensions {
     int width;
     int height;
@@ -93,13 +95,12 @@ public:
         return mousePosition;
     };
 
+    void SetViewport(int width, int height);
+    void ResetViewport();
+
 private:
-    static void FrameBufferResizeCallback(GLFWwindow *window_ptr, int width,
-                                          int height);
-    static void KeyCallback(GLFWwindow *window_ptr, int key, int code,
-                            int action, int mode);
-    static void MouseCursorCallback(GLFWwindow *window_ptr, double xPos,
-                                    double yPos);
-    static void MouseButtonCallback(GLFWwindow *window_ptr, int button,
-                                    int action, int mods);
+    static void FrameBufferResizeCallback(GLFWwindow *window_ptr, int width, int height);
+    static void KeyCallback(GLFWwindow *window_ptr, int key, int code, int action, int mode);
+    static void MouseCursorCallback(GLFWwindow *window_ptr, double xPos, double yPos);
+    static void MouseButtonCallback(GLFWwindow *window_ptr, int button, int action, int mods);
 };

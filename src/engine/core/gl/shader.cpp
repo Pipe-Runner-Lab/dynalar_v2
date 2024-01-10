@@ -1,7 +1,6 @@
 #include "shader.h"
 
-Shader::Shader(const std::string &vertexShaderFilePath,
-               const std::string &fragmentShaderFilePath)
+Shader::Shader(const std::string &vertexShaderFilePath, const std::string &fragmentShaderFilePath)
     : m_shaderProgramID(0) {
     const std::string vShaderSrc = ParseShader(vertexShaderFilePath);
     const std::string fShaderSrc = ParseShader(fragmentShaderFilePath);
@@ -11,6 +10,7 @@ Shader::Shader(const std::string &vertexShaderFilePath,
 
 Shader::~Shader() {
     GL_CALL(glDeleteProgram(m_shaderProgramID));
+    Unbind();
 }
 
 GLuint Shader::CompileShader(const std::string &srcCode, GLenum shaderType) {
@@ -33,16 +33,14 @@ GLuint Shader::CompileShader(const std::string &srcCode, GLenum shaderType) {
 
         throw std::runtime_error(
             fmt::format("Compilation Error: {} does not exist\n",
-                        (shaderType == GL_FRAGMENT_SHADER ? "Fragment Shader"
-                                                          : "Vertex Shader")));
+                        (shaderType == GL_FRAGMENT_SHADER ? "Fragment Shader" : "Vertex Shader")));
         ;
     }
 
     return shader;
 }
 
-GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc,
-                                   const std::string &fShaderSrc) {
+GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::string &fShaderSrc) {
     GL_CALL(GLuint shaderProgramID = glCreateProgram());
 
     GLuint vertexShader = CompileShader(vShaderSrc, GL_VERTEX_SHADER);
@@ -58,12 +56,10 @@ GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc,
     GL_CALL(glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success));
     if (!success) {
         GLchar infoLog[1024] = {0};
-        GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL,
-                                    infoLog));
+        GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL, infoLog));
         fmt::print(stderr, "{}\n", infoLog);
 
-        throw std::runtime_error(
-            fmt::format("Linking Error for Program ID {}\n", shaderProgramID));
+        throw std::runtime_error(fmt::format("Linking Error for Program ID {}\n", shaderProgramID));
     }
 
     // Validate program
@@ -71,12 +67,11 @@ GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc,
     GL_CALL(glGetProgramiv(shaderProgramID, GL_VALIDATE_STATUS, &success));
     if (!success) {
         GLchar infoLog[1024] = {0};
-        GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL,
-                                    infoLog));
+        GL_CALL(glGetProgramInfoLog(shaderProgramID, sizeof(infoLog), NULL, infoLog));
         fmt::print(stderr, "{}\n", infoLog);
 
-        throw std::runtime_error(fmt::format(
-            "Validation Error for Program ID {}\n", shaderProgramID));
+        throw std::runtime_error(
+            fmt::format("Validation Error for Program ID {}\n", shaderProgramID));
     }
 
     // Delete intermediate shader outputs
@@ -91,8 +86,7 @@ std::string Shader::ParseShader(const std::string &filename) {
     std::ifstream fileStream = std::ifstream(filename.c_str(), std::ios::in);
 
     if (!fileStream.is_open()) {
-        throw std::runtime_error(
-            fmt::format("Failed to read shader file {}.\n", filename));
+        throw std::runtime_error(fmt::format("Failed to read shader file {}.\n", filename));
     }
 
     std::string line = "";
@@ -127,26 +121,22 @@ void Shader::SetUniform1f(const std::string &name, float v0) {
         GL_CALL(glUniform1f(location, v0));
 }
 
-void Shader::SetUniform3f(const std::string &name, float v0, float v1,
-                          float v2) {
+void Shader::SetUniform3f(const std::string &name, float v0, float v1, float v2) {
     GLint location = GetUniformLocation(name);
     if (location != -1)
         GL_CALL(glUniform3f(location, v0, v1, v2));
 }
 
-void Shader::SetUniform4f(const std::string &name, float v0, float v1, float v2,
-                          float v3) {
+void Shader::SetUniform4f(const std::string &name, float v0, float v1, float v2, float v3) {
     GLint location = GetUniformLocation(name);
     if (location != -1)
         GL_CALL(glUniform4f(location, v0, v1, v2, v3));
 }
 
-void Shader::SetUniformMatrix4f(const std::string &name,
-                                const glm::mat4 &matrix) {
+void Shader::SetUniformMatrix4f(const std::string &name, const glm::mat4 &matrix) {
     GLint location = GetUniformLocation(name);
     if (location != -1)
-        GL_CALL(
-            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)));
+        GL_CALL(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)));
 }
 
 void Shader::SetUniformBool(const std::string &name, bool value) {
@@ -156,8 +146,7 @@ void Shader::SetUniformBool(const std::string &name, bool value) {
 }
 
 GLint Shader::GetUniformLocation(const std::string &name) {
-    GL_CALL(GLint location =
-                glGetUniformLocation(m_shaderProgramID, name.c_str()));
+    GL_CALL(GLint location = glGetUniformLocation(m_shaderProgramID, name.c_str()));
 
     if (location == -1) {
         fmt::print("Warning: {} does not exist\n", name);

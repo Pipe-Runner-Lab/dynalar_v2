@@ -12,9 +12,9 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
             Model &selectedModel = GetSelectedModel();
 
             if (ImGui::BeginCombo("Selected Object", selectedModel.title.c_str())) {
-                for (int itemIdx = 0; itemIdx < m_models.size(); itemIdx++) {
+                for (int itemIdx = 0; itemIdx < m_modelPtrs.size(); itemIdx++) {
                     const bool is_selected = (m_selectedModelIndex == itemIdx);
-                    if (ImGui::Selectable(m_models[itemIdx].title.c_str(), is_selected)) {
+                    if (ImGui::Selectable(m_modelPtrs[itemIdx]->title.c_str(), is_selected)) {
                         m_selectedModelIndex = itemIdx;
                     }
 
@@ -31,7 +31,7 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
         std::make_unique<CameraPropertiesEditor>(CameraPropertiesEditor([&]() {
             if (ImGui::BeginCombo("Active Camera",
                                   fmt::format("Camera {}", m_activeCameraIndex).c_str())) {
-                for (int itemIdx = 0; itemIdx < m_cameras.size(); itemIdx++) {
+                for (int itemIdx = 0; itemIdx < m_cameraPtrs.size(); itemIdx++) {
                     const bool is_selected = (m_activeCameraIndex == itemIdx);
                     if (ImGui::Selectable(fmt::format("Camera {}", itemIdx).c_str(), is_selected))
                         m_activeCameraIndex = itemIdx;
@@ -87,11 +87,11 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
 
 void BaseScene::OnGUIRender() {
     if (ImGui::BeginTabBar("Editor")) {
-        if (m_models.size() > 0) {
+        if (m_modelPtrs.size() > 0) {
             m_objectPropertiesEditorPtr->Render();
         }
 
-        if (m_cameras.size() > 0) {
+        if (m_cameraPtrs.size() > 0) {
             m_cameraPropertiesEditorPtr->Render();
         }
 
@@ -106,7 +106,7 @@ void BaseScene::OnGUIRender() {
 }
 
 void BaseScene::OnUpdate() {
-    if (m_cameras.size() > 0) {
+    if (m_cameraPtrs.size() > 0) {
         WindowManager &windowManager = *m_renderContext.windowManagerPtr;
 
         // mouse input

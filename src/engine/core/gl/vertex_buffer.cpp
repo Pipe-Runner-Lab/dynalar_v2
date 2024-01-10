@@ -8,6 +8,7 @@ VertexBuffer::VertexBuffer(const void *data, GLuint size) : m_bufferID(0) {
 
 VertexBuffer::~VertexBuffer() {
     GL_CALL(glDeleteBuffers(1, &m_bufferID));
+    Unbind();
 }
 
 void VertexBuffer::Bind() const {

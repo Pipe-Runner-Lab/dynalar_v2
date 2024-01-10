@@ -28,9 +28,8 @@ WindowManager::WindowManager() {
         throw "GLFW failed to create window";
     }
 
-    glfwGetFramebufferSize(
-        m_windowPtr, &m_currentWidth,
-        &m_currentHeight);  // get actual sizes of the created window
+    glfwGetFramebufferSize(m_windowPtr, &m_currentWidth,
+                           &m_currentHeight);  // get actual sizes of the created window
 
     /* set aspect ratio */
     m_currentAspectRatio = (float)m_currentWidth / (float)m_currentHeight;
@@ -52,7 +51,7 @@ WindowManager::WindowManager() {
     }
 
     /* Setup viewport size */
-    glViewport(0, 0, m_currentWidth, m_currentHeight);
+    GL_CALL(glViewport(0, 0, m_currentWidth, m_currentHeight));
 
     /* Setup callbacks */
     // * https://discourse.glfw.org/t/what-is-a-possible-use-of-glfwgetwindowuserpointer/1294
@@ -68,24 +67,28 @@ WindowManager::~WindowManager() {
     glfwTerminate();
 }
 
-void WindowManager::FrameBufferResizeCallback(GLFWwindow *window_ptr, int width,
-                                              int height) {
+void WindowManager::SetViewport(int width, int height) {
+    GL_CALL(glViewport(0, 0, width, height));
+}
+
+void WindowManager::ResetViewport() {
+    GL_CALL(glViewport(0, 0, m_currentWidth, m_currentHeight));
+}
+
+void WindowManager::FrameBufferResizeCallback(GLFWwindow *window_ptr, int width, int height) {
     if (width == 0 || height == 0)
         return;
 
-    WindowManager *windowManagerPtr =
-        (WindowManager *)glfwGetWindowUserPointer(window_ptr);
+    WindowManager *windowManagerPtr = (WindowManager *)glfwGetWindowUserPointer(window_ptr);
 
     windowManagerPtr->m_currentWidth = width;
     windowManagerPtr->m_currentHeight = height;
     windowManagerPtr->m_currentAspectRatio = (float)width / (float)height;
-    glViewport(0, 0, width, height);
+    GL_CALL(glViewport(0, 0, width, height));
 }
 
-void WindowManager::KeyCallback(GLFWwindow *window_ptr, int key, int code,
-                                int action, int mode) {
-    WindowManager *windowManagerPtr =
-        (WindowManager *)glfwGetWindowUserPointer(window_ptr);
+void WindowManager::KeyCallback(GLFWwindow *window_ptr, int key, int code, int action, int mode) {
+    WindowManager *windowManagerPtr = (WindowManager *)glfwGetWindowUserPointer(window_ptr);
 
     if (KEYCODE_LOWER_LIMIT < key && key < KEYCODE_UPPER_LIMIT) {
         if (action == GLFW_PRESS) {
@@ -98,14 +101,11 @@ void WindowManager::KeyCallback(GLFWwindow *window_ptr, int key, int code,
     }
 }
 
-void WindowManager::MouseCursorCallback(GLFWwindow *window_ptr, double xPos,
-                                        double yPos) {
-    WindowManager *windowManagerPtr =
-        (WindowManager *)glfwGetWindowUserPointer(window_ptr);
+void WindowManager::MouseCursorCallback(GLFWwindow *window_ptr, double xPos, double yPos) {
+    WindowManager *windowManagerPtr = (WindowManager *)glfwGetWindowUserPointer(window_ptr);
 
     MousePosition &lastMousePosition = windowManagerPtr->m_mousePosition;
-    MousePositionDelta &mousePositionDelta =
-        windowManagerPtr->m_mousePositionDelta;
+    MousePositionDelta &mousePositionDelta = windowManagerPtr->m_mousePositionDelta;
 
     // check initial movement, to avoid jerky start
     if (lastMousePosition.isInitialized) {
@@ -118,10 +118,8 @@ void WindowManager::MouseCursorCallback(GLFWwindow *window_ptr, double xPos,
     lastMousePosition.isInitialized = true;
 }
 
-void WindowManager::MouseButtonCallback(GLFWwindow *window_ptr, int button,
-                                        int action, int mods) {
-    WindowManager *windowManagerPtr =
-        (WindowManager *)glfwGetWindowUserPointer(window_ptr);
+void WindowManager::MouseButtonCallback(GLFWwindow *window_ptr, int button, int action, int mods) {
+    WindowManager *windowManagerPtr = (WindowManager *)glfwGetWindowUserPointer(window_ptr);
 
     if (action == GLFW_PRESS) {
         windowManagerPtr->SetMouseButton(button, true);

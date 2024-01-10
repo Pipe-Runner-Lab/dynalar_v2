@@ -93,10 +93,10 @@ struct LightsContainer {
 class BaseScene {
 protected:
     RenderContext &m_renderContext;
-    std::vector<Model> m_models;
+    std::vector<std::unique_ptr<Model>> m_modelPtrs;
     LightsContainer m_lightsContainer;
-    std::vector<Camera> m_cameras;
-    std::vector<Shader> m_shaders;
+    std::vector<std::unique_ptr<Camera>> m_cameraPtrs;
+    std::vector<std::unique_ptr<Shader>> m_shaderPtrs;
 
 private:
     int m_activeCameraIndex = 0;
@@ -127,34 +127,26 @@ public:
     virtual void OnGUIRender();
 
 protected:
-    void AddCamera(Camera &camera) {
-        m_cameras.push_back(std::move(camera));
-    }
-
-    void AddCamera(Camera &&camera) {
-        m_cameras.push_back(std::move(camera));
+    void AddCamera(std::unique_ptr<Camera> &&cameraPtr) {
+        m_cameraPtrs.push_back(std::move(cameraPtr));
     }
 
     Camera &GetActiveCamera() {
-        if (m_cameras.size() == 0) {
+        if (m_cameraPtrs.size() == 0) {
             throw std::runtime_error("No camera has been added to the scene");
         }
 
-        return m_cameras[m_activeCameraIndex];
+        return *m_cameraPtrs[m_activeCameraIndex];
     }
 
     void SetActiveCameraIndex(int index) {
-        if (index < m_cameras.size()) {
+        if (index < m_cameraPtrs.size()) {
             m_activeCameraIndex = index;
         }
     }
 
-    void AddModel(Model &model) {
-        m_models.push_back(std::move(model));
-    }
-
-    void AddModel(Model &&model) {
-        m_models.push_back(std::move(model));
+    void AddModel(std::unique_ptr<Model> &&modelPtr) {
+        m_modelPtrs.push_back(std::move(modelPtr));
     }
 
     void AddLight(std::unique_ptr<BaseLight> &&lightPtr) {
@@ -162,12 +154,16 @@ protected:
         m_lightsContainer.m_lightPtrs.push_back(std::move(lightPtr));
     }
 
+    void AddShader(std::unique_ptr<Shader> &&shaderPtr) {
+        m_shaderPtrs.push_back(std::move(shaderPtr));
+    }
+
     Model &GetSelectedModel() {
-        if (m_models.size() == 0) {
+        if (m_modelPtrs.size() == 0) {
             throw std::runtime_error("No model has been added to the scene");
         }
 
-        return m_models[m_selectedModelIndex];
+        return *m_modelPtrs[m_selectedModelIndex];
     }
 
     std::unique_ptr<BaseLight> &GetSelectedLightPtr() {

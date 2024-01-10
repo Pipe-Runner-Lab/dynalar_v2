@@ -26,13 +26,15 @@ public:
 
 public:
     Texture(const std::string &filePath, bool hasAlpha = true);
-    Texture(const std::string &filePath, TextureType type,
-            bool hasAlpha = true);
+    Texture(const std::string &filePath, TextureType type, bool hasAlpha = true);
 
     Texture(const Texture &other) = delete;
 
     ~Texture();
 
+    /// @brief Binds the texture to the specified slot
+    /// @param slot unsigned int (default: 0) - specifying the slot to bind the texture to (should
+    /// match with Sampler2D in the shader)
     void Bind(GLuint slot = 0) const;
     void Unbind() const;
 

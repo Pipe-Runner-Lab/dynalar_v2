@@ -16,14 +16,13 @@ Texture::Texture(const std::string &filePath, TextureType type, bool hasAlpha)
     GL_CALL(glGenTextures(1, &m_textureID));
 
     // binding texture without activating slot
+    // binding (to GL_TEXTURE_2D) is done to set the texture parameters
     GL_CALL(glBindTexture(GL_TEXTURE_2D, m_textureID))
 
-    GL_CALL(glTexParameteri(
-        GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-        GL_LINEAR));  // setting minification filter to linear (image larger)
-    GL_CALL(glTexParameteri(
-        GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-        GL_LINEAR));  // setting magnification filter to linear (image smaller)
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            GL_LINEAR));  // setting minification filter to linear (image larger)
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                            GL_LINEAR));  // setting magnification filter to linear (image smaller)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
                             GL_CLAMP_TO_EDGE));  // s -> horizontal
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
@@ -42,8 +41,8 @@ Texture::Texture(const std::string &filePath, TextureType type, bool hasAlpha)
         format = GL_RGBA;
 
     if (m_localBuffer) {
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0,
-                             format, GL_UNSIGNED_BYTE, m_localBuffer));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format,
+                             GL_UNSIGNED_BYTE, m_localBuffer));
 
         // generating mipmap
         GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
@@ -64,12 +63,12 @@ Texture::Texture(const std::string &filePath, TextureType type, bool hasAlpha)
 
 Texture::~Texture() {
     GL_CALL(glDeleteTextures(1, &m_textureID));
+    Unbind();
 }
 
 void Texture::Bind(GLuint slot) const {
-    GL_CALL(glActiveTexture(
-        GL_TEXTURE0 +
-        slot));  // since GL_TEXTURE<number> are consecutive we can add directly
+    GL_CALL(glActiveTexture(GL_TEXTURE0 +
+                            slot));  // since GL_TEXTURE<number> are consecutive we can add directly
     GL_CALL(glBindTexture(GL_TEXTURE_2D,
                           m_textureID));  // other types of textures also exist
 }
@@ -79,9 +78,8 @@ void Texture::Unbind() const {
 }
 
 void Texture::LoadDefaultTexture() {
-    m_localBuffer =
-        stbi_load("assets/textures/default.png", &m_width, &m_height, &m_bpp,
-                  0);  // desired channel 4 since RGBA
+    m_localBuffer = stbi_load("assets/textures/default.png", &m_width, &m_height, &m_bpp,
+                              0);  // desired channel 4 since RGBA
 
     GLenum format;
     if (m_bpp == 1)
@@ -93,8 +91,8 @@ void Texture::LoadDefaultTexture() {
 
     if (m_localBuffer) {
         // sending texture data to GPU
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0,
-                             format, GL_UNSIGNED_BYTE, m_localBuffer));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format,
+                             GL_UNSIGNED_BYTE, m_localBuffer));
 
         // generating mipmap
         GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));

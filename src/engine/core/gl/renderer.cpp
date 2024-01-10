@@ -19,9 +19,9 @@ Renderer::Renderer() {
     fmt::print("Renderer using OpenGL version: {}\n", glVersion);
 }
 
-void Renderer::Clear() {
+void Renderer::Clear(GLbitfield mask) {
     GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    GL_CALL(glClear(mask));
 }
 
 void Renderer::Clear(float r, float g, float b, float a) {
@@ -32,19 +32,16 @@ void Renderer::Clear(float r, float g, float b, float a) {
 void Renderer::Draw(VertexArray &vertexArray, IndexBuffer &indexBuffer) {
     vertexArray.Bind();
     indexBuffer.Bind();
-    GL_CALL(glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(),
-                           GL_UNSIGNED_INT, nullptr));
+    GL_CALL(glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr));
     vertexArray.Unbind();
     indexBuffer.Unbind();
 }
 
-glm::mat4 Renderer::ComputeMVPMatrix(glm::mat4 &modelMatrix,
-                                     glm::mat4 &viewMatrix,
+glm::mat4 Renderer::ComputeMVPMatrix(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix,
                                      glm::mat4 &projectionMatrix) {
     return projectionMatrix * viewMatrix * modelMatrix;
 }
 
-glm::mat4 Renderer::ComputeMVPMatrix(glm::mat4 &vpMatrix,
-                                     glm::mat4 &modelMatrix) {
+glm::mat4 Renderer::ComputeMVPMatrix(glm::mat4 &vpMatrix, glm::mat4 &modelMatrix) {
     return vpMatrix * modelMatrix;
 }

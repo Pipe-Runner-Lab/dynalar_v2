@@ -2,12 +2,11 @@
 
 Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     : BaseScene(renderContext, "Hello 3D World"),
-      m_shader("assets/shaders/vertex/simple_3d.vert",
-               "assets/shaders/fragment/simple_3d.frag") {
-    AddModel(Plane("Ground Plane", {0, 0, 0}, {-90, 0, 0}, {10, 10, 1},
-                   {0.0, 1.0, 0.0, 1.0}));
-    AddModel(Cube("Cube 1", {0, 1.01, 0}, {0, 0, 0}, {2, 2, 2},
-                  {1.0, 0.0, 0.0, 1.0}));
+      m_shader("assets/shaders/vertex/simple_3d.vert", "assets/shaders/fragment/simple_3d.frag") {
+    AddModel(std::make_unique<Plane>("Ground Plane", glm::vec3(0, 0, 0), glm::vec3(-90, 0, 0),
+                                     glm::vec3(10, 10, 1), glm::vec4(0.0, 1.0, 0.0, 1.0)));
+    AddModel(std::make_unique<Cube>("Cube 1", glm::vec3(0, 1.01, 0), glm::vec3(0, 0, 0),
+                                    glm::vec3(2, 2, 2), glm::vec4(1.0, 0.0, 0.0, 1.0)));
 
     std::vector<float> vertices = {
         // 0 - +y
@@ -120,22 +119,20 @@ Hello3DWorldScene::Hello3DWorldScene(RenderContext &renderContext)
     layout.Push<float>(3);  // normal
     layout.Push<float>(2);  // uv
     std::vector<Mesh> meshGroup;
-    std::shared_ptr<MeshBasicMaterial> material =
-        std::make_shared<MeshBasicMaterial>();
+    std::shared_ptr<MeshBasicMaterial> material = std::make_shared<MeshBasicMaterial>();
     material->albedo = {0.0, 0.0, 1.0};
     meshGroup.push_back(Mesh(vertices, indices, layout));
     std::vector<std::shared_ptr<Material>> materialPtrs = {material};
-    AddModel(Model("Cube 2", meshGroup, materialPtrs, {-2.5, 1.01, 0},
-                   {0, 0, 0}, {2, 2, 2}));
+    AddModel(std::make_unique<Model>("Cube 2", meshGroup, materialPtrs, glm::vec3(-2.5, 1.01, 0),
+                                     glm::vec3(0, 0, 0), glm::vec3(2, 2, 2)));
 
     // set up camera
-    AddCamera(Camera(
+    AddCamera(std::make_unique<Camera>(
         glm::vec3(0, 5, 10), -30, -90,
-        glm::perspective(glm::radians(45.0f),
-                         renderContext.windowManagerPtr->GetAspectRatio(), 0.1f,
-                         100.0f)));
-    AddCamera(Camera(glm::vec3(0, 0, 10), 0, -90,
-                     glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f)));
+        glm::perspective(glm::radians(45.0f), renderContext.windowManagerPtr->GetAspectRatio(),
+                         0.1f, 100.0f)));
+    AddCamera(std::make_unique<Camera>(glm::vec3(0, 0, 10), 0, -90,
+                                       glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f)));
 }
 
 void Hello3DWorldScene::OnUpdate() {
@@ -153,11 +150,10 @@ void Hello3DWorldScene::OnRender() {
     m_shader.Bind();
 
     Camera &activeCamera = GetActiveCamera();
-    glm::mat4 vpMatrix =
-        activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
+    glm::mat4 vpMatrix = activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
 
-    for (auto &model : m_models) {
-        model.Draw(*m_renderContext.rendererPtr, m_shader, vpMatrix);
+    for (auto &modelPtr : m_modelPtrs) {
+        modelPtr->Draw(*m_renderContext.rendererPtr, m_shader, vpMatrix);
     }
     m_shader.Unbind();
 }
