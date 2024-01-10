@@ -1,7 +1,7 @@
 #include "material.h"
 
-void MeshBasicMaterial::Bind(Shader& shader) {
-    int textureSlot = 0;
+void MeshBasicMaterial::Bind(Shader& shader, int reservedTextureSlots) {
+    int textureSlot = reservedTextureSlots;  // start binding from reserved slots (0 indexed)
 
     if (diffuseMaps.size() > 0) {
         shader.SetUniform1i("u_material.numDiffuseMaps", diffuseMaps.size());

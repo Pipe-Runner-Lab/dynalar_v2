@@ -35,7 +35,18 @@ void ShadowMap::Unbind() const {
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-void ShadowMap::Draw(Renderer& renderer, WindowManager& window_manager) const {
+void ShadowMap::ActivateShadowTexture(int slot) const {
+    GL_CALL(glActiveTexture(GL_TEXTURE0 + slot));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, m_depthMap));
+}
+
+void ShadowMap::GenerateShadow(Renderer& renderer, WindowManager& window_manager,
+                               std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader,
+                               glm::mat4 vpMatrix) const {
     window_manager.SetViewport(m_width, m_height);
     renderer.Clear(GL_DEPTH_BUFFER_BIT);
+
+    for (auto& modelPtr : modelPtrs) {
+        modelPtr->Draw(renderer, shader, vpMatrix);
+    }
 }

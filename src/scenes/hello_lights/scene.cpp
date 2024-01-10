@@ -54,16 +54,37 @@ void HelloLightsScene::OnUpdate() {
 }
 
 void HelloLightsScene::OnRender() {
-    // 1. render shadow maps
-    // m_shaders[1].Bind();
+    m_lightsContainer.shadowMapCount = 1;
 
-    // m_shaders[1].Unbind();
+    // 1. render shadow maps
+    m_shaderPtrs[1]->Bind();
+    for (auto &lightPtr : m_lightsContainer.lightPtrs) {
+        if (lightPtr->type == LightType::DIRECTIONAL) {
+            DirectionalLight *dirLightPtr = static_cast<DirectionalLight *>(lightPtr.get());
+            m_shadowMap.Bind();
+            m_shadowMap.GenerateShadow(*m_renderContext.rendererPtr,
+                                       *m_renderContext.windowManagerPtr, m_modelPtrs,
+                                       *m_shaderPtrs[1], dirLightPtr->GetVpMatrix());
+            m_shadowMap.Unbind();
+        }
+    }
+    m_shaderPtrs[1]->Unbind();
 
     // 2. render scene
     m_shaderPtrs[0]->Bind();
 
     // 2.1 set light uniforms
     m_lightsContainer.Bind(*m_shaderPtrs[0]);
+
+    // 2.2 activate shadow map slots
+    for (auto &lightPtr : m_lightsContainer.lightPtrs) {
+        if (lightPtr->type == LightType::DIRECTIONAL) {
+            DirectionalLight *dirLightPtr = static_cast<DirectionalLight *>(lightPtr.get());
+            m_shaderPtrs[0]->SetUniformMatrix4f("u_lightSpaceVpMatrices[0]",
+                                                dirLightPtr->GetVpMatrix());
+            m_shadowMap.ActivateShadowTexture(0);
+        }
+    }
 
     Camera &activeCamera = GetActiveCamera();
     glm::mat4 vpMatrix = activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
@@ -75,7 +96,7 @@ void HelloLightsScene::OnRender() {
     }
 
     // 3. render light models
-    for (auto &lightPtr : m_lightsContainer.m_lightPtrs) {
+    for (auto &lightPtr : m_lightsContainer.lightPtrs) {
         lightPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix);
     }
 

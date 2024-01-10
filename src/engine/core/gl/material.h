@@ -33,7 +33,7 @@ public:
               //                           &Material::MAX_TEXTURE_SLOT));
           };
 
-    virtual void Bind(Shader& shader){};
+    virtual void Bind(Shader& shader, int reservedTextureSlots = 0){};
     virtual void Unbind(Shader& shader){};
 };
 
@@ -58,7 +58,7 @@ public:
     MeshBasicMaterial() : MeshBasicMaterial("Material"){};
     MeshBasicMaterial(std::string name) : Material(name, MaterialType::MESH_BASIC_MATERIAL){};
 
-    void Bind(Shader& shader) override;
+    void Bind(Shader& shader, int reservedTextureSlots = 0) override;
     void Unbind(Shader& shader) override;
 
     inline void AddTexture(std::shared_ptr<Texture> texturePtr) {

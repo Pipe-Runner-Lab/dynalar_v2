@@ -4,6 +4,7 @@ const int MAX_DIRECTIONAL_LIGHTS=4;
 const int MAX_POINT_LIGHTS=4;
 const int MAX_SPOT_LIGHTS=4;
 const int MAX_TEXTURES=10;
+const int MAX_SHADOW_MAPS=10;
 
 struct MeshBaseMaterial{
   vec3 albedo;
@@ -59,6 +60,7 @@ in vec2 v_uv;
 in vec4 v_color;
 in vec3 v_normal;
 in vec3 v_fragPos;
+in vec4 v_lightSpaceFragPositions[10];
 
 // general
 // https://stackoverflow.com/questions/33690186/opengl-bool-uniform
@@ -75,6 +77,10 @@ uniform int u_numPointLights;
 uniform PointLight u_pointLights[MAX_POINT_LIGHTS];
 uniform int u_numSpotLights;
 uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
+
+// shadows
+uniform int u_numShadowMaps=0;
+uniform sampler2DShadow u_shadowMaps[MAX_SHADOW_MAPS];
 
 float ComputeAttenuation(float constant,float linear,float quadratic,float distance){
   return 1./(constant+linear*distance+quadratic*distance*distance);

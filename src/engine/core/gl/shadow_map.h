@@ -3,7 +3,9 @@
 
 #include "../../window/window_manager.h"
 #include "../utils/error.h"
+#include "model.h"
 #include "renderer.h"
+#include "shader.h"
 
 class ShadowMap {
 private:
@@ -20,5 +22,9 @@ public:
     void Bind() const;
     void Unbind() const;
 
-    void Draw(Renderer& renderer, WindowManager& window_manager) const;
+    void ActivateShadowTexture(int slot = 0) const;
+
+    void GenerateShadow(Renderer& renderer, WindowManager& window_manager,
+                        std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader,
+                        glm::mat4 vpMatrix) const;
 };

@@ -112,9 +112,10 @@ public:
         return *this;
     }
 
-    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix);
+    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
+              int reservedTextureSlots = 0);
 
-    void Draw(Renderer &renderer, Shader &shader);
+    void Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots = 0);
 
     inline glm::mat4 &GetModelMatrix() {
         m_modelMatrix = glm::mat4(1.0f);

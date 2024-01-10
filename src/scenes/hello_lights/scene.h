@@ -7,8 +7,12 @@
 #include "../../engine/app/pre_made_objects/cube.h"
 #include "../../engine/app/pre_made_objects/plane.h"
 #include "../../engine/app/widgets/properties_editor.h"
+#include "../../engine/core/gl/shadow_map.h"
 
 class HelloLightsScene : public BaseScene {
+private:
+    ShadowMap m_shadowMap;
+
 public:
     HelloLightsScene(RenderContext &renderContext);
     void OnUpdate() override;

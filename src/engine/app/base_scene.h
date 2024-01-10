@@ -42,7 +42,16 @@ struct RenderContext {
 
 struct LightsContainer {
     unsigned int lightCounts[3] = {0, 0, 0};
-    std::vector<std::unique_ptr<BaseLight>> m_lightPtrs;
+    std::vector<std::unique_ptr<BaseLight>> lightPtrs;
+    int shadowMapCount = 0;
+
+    void GenerateShadowMaps() {
+        // TODO: Implement (also updates shadowMapCount)
+    }
+
+    void ActivateShadowMaps() {
+        // TODO: Implement (activates shadow map slots in shader)
+    }
 
     void IncreaseLightCount(LightType type) {
         lightCounts[(int)type]++;
@@ -52,13 +61,15 @@ struct LightsContainer {
     }
 
     void Bind(Shader &shader) {
+        shader.SetUniform1i("u_numShadowMaps", shadowMapCount);
+
         shader.SetUniform1i("u_numAmbientLights", lightCounts[(int)LightType::AMBIENT]);
         shader.SetUniform1i("u_numDirectionalLights", lightCounts[(int)LightType::DIRECTIONAL]);
         shader.SetUniform1i("u_numPointLights", lightCounts[(int)LightType::POINT]);
         shader.SetUniform1i("u_numSpotLights", lightCounts[(int)LightType::SPOT]);
 
         int lightIndices[4] = {0, 0, 0, 0};
-        for (auto &lightPtr : m_lightPtrs) {
+        for (auto &lightPtr : lightPtrs) {
             if (!lightPtr->enabled)
                 continue;
 
@@ -68,13 +79,15 @@ struct LightsContainer {
     }
 
     void Unbind(Shader &shader) {
+        shader.SetUniform1i("u_numShadowMaps", 0);
+
         shader.SetUniform1i("u_numAmbientLights", 0);
         shader.SetUniform1i("u_numDirectionalLights", 0);
         shader.SetUniform1i("u_numPointLights", 0);
         shader.SetUniform1i("u_numSpotLights", 0);
 
         int pointLightIdx = 0;
-        for (auto &lightPtr : m_lightPtrs) {
+        for (auto &lightPtr : lightPtrs) {
             switch (lightPtr->type) {
                 case LightType::AMBIENT:
                     lightPtr->Unbind(shader);
@@ -151,7 +164,7 @@ protected:
 
     void AddLight(std::unique_ptr<BaseLight> &&lightPtr) {
         m_lightsContainer.IncreaseLightCount(lightPtr->type);
-        m_lightsContainer.m_lightPtrs.push_back(std::move(lightPtr));
+        m_lightsContainer.lightPtrs.push_back(std::move(lightPtr));
     }
 
     void AddShader(std::unique_ptr<Shader> &&shaderPtr) {
@@ -167,10 +180,10 @@ protected:
     }
 
     std::unique_ptr<BaseLight> &GetSelectedLightPtr() {
-        if (m_lightsContainer.m_lightPtrs.size() == 0) {
+        if (m_lightsContainer.lightPtrs.size() == 0) {
             throw std::runtime_error("No light has been added to the scene");
         }
 
-        return m_lightsContainer.m_lightPtrs[m_activeLightIndex];
+        return m_lightsContainer.lightPtrs[m_activeLightIndex];
     }
 };

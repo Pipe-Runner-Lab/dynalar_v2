@@ -160,17 +160,18 @@ Model::Model(Model &&other)
 Model::~Model() {
 }
 
-void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix) {
+void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
+                 int reservedTextureSlots) {
     glm::mat4 &modelMatrix = GetModelMatrix();
 
     shader.SetUniformMatrix4f("u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
     shader.SetUniformMatrix4f("u_mMatrix", modelMatrix);
     shader.SetUniformBool("u_debugNormals", debugNormals);
 
-    Draw(renderer, shader);
+    Draw(renderer, shader, reservedTextureSlots);
 }
 
-void Model::Draw(Renderer &renderer, Shader &shader) {
+void Model::Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots) {
     bool hasMaterial = m_materialPtrs.size() > 0;
 
     if (hasMaterial && m_materialPtrs.size() != m_meshesPtr->size()) {
@@ -187,7 +188,7 @@ void Model::Draw(Renderer &renderer, Shader &shader) {
         }
 
         if (hasMaterial) {
-            m_materialPtrs[meshIdx]->Bind(shader);
+            m_materialPtrs[meshIdx]->Bind(shader, reservedTextureSlots);
         }
 
         m_meshesPtr->at(meshIdx).Draw(renderer);
