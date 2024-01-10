@@ -49,8 +49,8 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
 void HelloLightsScene::OnUpdate() {
     BaseScene::OnUpdate();
 
-    m_modelPtrs[3]->Rotate({0, 0.2f, 0});
-    m_modelPtrs[4]->Rotate({0, 0.2f, 0});
+    // m_modelPtrs[3]->Rotate({0, 0.2f, 0});
+    // m_modelPtrs[4]->Rotate({0, 0.2f, 0});
 }
 
 void HelloLightsScene::OnRender() {
@@ -69,6 +69,7 @@ void HelloLightsScene::OnRender() {
         }
     }
     m_shaderPtrs[1]->Unbind();
+    m_renderContext.windowManagerPtr->ResetViewport();
 
     // 2. render scene
     m_shaderPtrs[0]->Bind();

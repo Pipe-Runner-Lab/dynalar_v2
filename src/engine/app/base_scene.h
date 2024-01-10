@@ -41,7 +41,7 @@ struct RenderContext {
 };
 
 struct LightsContainer {
-    unsigned int lightCounts[3] = {0, 0, 0};
+    unsigned int lightCounts[4] = {0, 0, 0, 0};
     std::vector<std::unique_ptr<BaseLight>> lightPtrs;
     int shadowMapCount = 0;
 

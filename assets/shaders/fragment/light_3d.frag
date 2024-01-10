@@ -80,7 +80,19 @@ uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
 
 // shadows
 uniform int u_numShadowMaps=0;
-uniform sampler2DShadow u_shadowMaps[MAX_SHADOW_MAPS];
+uniform sampler2D u_shadowMaps[MAX_SHADOW_MAPS];
+
+float ComputeShadow(){
+  float shadow=0.;
+  for(int i=0;i<u_numShadowMaps;i++){
+    vec3 projCoords=v_lightSpaceFragPositions[i].xyz/v_lightSpaceFragPositions[i].w;
+    projCoords=projCoords*.5+.5;
+    float closestDepth=texture(u_shadowMaps[i],projCoords.xy).r;
+    float currentDepth=projCoords.z;
+    shadow+=(currentDepth>closestDepth?1.:0.);
+  }
+  return shadow;
+}
 
 float ComputeAttenuation(float constant,float linear,float quadratic,float distance){
   return 1./(constant+linear*distance+quadratic*distance*distance);
@@ -125,91 +137,94 @@ vec3 ComputeAmbientLight(AmbientLight ambientLight){
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 viewDir){
+  float shadow=ComputeShadow();
+  
   vec3 lightDir=normalize(-directionalLight.direction);
   float diffuseFactor=max(dot(normal,lightDir),0.f);
   
   vec3 reflectDir=reflect(-lightDir,normal);
   float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
   
-  return(ComputeAmbientComponent(directionalLight.color,directionalLight.ambientIntensity)+
-  ComputeDiffuseComponent(directionalLight.color,directionalLight.diffuseIntensity,diffuseFactor)+
-  ComputeSpecularComponent(directionalLight.color,directionalLight.specularIntensity,specularFactor));
-}
-
-vec3 ComputePointLight(PointLight pointLight,vec3 normal,vec3 viewDir){
-  vec3 lightDir=normalize(pointLight.position-v_fragPos);
-  float diffuseFactor=max(dot(normal,lightDir),0.f);
-  
-  vec3 reflectDir=reflect(-lightDir,normal);
-  float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
-  
-  // attenuation
-  float distance=length(pointLight.position-v_fragPos);
-  float attenuation=ComputeAttenuation(pointLight.constant,pointLight.linear,pointLight.quadratic,distance);
-  
-  return(ComputeAmbientComponent(pointLight.color,pointLight.ambientIntensity)+
-  ComputeDiffuseComponent(pointLight.color,pointLight.diffuseIntensity,diffuseFactor)+
-  ComputeSpecularComponent(pointLight.color,pointLight.specularIntensity,specularFactor))*attenuation;
-}
-
-vec3 ComputeSpotLight(SpotLight spotLight,vec3 normal,vec3 viewDir){
-  vec3 lightDir=normalize(spotLight.position-v_fragPos);
-  float diffuseFactor=max(dot(normal,lightDir),0.f);
-  
-  vec3 reflectDir=reflect(-lightDir,normal);
-  float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
-  
-  // attenuation
-  float distance=length(spotLight.position-v_fragPos);
-  float attenuation=ComputeAttenuation(spotLight.constant,spotLight.linear,spotLight.quadratic,distance);
-  
-  float phi=cos(radians(spotLight.innerCutoff));
-  float gamma=cos(radians(spotLight.outerCutoff));
-  float theta=dot(lightDir,normalize(-spotLight.direction));
-  float epsilon=phi-gamma;
-  float intensity=clamp((theta-gamma)/epsilon,0.,1.);
-  
-  return(ComputeAmbientComponent(spotLight.color,spotLight.ambientIntensity)+
-  ComputeDiffuseComponent(spotLight.color,spotLight.diffuseIntensity,diffuseFactor*intensity)+
-  ComputeSpecularComponent(spotLight.color,spotLight.specularIntensity,specularFactor*intensity))*attenuation;
-}
-
-void main(){
-  if(u_debugNormals){
-    pixelColor=v_color;
-    return;
+  return(ComputeAmbientComponent(directionalLight.color,directionalLight.ambientIntensity)+(1-shadow)*(
+    ComputeDiffuseComponent(directionalLight.color,directionalLight.diffuseIntensity,diffuseFactor)+
+    ComputeSpecularComponent(directionalLight.color,directionalLight.specularIntensity,specularFactor)));
   }
   
-  vec3 normal=normalize(v_normal);
-  vec3 viewDir=normalize(u_viewPos-v_fragPos);
-  
-  vec3 cumulative=vec3(0.f);
-  
-  // ambient light
-  // TODO: Add support for ambient maps
-  if(u_numAmbientLights==1){
-    cumulative+=ComputeAmbientLight(u_ambientLight);
+  vec3 ComputePointLight(PointLight pointLight,vec3 normal,vec3 viewDir){
+    vec3 lightDir=normalize(pointLight.position-v_fragPos);
+    float diffuseFactor=max(dot(normal,lightDir),0.f);
+    
+    vec3 reflectDir=reflect(-lightDir,normal);
+    float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
+    
+    // attenuation
+    float distance=length(pointLight.position-v_fragPos);
+    float attenuation=ComputeAttenuation(pointLight.constant,pointLight.linear,pointLight.quadratic,distance);
+    
+    return(ComputeAmbientComponent(pointLight.color,pointLight.ambientIntensity)+
+    ComputeDiffuseComponent(pointLight.color,pointLight.diffuseIntensity,diffuseFactor)+
+    ComputeSpecularComponent(pointLight.color,pointLight.specularIntensity,specularFactor))*attenuation;
   }
   
-  // directional light
-  for(int i=0;i<u_numDirectionalLights;i++){
-    cumulative+=ComputeDirectionalLight(u_directionalLights[i],normal,viewDir);
+  vec3 ComputeSpotLight(SpotLight spotLight,vec3 normal,vec3 viewDir){
+    vec3 lightDir=normalize(spotLight.position-v_fragPos);
+    float diffuseFactor=max(dot(normal,lightDir),0.f);
+    
+    vec3 reflectDir=reflect(-lightDir,normal);
+    float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
+    
+    // attenuation
+    float distance=length(spotLight.position-v_fragPos);
+    float attenuation=ComputeAttenuation(spotLight.constant,spotLight.linear,spotLight.quadratic,distance);
+    
+    float phi=cos(radians(spotLight.innerCutoff));
+    float gamma=cos(radians(spotLight.outerCutoff));
+    float theta=dot(lightDir,normalize(-spotLight.direction));
+    float epsilon=phi-gamma;
+    float intensity=clamp((theta-gamma)/epsilon,0.,1.);
+    
+    return(ComputeAmbientComponent(spotLight.color,spotLight.ambientIntensity)+
+    ComputeDiffuseComponent(spotLight.color,spotLight.diffuseIntensity,diffuseFactor*intensity)+
+    ComputeSpecularComponent(spotLight.color,spotLight.specularIntensity,specularFactor*intensity))*attenuation;
   }
   
-  // point light
-  for(int i=0;i<u_numPointLights;i++){
-    cumulative+=ComputePointLight(u_pointLights[i],normal,viewDir);
+  void main(){
+    if(u_debugNormals){
+      pixelColor=v_color;
+      return;
+    }
+    
+    vec3 normal=normalize(v_normal);
+    vec3 viewDir=normalize(u_viewPos-v_fragPos);
+    
+    vec3 cumulative=vec3(0.f);
+    
+    // ambient light
+    // TODO: Add support for ambient maps
+    if(u_numAmbientLights==1){
+      cumulative+=ComputeAmbientLight(u_ambientLight);
+    }
+    
+    // directional light
+    for(int i=0;i<u_numDirectionalLights;i++){
+      cumulative+=ComputeDirectionalLight(u_directionalLights[i],normal,viewDir);
+    }
+    
+    // point light
+    for(int i=0;i<u_numPointLights;i++){
+      cumulative+=ComputePointLight(u_pointLights[i],normal,viewDir);
+    }
+    
+    // spot light
+    for(int i=0;i<u_numSpotLights;i++){
+      cumulative+=ComputeSpotLight(u_spotLights[i],normal,viewDir);
+    }
+    
+    // TODO: Opactiy map needs to be accounted for
+    pixelColor=vec4(cumulative,u_material.opacity);
+    
+    // gamma correction
+    float gamma=2.2;
+    pixelColor.rgb=pow(pixelColor.rgb,vec3(1./gamma));
   }
   
-  // spot light
-  for(int i=0;i<u_numSpotLights;i++){
-    cumulative+=ComputeSpotLight(u_spotLights[i],normal,viewDir);
-  }
-  
-  // TODO: Opactiy map needs to be accounted for
-  pixelColor=vec4(cumulative,u_material.opacity);
-  
-  // gamma correction
-  float gamma=2.2;
-  pixelColor.rgb=pow(pixelColor.rgb,vec3(1./gamma));
-}
