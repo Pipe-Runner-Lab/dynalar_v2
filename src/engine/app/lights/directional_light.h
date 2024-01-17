@@ -5,7 +5,7 @@
 
 class DirectionalLight : public BaseLight {
     friend class BaseScene;
-    friend class LightsContainer;
+    friend struct LightsContainer;
 
 private:
     float m_diffuseIntensity;

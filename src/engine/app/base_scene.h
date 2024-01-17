@@ -77,8 +77,8 @@ struct LightsContainer {
                         dirLightPtr->GetVpMatrix());
                     if (dirLightPtr->m_shouldRenderShadowMap) {
                         dirLightPtr->m_shadowMap.ActivateShadowTexture(shadowMapSlot);
-                        shadowMapSlot++;
                         lightVsShadowMapIndices[lightIdx] = shadowMapSlot;
+                        shadowMapSlot++;
                     } else {
                         lightVsShadowMapIndices[lightIdx] = -1;
                     }
@@ -90,6 +90,10 @@ struct LightsContainer {
                 }
             }
             lightIdx++;
+        }
+
+        for (int i = 0; i < shadowMapCount; i++) {
+            shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", i), i);
         }
     }
 

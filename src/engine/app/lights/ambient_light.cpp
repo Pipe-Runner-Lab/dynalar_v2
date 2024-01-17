@@ -8,7 +8,7 @@ AmbientLight::AmbientLight(std::string name, const glm::vec3 color, float intens
     : BaseLight(name, LightType::AMBIENT, color, intensity) {
 }
 
-void AmbientLight::Bind(Shader& shader, int idx) {
+void AmbientLight::Bind(Shader& shader, int idx, int shadowMapSlot) {
     shader.SetUniform3f("u_ambientLight.color", m_color.r, m_color.g, m_color.b);
     shader.SetUniform1f("u_ambientLight.ambientIntensity", m_ambientIntensity);
 }

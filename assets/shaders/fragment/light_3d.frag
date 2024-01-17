@@ -85,15 +85,16 @@ uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
 uniform int u_numShadowMaps=0;
 uniform sampler2D u_shadowMaps[MAX_SHADOW_MAPS];
 
-float ComputeShadow(){
-  float shadow=0.;
-  for(int i=0;i<u_numShadowMaps;i++){
-    vec3 projCoords=v_lightSpaceFragPositions[i].xyz/v_lightSpaceFragPositions[i].w;
-    projCoords=projCoords*.5+.5;
-    float closestDepth=texture(u_shadowMaps[i],projCoords.xy).r;
-    float currentDepth=projCoords.z;
-    shadow+=(currentDepth>closestDepth?1.:0.);
+float ComputeShadow(int shadowMapSlot){
+  if(shadowMapSlot<0){
+    return 0.;
   }
+  
+  vec3 projCoords=v_lightSpaceFragPositions[shadowMapSlot].xyz/v_lightSpaceFragPositions[shadowMapSlot].w;
+  projCoords=projCoords*.5+.5;
+  float closestDepth=texture(u_shadowMaps[shadowMapSlot],projCoords.xy).r;
+  float currentDepth=projCoords.z;
+  float shadow=(currentDepth>closestDepth?1.:0.);
   return shadow;
 }
 
@@ -139,8 +140,8 @@ vec3 ComputeAmbientLight(AmbientLight ambientLight){
   return ComputeAmbientComponent(ambientLight.color,ambientLight.ambientIntensity);
 }
 
-vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 viewDir){
-  float shadow=ComputeShadow();
+vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 viewDir,int shadowMapSlot){
+  float shadow=ComputeShadow(shadowMapSlot);
   
   vec3 lightDir=normalize(-directionalLight.direction);
   float diffuseFactor=max(dot(normal,lightDir),0.f);
@@ -153,7 +154,7 @@ vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 
     ComputeSpecularComponent(directionalLight.color,directionalLight.specularIntensity,specularFactor)));
   }
   
-  vec3 ComputePointLight(PointLight pointLight,vec3 normal,vec3 viewDir){
+  vec3 ComputePointLight(PointLight pointLight,vec3 normal,vec3 viewDir,int shadowMapSlot){
     vec3 lightDir=normalize(pointLight.position-v_fragPos);
     float diffuseFactor=max(dot(normal,lightDir),0.f);
     
@@ -169,7 +170,7 @@ vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 
     ComputeSpecularComponent(pointLight.color,pointLight.specularIntensity,specularFactor))*attenuation;
   }
   
-  vec3 ComputeSpotLight(SpotLight spotLight,vec3 normal,vec3 viewDir){
+  vec3 ComputeSpotLight(SpotLight spotLight,vec3 normal,vec3 viewDir,int shadowMapSlot){
     vec3 lightDir=normalize(spotLight.position-v_fragPos);
     float diffuseFactor=max(dot(normal,lightDir),0.f);
     
@@ -210,17 +211,17 @@ vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 
     
     // directional light
     for(int i=0;i<u_numDirectionalLights;i++){
-      cumulative+=ComputeDirectionalLight(u_directionalLights[i],normal,viewDir);
+      cumulative+=ComputeDirectionalLight(u_directionalLights[i],normal,viewDir,u_directionalLights[i].shadowMapSlot);
     }
     
     // point light
     for(int i=0;i<u_numPointLights;i++){
-      cumulative+=ComputePointLight(u_pointLights[i],normal,viewDir);
+      cumulative+=ComputePointLight(u_pointLights[i],normal,viewDir,u_pointLights[i].shadowMapSlot);
     }
     
     // spot light
     for(int i=0;i<u_numSpotLights;i++){
-      cumulative+=ComputeSpotLight(u_spotLights[i],normal,viewDir);
+      cumulative+=ComputeSpotLight(u_spotLights[i],normal,viewDir,u_spotLights[i].shadowMapSlot);
     }
     
     // TODO: Opactiy map needs to be accounted for

@@ -7,6 +7,7 @@
 #include "../../core/gl/model.h"
 #include "../../core/gl/renderer.h"
 #include "../../core/gl/shader.h"
+#include "../../core/gl/shadow_map.h"
 #include "../../window/window_manager.h"
 
 enum class LightType {
