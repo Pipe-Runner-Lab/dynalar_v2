@@ -42,19 +42,60 @@ struct RenderContext {
 
 struct LightsContainer {
     unsigned int lightCounts[4] = {0, 0, 0, 0};
+    std::vector<int> lightVsShadowMapIndices;
     std::vector<std::unique_ptr<BaseLight>> lightPtrs;
     int shadowMapCount = 0;
 
-    void GenerateShadowMaps() {
-        // TODO: Implement (also updates shadowMapCount)
+    void GenerateShadowMaps(Renderer &renderer, WindowManager &window_manager,
+                            std::vector<std::unique_ptr<Model>> &modelPtrs, Shader &shader) {
+        shadowMapCount = 0;
+        for (auto &lightPtr : lightPtrs) {
+            switch (lightPtr->type) {
+                case LightType::DIRECTIONAL: {
+                    DirectionalLight *dirLightPtr = static_cast<DirectionalLight *>(lightPtr.get());
+                    if (dirLightPtr->m_shouldRenderShadowMap) {
+                        shadowMapCount++;
+                        dirLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs, shader);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
     }
 
-    void ActivateShadowMaps() {
-        // TODO: Implement (activates shadow map slots in shader)
+    void ActivateShadowMaps(Shader &shader) {
+        int shadowMapSlot = 0;
+        int lightIdx = 0;
+        for (auto &lightPtr : lightPtrs) {
+            switch (lightPtr->type) {
+                case LightType::DIRECTIONAL: {
+                    DirectionalLight *dirLightPtr = static_cast<DirectionalLight *>(lightPtr.get());
+                    shader.SetUniformMatrix4f(
+                        fmt::format("u_lightSpaceVpMatrices[{}]", shadowMapSlot),
+                        dirLightPtr->GetVpMatrix());
+                    if (dirLightPtr->m_shouldRenderShadowMap) {
+                        dirLightPtr->m_shadowMap.ActivateShadowTexture(shadowMapSlot);
+                        shadowMapSlot++;
+                        lightVsShadowMapIndices[lightIdx] = shadowMapSlot;
+                    } else {
+                        lightVsShadowMapIndices[lightIdx] = -1;
+                    }
+                    break;
+                }
+                default: {
+                    lightVsShadowMapIndices[lightIdx] = -1;
+                    break;
+                }
+            }
+            lightIdx++;
+        }
     }
 
     void IncreaseLightCount(LightType type) {
         lightCounts[(int)type]++;
+        lightVsShadowMapIndices.push_back(-1);  // -1 means no shadow map
 
         if (lightCounts[(int)LightType::AMBIENT] > 1)
             throw std::runtime_error("Only one ambient light can be added to the scene");
@@ -69,11 +110,15 @@ struct LightsContainer {
         shader.SetUniform1i("u_numSpotLights", lightCounts[(int)LightType::SPOT]);
 
         int lightIndices[4] = {0, 0, 0, 0};
+        int lightIdx = 0;
         for (auto &lightPtr : lightPtrs) {
-            if (!lightPtr->enabled)
+            if (!lightPtr->enabled) {
+                lightIdx++;
                 continue;
+            }
 
-            lightPtr->Bind(shader, lightIndices[(int)lightPtr->type]);
+            lightPtr->Bind(shader, lightIndices[(int)lightPtr->type],
+                           lightVsShadowMapIndices[lightIdx++]);
             lightIndices[(int)lightPtr->type]++;
         }
     }

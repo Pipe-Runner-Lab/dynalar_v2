@@ -26,6 +26,7 @@ class Model : public EditorProperties {
     friend class BaseScene;
     friend class PointLight;
     friend class SpotLight;
+    friend class DirectionalLight;
 
 protected:
     std::shared_ptr<std::vector<Mesh>> m_meshesPtr;

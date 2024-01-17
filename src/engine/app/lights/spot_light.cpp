@@ -25,7 +25,7 @@ SpotLight::SpotLight(std::string name, const glm::vec3 color, float ambientInten
       m_quadratic(quadratic) {
 }
 
-void SpotLight::Bind(Shader& shader, int idx) {
+void SpotLight::Bind(Shader& shader, int idx, int shadowMapSlot) {
     shader.SetUniform3f(fmt::format("u_spotLights[{}].position", idx), m_position.x, m_position.y,
                         m_position.z);
     shader.SetUniform3f(fmt::format("u_spotLights[{}].direction", idx), m_direction.x,
@@ -43,6 +43,8 @@ void SpotLight::Bind(Shader& shader, int idx) {
     shader.SetUniform1f(fmt::format("u_spotLights[{}].constant", idx), m_constant);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].linear", idx), m_linear);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].quadratic", idx), m_quadratic);
+
+    shader.SetUniform1i(fmt::format("u_spotLights[{}].shadowMapSlot", idx), shadowMapSlot);
 }
 
 void SpotLight::Unbind(Shader& shader, int idx) {
@@ -59,6 +61,8 @@ void SpotLight::Unbind(Shader& shader, int idx) {
     shader.SetUniform1f(fmt::format("u_spotLights[{}].constant", idx), 0.0f);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].linear", idx), 0.0f);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].quadratic", idx), 0.0f);
+
+    shader.SetUniform1i(fmt::format("u_spotLights[{}].shadowMapSlot", idx), -1);
 }
 
 void SpotLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {

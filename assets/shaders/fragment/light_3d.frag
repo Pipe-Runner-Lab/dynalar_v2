@@ -28,6 +28,7 @@ struct DirectionalLight{
   float diffuseIntensity;
   float specularIntensity;
   vec3 direction;
+  int shadowMapSlot;
 };
 
 struct PointLight{
@@ -39,6 +40,7 @@ struct PointLight{
   float constant;
   float linear;
   float quadratic;
+  int shadowMapSlot;
 };
 
 struct SpotLight{
@@ -53,6 +55,7 @@ struct SpotLight{
   float quadratic;
   float innerCutoff;
   float outerCutoff;
+  int shadowMapSlot;
 };
 
 out vec4 pixelColor;

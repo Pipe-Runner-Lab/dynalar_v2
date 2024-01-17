@@ -24,6 +24,20 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
     AddModel(std::make_unique<Model>("Helmet", "assets/models/flight_helmet/FlightHelmet.gltf",
                                      glm::vec3(0, 2, 0), glm::vec3(0, -90, 0), glm::vec3(4, 4, 4)));
 
+    // axis debugging
+    float scale = 10;
+    AddModel(std::make_unique<Cube>("Origin", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0),
+                                    glm::vec3(0.1, 0.1, 0.1), glm::vec4(1, 1, 1, 1)));  // origin
+    AddModel(std::make_unique<Cube>("X Axis", glm::vec3(scale, 0, 0), glm::vec3(0, 0, 0),
+                                    glm::vec3(scale / 2, 0.05, 0.05),
+                                    glm::vec4(1, 0, 0, 1)));  // x axis (red)
+    AddModel(std::make_unique<Cube>("Y Axis", glm::vec3(0, scale, 0), glm::vec3(0, 0, 0),
+                                    glm::vec3(0.05, scale / 2, 0.05),
+                                    glm::vec4(0, 1, 0, 1)));  // y axis (blue)
+    AddModel(std::make_unique<Cube>("Z Axis", glm::vec3(0, 0, scale), glm::vec3(0, 0, 0),
+                                    glm::vec3(0.05, 0.05, scale / 2),
+                                    glm::vec4(0, 0, 1, 1)));  // z axis (green)
+
     // AddModel(Model("sponza", "assets/models/sponza/Sponza.gltf", {0, 0, 0}, {0, 0, 0}, {1, 1,
     // 1}));
 
@@ -61,11 +75,9 @@ void HelloLightsScene::OnRender() {
     for (auto &lightPtr : m_lightsContainer.lightPtrs) {
         if (lightPtr->type == LightType::DIRECTIONAL) {
             DirectionalLight *dirLightPtr = static_cast<DirectionalLight *>(lightPtr.get());
-            m_shadowMap.Bind();
-            m_shadowMap.GenerateShadow(*m_renderContext.rendererPtr,
-                                       *m_renderContext.windowManagerPtr, m_modelPtrs,
-                                       *m_shaderPtrs[1], dirLightPtr->GetVpMatrix());
-            m_shadowMap.Unbind();
+            dirLightPtr->GenerateShadowMap(*m_renderContext.rendererPtr,
+                                           *m_renderContext.windowManagerPtr, m_modelPtrs,
+                                           *m_shaderPtrs[1]);
         }
     }
     m_shaderPtrs[1]->Unbind();
@@ -78,14 +90,7 @@ void HelloLightsScene::OnRender() {
     m_lightsContainer.Bind(*m_shaderPtrs[0]);
 
     // 2.2 activate shadow map slots
-    for (auto &lightPtr : m_lightsContainer.lightPtrs) {
-        if (lightPtr->type == LightType::DIRECTIONAL) {
-            DirectionalLight *dirLightPtr = static_cast<DirectionalLight *>(lightPtr.get());
-            m_shaderPtrs[0]->SetUniformMatrix4f("u_lightSpaceVpMatrices[0]",
-                                                dirLightPtr->GetVpMatrix());
-            m_shadowMap.ActivateShadowTexture(0);
-        }
-    }
+    m_lightsContainer.ActivateShadowMaps(*m_shaderPtrs[0]);
 
     Camera &activeCamera = GetActiveCamera();
     glm::mat4 vpMatrix = activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
@@ -93,7 +98,8 @@ void HelloLightsScene::OnRender() {
                                   activeCamera.GetPosition().y, activeCamera.GetPosition().z);
 
     for (auto &modelPtr : m_modelPtrs) {
-        modelPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix);
+        modelPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix,
+                       m_lightsContainer.shadowMapCount);
     }
 
     // 3. render light models
