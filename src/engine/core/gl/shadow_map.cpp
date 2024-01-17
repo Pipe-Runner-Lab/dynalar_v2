@@ -47,6 +47,6 @@ void ShadowMap::GenerateShadow(Renderer& renderer, WindowManager& window_manager
     renderer.Clear(GL_DEPTH_BUFFER_BIT);
 
     for (auto& modelPtr : modelPtrs) {
-        modelPtr->Draw(renderer, shader, vpMatrix);
+        modelPtr->Draw(renderer, shader, vpMatrix, true);
     }
 }

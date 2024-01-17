@@ -55,6 +55,7 @@ void DirectionalLight::RenderEditorProperties() {
     ImGui::DragFloat("Top", &top, 0.1f);
     ImGui::DragFloat("Near", &near, 0.1f);
     ImGui::DragFloat("Far", &far, 0.1f);
+    ImGui::DragFloat("Light Depth Scale", &lightDepthScale, 0.1f);
 }
 
 void DirectionalLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {

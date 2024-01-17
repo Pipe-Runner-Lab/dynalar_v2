@@ -199,6 +199,14 @@ void Model::Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots) {
     }
 }
 
+void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, bool) {
+    glm::mat4 &modelMatrix = GetModelMatrix();
+    shader.SetUniformMatrix4f("u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
+    for (int meshIdx = 0; meshIdx < m_meshesPtr->size(); meshIdx++) {
+        m_meshesPtr->at(meshIdx).Draw(renderer);
+    }
+}
+
 void Model::RenderEditorProperties() {
     ImGui::Checkbox("Debug Normals", &debugNormals);
     ImGui::Checkbox("Wireframe", &wireframe);

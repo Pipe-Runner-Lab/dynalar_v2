@@ -22,6 +22,7 @@ private:
     float top = 20.0f;
     float near = 0.1f;
     float far = 100.0f;
+    float lightDepthScale = 10.0f;
 
     // glm::mat4 m_projectionMatrix = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f);
 
@@ -41,8 +42,8 @@ public:
 
     // for shadow mapping
     inline glm::mat4 GetVpMatrix() {
-        glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0, 0, 0) - (40.0f * m_direction),
-                                           glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        m_position = glm::vec3(0, 0, 0) - m_direction * lightDepthScale;
+        glm::mat4 viewMatrix = glm::lookAt(m_position, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
         glm::mat4 m_projectionMatrix = glm::ortho(left, right, bottom, top, near, far);
         return m_projectionMatrix * viewMatrix;
     }

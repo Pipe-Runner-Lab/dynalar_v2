@@ -33,10 +33,10 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
                                     glm::vec4(1, 0, 0, 1)));  // x axis (red)
     AddModel(std::make_unique<Cube>("Y Axis", glm::vec3(0, scale, 0), glm::vec3(0, 0, 0),
                                     glm::vec3(0.05, scale / 2, 0.05),
-                                    glm::vec4(0, 1, 0, 1)));  // y axis (blue)
+                                    glm::vec4(0, 1, 0, 1)));  // y axis (green)
     AddModel(std::make_unique<Cube>("Z Axis", glm::vec3(0, 0, scale), glm::vec3(0, 0, 0),
                                     glm::vec3(0.05, 0.05, scale / 2),
-                                    glm::vec4(0, 0, 1, 1)));  // z axis (green)
+                                    glm::vec4(0, 0, 1, 1)));  // z axis (blue)
 
     // AddModel(Model("sponza", "assets/models/sponza/Sponza.gltf", {0, 0, 0}, {0, 0, 0}, {1, 1,
     // 1}));
@@ -57,7 +57,7 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
     //                                      0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
     //                                      25.0f));
     AddLight(std::make_unique<DirectionalLight>("Directional Light", glm::vec3(1, 1, 1), 0.0f, 0.5f,
-                                                0.4f, glm::vec3(-1, -1, -1)));
+                                                0.4f, glm::vec3(1, -1, -1)));
 }
 
 void HelloLightsScene::OnUpdate() {

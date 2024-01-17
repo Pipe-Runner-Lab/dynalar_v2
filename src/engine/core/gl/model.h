@@ -116,6 +116,8 @@ public:
     void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
               int reservedTextureSlots = 0);
 
+    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, bool shadowPass);
+
     void Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots = 0);
 
     inline glm::mat4 &GetModelMatrix() {
