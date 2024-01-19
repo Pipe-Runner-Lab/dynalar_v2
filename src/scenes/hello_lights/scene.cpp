@@ -25,18 +25,18 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
                                      glm::vec3(0, 2, 0), glm::vec3(0, -90, 0), glm::vec3(4, 4, 4)));
 
     // axis debugging
-    float scale = 10;
-    AddModel(std::make_unique<Cube>("Origin", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0),
-                                    glm::vec3(0.1, 0.1, 0.1), glm::vec4(1, 1, 1, 1)));  // origin
-    AddModel(std::make_unique<Cube>("X Axis", glm::vec3(scale, 0, 0), glm::vec3(0, 0, 0),
-                                    glm::vec3(scale / 2, 0.05, 0.05),
-                                    glm::vec4(1, 0, 0, 1)));  // x axis (red)
-    AddModel(std::make_unique<Cube>("Y Axis", glm::vec3(0, scale, 0), glm::vec3(0, 0, 0),
-                                    glm::vec3(0.05, scale / 2, 0.05),
-                                    glm::vec4(0, 1, 0, 1)));  // y axis (green)
-    AddModel(std::make_unique<Cube>("Z Axis", glm::vec3(0, 0, scale), glm::vec3(0, 0, 0),
-                                    glm::vec3(0.05, 0.05, scale / 2),
-                                    glm::vec4(0, 0, 1, 1)));  // z axis (blue)
+    // float scale = 10;
+    // AddModel(std::make_unique<Cube>("Origin", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0),
+    //                                 glm::vec3(0.1, 0.1, 0.1), glm::vec4(1, 1, 1, 1)));  // origin
+    // AddModel(std::make_unique<Cube>("X Axis", glm::vec3(scale, 0, 0), glm::vec3(0, 0, 0),
+    //                                 glm::vec3(scale / 2, 0.05, 0.05),
+    //                                 glm::vec4(1, 0, 0, 1)));  // x axis (red)
+    // AddModel(std::make_unique<Cube>("Y Axis", glm::vec3(0, scale, 0), glm::vec3(0, 0, 0),
+    //                                 glm::vec3(0.05, scale / 2, 0.05),
+    //                                 glm::vec4(0, 1, 0, 1)));  // y axis (green)
+    // AddModel(std::make_unique<Cube>("Z Axis", glm::vec3(0, 0, scale), glm::vec3(0, 0, 0),
+    //                                 glm::vec3(0.05, 0.05, scale / 2),
+    //                                 glm::vec4(0, 0, 1, 1)));  // z axis (blue)
 
     // AddModel(Model("sponza", "assets/models/sponza/Sponza.gltf", {0, 0, 0}, {0, 0, 0}, {1, 1,
     // 1}));
@@ -56,8 +56,10 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
     // AddLight(std::make_unique<SpotLight>("Spot Light 1", glm::vec3(0.93, 0.95, 0.45), 0.0f, 0.5f,
     //                                      0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
     //                                      25.0f));
-    AddLight(std::make_unique<DirectionalLight>("Directional Light", glm::vec3(1, 1, 1), 0.0f, 0.5f,
-                                                0.4f, glm::vec3(1, -1, -1)));
+    AddLight(std::make_unique<DirectionalLight>("Directional Light 1", glm::vec3(1, 1, 1), 0.0f,
+                                                0.5f, 0.4f, glm::vec3(1, -1, -1)));
+    // AddLight(std::make_unique<DirectionalLight>("Directional Light 2", glm::vec3(1, 0, 1), 0.0f,
+    //                                             0.5f, 0.4f, glm::vec3(1, -1, -0.5)));
 }
 
 void HelloLightsScene::OnUpdate() {
@@ -68,29 +70,23 @@ void HelloLightsScene::OnUpdate() {
 }
 
 void HelloLightsScene::OnRender() {
-    m_lightsContainer.shadowMapCount = 1;
+    m_lightsManager.shadowMapCount = 1;
 
     // 1. render shadow maps
     m_shaderPtrs[1]->Bind();
-    for (auto &lightPtr : m_lightsContainer.lightPtrs) {
-        if (lightPtr->type == LightType::DIRECTIONAL) {
-            DirectionalLight *dirLightPtr = static_cast<DirectionalLight *>(lightPtr.get());
-            dirLightPtr->GenerateShadowMap(*m_renderContext.rendererPtr,
-                                           *m_renderContext.windowManagerPtr, m_modelPtrs,
-                                           *m_shaderPtrs[1]);
-        }
-    }
+    m_lightsManager.GenerateShadowMaps(*m_renderContext.rendererPtr,
+                                       *m_renderContext.windowManagerPtr, m_modelPtrs,
+                                       *m_shaderPtrs[1]);
     m_shaderPtrs[1]->Unbind();
-    m_renderContext.windowManagerPtr->ResetViewport();
 
     // 2. render scene
     m_shaderPtrs[0]->Bind();
 
     // 2.1 set light uniforms
-    m_lightsContainer.Bind(*m_shaderPtrs[0]);
+    m_lightsManager.Bind(*m_shaderPtrs[0]);
 
     // 2.2 activate shadow map slots
-    m_lightsContainer.ActivateShadowMaps(*m_shaderPtrs[0]);
+    m_lightsManager.ActivateShadowMaps(*m_shaderPtrs[0]);
 
     Camera &activeCamera = GetActiveCamera();
     glm::mat4 vpMatrix = activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
@@ -99,11 +95,11 @@ void HelloLightsScene::OnRender() {
 
     for (auto &modelPtr : m_modelPtrs) {
         modelPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix,
-                       m_lightsContainer.shadowMapCount);
+                       m_lightsManager.shadowMapCount);
     }
 
     // 3. render light models
-    for (auto &lightPtr : m_lightsContainer.lightPtrs) {
+    for (auto &lightPtr : m_lightsManager.lightPtrs) {
         lightPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix);
     }
 

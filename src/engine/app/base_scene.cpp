@@ -56,7 +56,7 @@ BaseScene::BaseScene(RenderContext &renderContext, std::string sceneTitle)
     m_lightPropertiesEditorPtr =
         std::make_unique<LightPropertiesEditor>(LightPropertiesEditor([&]() {
             BaseLight *selectedLightPtr = GetSelectedLightPtr().get();
-            auto &lightPtrs = m_lightsContainer.lightPtrs;
+            auto &lightPtrs = m_lightsManager.lightPtrs;
 
             if (ImGui::BeginCombo("Selected Light", selectedLightPtr->name.c_str())) {
                 for (int itemIdx = 0; itemIdx < lightPtrs.size(); itemIdx++) {
@@ -95,7 +95,7 @@ void BaseScene::OnGUIRender() {
             m_cameraPropertiesEditorPtr->Render();
         }
 
-        if (m_lightsContainer.lightPtrs.size() > 0) {
+        if (m_lightsManager.lightPtrs.size() > 0) {
             m_lightPropertiesEditorPtr->Render();
         }
 

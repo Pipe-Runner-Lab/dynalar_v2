@@ -18,7 +18,7 @@ private:
     int m_height;
 
 public:
-    ShadowMap(int width = 1024, int height = 1024);
+    ShadowMap(int width = 2048, int height = 2048);
     ~ShadowMap();
 
     void Bind() const;

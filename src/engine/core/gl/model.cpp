@@ -160,9 +160,15 @@ Model::Model(Model &&other)
 Model::~Model() {
 }
 
-void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
-                 int reservedTextureSlots) {
+void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, int reservedTextureSlots,
+                 RenderPassType renderPassType) {
     glm::mat4 &modelMatrix = GetModelMatrix();
+
+    if (renderPassType == RenderPassType::SHADOW) {
+        shader.SetUniformMatrix4f("u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
+        ShadowPass(renderer, shader);
+        return;
+    }
 
     shader.SetUniformMatrix4f("u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
     shader.SetUniformMatrix4f("u_mMatrix", modelMatrix);
@@ -199,9 +205,7 @@ void Model::Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots) {
     }
 }
 
-void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, bool) {
-    glm::mat4 &modelMatrix = GetModelMatrix();
-    shader.SetUniformMatrix4f("u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
+void Model::ShadowPass(Renderer &renderer, Shader &shader) {
     for (int meshIdx = 0; meshIdx < m_meshesPtr->size(); meshIdx++) {
         m_meshesPtr->at(meshIdx).Draw(renderer);
     }

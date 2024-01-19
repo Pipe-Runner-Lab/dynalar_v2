@@ -85,16 +85,36 @@ uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
 uniform int u_numShadowMaps=0;
 uniform sampler2D u_shadowMaps[MAX_SHADOW_MAPS];
 
-float ComputeShadow(int shadowMapSlot){
+float ComputeShadow(int shadowMapSlot,vec3 lightDir,vec3 normal){
   if(shadowMapSlot<0){
     return 0.;
   }
   
+  float bias=max(.05*(1.-dot(normal,lightDir)),.005);// dynamic bias
+  
   vec3 projCoords=v_lightSpaceFragPositions[shadowMapSlot].xyz/v_lightSpaceFragPositions[shadowMapSlot].w;
-  projCoords=projCoords*.5+.5;
-  float closestDepth=texture(u_shadowMaps[shadowMapSlot],projCoords.xy).r;
+  projCoords=projCoords*.5+.5;// transform to [0,1] range from [-1,1]
   float currentDepth=projCoords.z;
-  float shadow=(currentDepth>closestDepth?1.:0.);
+  
+  // if currentDepth is greater than 1 or less than 0, then the fragment is outside the light's frustum
+  if(currentDepth>1.||currentDepth<0.){
+    return 0.;
+  }
+  
+  // PCF (using a 3x3 kernel/filter)
+  vec2 texelSize=1./textureSize(u_shadowMaps[shadowMapSlot],0);// texture size on mipmap lvl 0
+  float shadow=0.;
+  for(int x=-1;x<=1;++x){
+    for(int y=-1;y<=1;++y){
+      vec2 offset=vec2(x,y)*texelSize;
+      float pcfDepth=texture(u_shadowMaps[shadowMapSlot],projCoords.xy+offset).r;
+      shadow+=currentDepth-bias>pcfDepth?1.:0.;
+    }
+  }
+  shadow/=9.;
+  
+  // float closestDepth=texture(u_shadowMaps[shadowMapSlot],projCoords.xy).r;
+  // float shadow=(currentDepth-bias>closestDepth?1.:0.);// adjusted shadow map depth
   return shadow;
 }
 
@@ -141,13 +161,13 @@ vec3 ComputeAmbientLight(AmbientLight ambientLight){
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 viewDir,int shadowMapSlot){
-  float shadow=ComputeShadow(shadowMapSlot);
-  
   vec3 lightDir=normalize(-directionalLight.direction);
   float diffuseFactor=max(dot(normal,lightDir),0.f);
   
   vec3 reflectDir=reflect(-lightDir,normal);
   float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
+  
+  float shadow=ComputeShadow(shadowMapSlot,lightDir,normal);
   
   return(ComputeAmbientComponent(directionalLight.color,directionalLight.ambientIntensity)+(1-shadow)*(
     ComputeDiffuseComponent(directionalLight.color,directionalLight.diffuseIntensity,diffuseFactor)+

@@ -49,13 +49,13 @@ void DirectionalLight::RenderEditorProperties() {
     ImGui::SliderFloat("Specular Intensity", &m_specularIntensity, 0.0f, 1.0f);
 
     // shadow
-    ImGui::DragFloat("Left", &left, 0.1f);
-    ImGui::DragFloat("Right", &right, 0.1f);
-    ImGui::DragFloat("Bottom", &bottom, 0.1f);
-    ImGui::DragFloat("Top", &top, 0.1f);
+    ImGui::Text("Shadow Properties");
+    ImGui::Checkbox("Render Shadow Map", &m_shouldRenderShadowMap);
+    ImGui::DragFloat("Width", &width, 0.1f, 0.01f);
+    ImGui::DragFloat("Height", &height, 0.1f, 0.01f);
     ImGui::DragFloat("Near", &near, 0.1f);
     ImGui::DragFloat("Far", &far, 0.1f);
-    ImGui::DragFloat("Light Depth Scale", &lightDepthScale, 0.1f);
+    ImGui::DragFloat("Aligned Position (From Origin)", &m_positionAlignedScale, 0.1f, 0.0f);
 }
 
 void DirectionalLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {

@@ -17,6 +17,8 @@
 #include "shader.h"
 #include "texture.h"
 
+enum class RenderPassType { COMPLETE, SHADOW };
+
 /**
  * Note: Rotation is right-handed
  * Note: Copying a model is not allowed.
@@ -113,10 +115,10 @@ public:
         return *this;
     }
 
-    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
-              int reservedTextureSlots = 0);
+    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, int reservedTextureSlots = 0,
+              RenderPassType renderPassType = RenderPassType::COMPLETE);
 
-    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, bool shadowPass);
+    void ShadowPass(Renderer &renderer, Shader &shader);
 
     void Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots = 0);
 

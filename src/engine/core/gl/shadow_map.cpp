@@ -9,8 +9,12 @@ ShadowMap::ShadowMap(int width, int height) : m_width(width), m_height(height) {
                          GL_FLOAT, nullptr));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER));
+
+    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};  // everything outside of the light's frustum
+                                                     // will be in light (sideways)
+    GL_CALL(glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor));
 
     // attach depth texture as FBO's depth buffer
     Bind();
@@ -45,8 +49,11 @@ void ShadowMap::GenerateShadow(Renderer& renderer, WindowManager& window_manager
                                glm::mat4 vpMatrix) const {
     window_manager.SetViewport(m_width, m_height);
     renderer.Clear(GL_DEPTH_BUFFER_BIT);
+    // glCullFace(GL_FRONT); //TODO: Fix peter panning
 
     for (auto& modelPtr : modelPtrs) {
-        modelPtr->Draw(renderer, shader, vpMatrix, true);
+        modelPtr->Draw(renderer, shader, vpMatrix, true, RenderPassType::SHADOW);
     }
+
+    // glCullFace(GL_BACK);
 }
