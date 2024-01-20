@@ -49,7 +49,10 @@ void DirectionalLight::RenderEditorProperties() {
     ImGui::SliderFloat("Specular Intensity", &m_specularIntensity, 0.0f, 1.0f);
 
     // shadow
+    ImGui::Separator();
     ImGui::Text("Shadow Properties");
+    ImGui::Text(
+        fmt::format("Shadow Map Size: {} x {}", m_shadowMap.m_width, m_shadowMap.m_height).c_str());
     ImGui::Checkbox("Render Shadow Map", &m_shouldRenderShadowMap);
     ImGui::DragFloat("Width", &width, 0.1f, 0.01f);
     ImGui::DragFloat("Height", &height, 0.1f, 0.01f);

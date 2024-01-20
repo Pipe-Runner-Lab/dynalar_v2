@@ -64,11 +64,6 @@ void LightsManager::IncreaseLightCount(LightType type) {
 void LightsManager::Bind(Shader& shader) {
     shader.SetUniform1i("u_numShadowMaps", shadowMapCount);
 
-    shader.SetUniform1i("u_numAmbientLights", lightCounts[(int)LightType::AMBIENT]);
-    shader.SetUniform1i("u_numDirectionalLights", lightCounts[(int)LightType::DIRECTIONAL]);
-    shader.SetUniform1i("u_numPointLights", lightCounts[(int)LightType::POINT]);
-    shader.SetUniform1i("u_numSpotLights", lightCounts[(int)LightType::SPOT]);
-
     int lightIndices[4] = {0, 0, 0, 0};
     int lightIdx = 0;
     for (auto& lightPtr : lightPtrs) {
@@ -77,10 +72,14 @@ void LightsManager::Bind(Shader& shader) {
             continue;
         }
 
-        lightPtr->Bind(shader, lightIndices[(int)lightPtr->type],
+        lightPtr->Bind(shader, lightIndices[(int)lightPtr->type]++,
                        lightVsShadowMapIndices[lightIdx++]);
-        lightIndices[(int)lightPtr->type]++;
     }
+
+    shader.SetUniform1i("u_numAmbientLights", lightIndices[(int)LightType::AMBIENT]);
+    shader.SetUniform1i("u_numDirectionalLights", lightIndices[(int)LightType::DIRECTIONAL]);
+    shader.SetUniform1i("u_numPointLights", lightIndices[(int)LightType::POINT]);
+    shader.SetUniform1i("u_numSpotLights", lightIndices[(int)LightType::SPOT]);
 }
 
 void LightsManager::Unbind(Shader& shader) {

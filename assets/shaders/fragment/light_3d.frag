@@ -5,6 +5,7 @@ const int MAX_POINT_LIGHTS=4;
 const int MAX_SPOT_LIGHTS=4;
 const int MAX_TEXTURES=10;
 const int MAX_SHADOW_MAPS=10;
+const float BIAS_FACTOR=.00009;
 
 struct MeshBaseMaterial{
   vec3 albedo;
@@ -90,7 +91,7 @@ float ComputeShadow(int shadowMapSlot,vec3 lightDir,vec3 normal){
     return 0.;
   }
   
-  float bias=max(.05*(1.-dot(normal,lightDir)),.005);// dynamic bias
+  float bias=max(BIAS_FACTOR*10*(1.-dot(normal,lightDir)),BIAS_FACTOR);// dynamic bias
   
   vec3 projCoords=v_lightSpaceFragPositions[shadowMapSlot].xyz/v_lightSpaceFragPositions[shadowMapSlot].w;
   projCoords=projCoords*.5+.5;// transform to [0,1] range from [-1,1]

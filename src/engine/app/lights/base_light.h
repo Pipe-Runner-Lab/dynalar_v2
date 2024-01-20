@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/core.h>
+
 #include <glm/glm.hpp>
 #include <string>
 

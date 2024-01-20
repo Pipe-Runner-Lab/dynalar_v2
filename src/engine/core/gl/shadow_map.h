@@ -10,6 +10,10 @@
 #include "shader.h"
 
 class ShadowMap {
+    friend class DirectionalLight;
+    friend class PointLight;
+    friend class SpotLight;
+
 private:
     unsigned int m_depthMapFBO;
     unsigned int m_depthMap;
