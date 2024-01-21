@@ -6,9 +6,9 @@
 
 #ifdef _DEBUG
 #define GL_CALL(statement) \
-  ClearAllGLErrors();      \
-  statement;               \
-  CheckOpenGLError(#statement, __FILE__, __LINE__);
+    ClearAllGLErrors();    \
+    statement;             \
+    CheckOpenGLError(#statement, __FILE__, __LINE__);
 #else
 #define GL_CALL(statement) statement
 #endif
@@ -22,3 +22,6 @@ void ClearAllGLErrors();
 /// @param line
 /// @return
 bool CheckOpenGLError(const char *statement, const char *file, int line);
+
+// NOTE: Careful when using GLCall inside an if statement without braces. Since this macro expands
+// to multiple lines,

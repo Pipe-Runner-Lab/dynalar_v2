@@ -1,11 +1,20 @@
 #include "shader.h"
 
-Shader::Shader(const std::string &vertexShaderFilePath, const std::string &fragmentShaderFilePath)
-    : m_shaderProgramID(0) {
+Shader::Shader(const std::string &vertexShaderFilePath, const std::string &fragmentShaderFilePath,
+               const std::string &geometryShaderFilePath)
+    : m_shaderProgramID(0),
+      m_vertFilepath(vertexShaderFilePath),
+      m_fragFilepath(fragmentShaderFilePath),
+      m_geomFilePath(geometryShaderFilePath) {
     const std::string vShaderSrc = ParseShader(vertexShaderFilePath);
     const std::string fShaderSrc = ParseShader(fragmentShaderFilePath);
 
-    m_shaderProgramID = CreateShaderProgram(vShaderSrc, fShaderSrc);
+    if (geometryShaderFilePath != "") {
+        const std::string gShaderSrc = ParseShader(geometryShaderFilePath);
+        m_shaderProgramID = CreateShaderProgram(vShaderSrc, fShaderSrc, gShaderSrc);
+    } else {
+        m_shaderProgramID = CreateShaderProgram(vShaderSrc, fShaderSrc);
+    }
 }
 
 Shader::~Shader() {
@@ -40,14 +49,19 @@ GLuint Shader::CompileShader(const std::string &srcCode, GLenum shaderType) {
     return shader;
 }
 
-GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::string &fShaderSrc) {
+GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::string &fShaderSrc,
+                                   const std::string &gShaderSrc) {
     GL_CALL(GLuint shaderProgramID = glCreateProgram());
 
     GLuint vertexShader = CompileShader(vShaderSrc, GL_VERTEX_SHADER);
     GLuint fragmentShader = CompileShader(fShaderSrc, GL_FRAGMENT_SHADER);
+    GLuint geometryShader = gShaderSrc == "" ? 0 : CompileShader(gShaderSrc, GL_GEOMETRY_SHADER);
 
     GL_CALL(glAttachShader(shaderProgramID, vertexShader));
     GL_CALL(glAttachShader(shaderProgramID, fragmentShader));
+    if (geometryShader != 0) {
+        GL_CALL(glAttachShader(shaderProgramID, geometryShader));
+    }
 
     GL_CALL(glLinkProgram(shaderProgramID));  // send program to GPU
 
@@ -77,6 +91,9 @@ GLuint Shader::CreateShaderProgram(const std::string &vShaderSrc, const std::str
     // Delete intermediate shader outputs
     GL_CALL(glDeleteShader(vertexShader));
     GL_CALL(glDeleteShader(fragmentShader));
+    if (geometryShader != 0) {
+        GL_CALL(glDeleteShader(geometryShader));
+    }
 
     return shaderProgramID;
 }
@@ -111,38 +128,44 @@ void Shader::Unbind() {
 
 void Shader::SetUniform1i(const std::string &name, int v0) {
     GLint location = GetUniformLocation(name);
-    if (location != -1)
+    if (location != -1) {
         GL_CALL(glUniform1i(location, v0));
+    }
 }
 
 void Shader::SetUniform1f(const std::string &name, float v0) {
     GLint location = GetUniformLocation(name);
-    if (location != -1)
+    if (location != -1) {
         GL_CALL(glUniform1f(location, v0));
+    }
 }
 
 void Shader::SetUniform3f(const std::string &name, float v0, float v1, float v2) {
     GLint location = GetUniformLocation(name);
-    if (location != -1)
+    if (location != -1) {
         GL_CALL(glUniform3f(location, v0, v1, v2));
+    }
 }
 
 void Shader::SetUniform4f(const std::string &name, float v0, float v1, float v2, float v3) {
     GLint location = GetUniformLocation(name);
-    if (location != -1)
+    if (location != -1) {
         GL_CALL(glUniform4f(location, v0, v1, v2, v3));
+    }
 }
 
 void Shader::SetUniformMatrix4f(const std::string &name, const glm::mat4 &matrix) {
     GLint location = GetUniformLocation(name);
-    if (location != -1)
+    if (location != -1) {
         GL_CALL(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)));
+    }
 }
 
 void Shader::SetUniformBool(const std::string &name, bool value) {
     GLint location = GetUniformLocation(name);
-    if (location != -1)
+    if (location != -1) {
         GL_CALL(glUniform1i(location, value));
+    }
 }
 
 GLint Shader::GetUniformLocation(const std::string &name) {
