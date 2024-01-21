@@ -53,7 +53,7 @@ void DirectionalShadowMap::GenerateShadow(Renderer& renderer, WindowManager& win
     // glCullFace(GL_FRONT); //TODO: Fix peter panning
 
     for (auto& modelPtr : modelPtrs) {
-        modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW);
+        modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW_DIRECTIONAL);
     }
 
     // glCullFace(GL_BACK);
@@ -109,7 +109,7 @@ void OmniDirectionalShadowMap::GenerateShadow(Renderer& renderer, WindowManager&
     // glCullFace(GL_FRONT); //TODO: Fix peter panning
 
     // for (auto& modelPtr : modelPtrs) {
-    //     modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW);
+    //     modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW_DIRECTIONAL);
     // }
 
     // glCullFace(GL_BACK);

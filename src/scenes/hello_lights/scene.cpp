@@ -13,7 +13,8 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
     AddShader(std::make_unique<Shader>("assets/shaders/vertex/directional_shadow.vert",
                                        "assets/shaders/fragment/directional_shadow.frag"));
     AddShader(std::make_unique<Shader>("assets/shaders/vertex/omnidirectional_shadow.vert",
-                                       "assets/shaders/fragment/omnidirectional_shadow.frag"));
+                                       "assets/shaders/fragment/omnidirectional_shadow.frag",
+                                       "assets/shaders/geometry/omnidirectional_shadow.geom"));
 
     AddModel(std::make_unique<Plane>("Ground Plane", glm::vec3(0, 0, 0), glm::vec3(-90, 0, 0),
                                      glm::vec3(10, 10, 1), glm::vec4(0.4, 0.3, 0.15, 1.0)));

@@ -165,8 +165,14 @@ void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
                  RenderPassType renderPassType) {
     glm::mat4 &modelMatrix = GetModelMatrix();
 
-    if (renderPassType == RenderPassType::SHADOW) {
+    if (renderPassType == RenderPassType::SHADOW_DIRECTIONAL) {
         shader.SetUniformMatrix4f("u_mvpMatrix", Renderer::ComputeMVPMatrix(vpMatrix, modelMatrix));
+        ShadowPass(renderer, shader);
+        return;
+    }
+
+    if (renderPassType == RenderPassType::SHADOW_OMNIDIRECTIONAL) {
+        shader.SetUniformMatrix4f("u_mMatrix", modelMatrix);
         ShadowPass(renderer, shader);
         return;
     }
