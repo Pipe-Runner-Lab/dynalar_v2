@@ -61,8 +61,9 @@ void DirectionalShadowMap::GenerateShadow(Renderer& renderer, WindowManager& win
 
 OmniDirectionalShadowMap::OmniDirectionalShadowMap(int width, int height)
     : m_width(width), m_height(height) {
-    GL_CALL(glGenTextures(1, &m_depthCubeMap));
+    GL_CALL(glGenFramebuffers(1, &m_depthMapFBO));
 
+    GL_CALL(glGenTextures(1, &m_depthCubeMap));
     GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubeMap));
     for (int i = 0; i < 6; i++) {
         GL_CALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, width,
@@ -80,11 +81,18 @@ OmniDirectionalShadowMap::OmniDirectionalShadowMap(int width, int height)
     GL_CALL(glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, borderColor));
 
     Bind();
+    // TODO: Need to verify this part
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                                    GL_TEXTURE_CUBE_MAP_POSITIVE_X, m_depthCubeMap, 0));
     GL_CALL(glDrawBuffer(GL_NONE));
     GL_CALL(glReadBuffer(GL_NONE));
     Unbind();
+}
+
+OmniDirectionalShadowMap::~OmniDirectionalShadowMap() {
+    Unbind();
+    GL_CALL(glDeleteFramebuffers(1, &m_depthMapFBO));
+    GL_CALL(glDeleteTextures(1, &m_depthCubeMap));
 }
 
 void OmniDirectionalShadowMap::Bind() const {
@@ -102,15 +110,22 @@ void OmniDirectionalShadowMap::ActivateShadowTexture(int slot) const {
 
 void OmniDirectionalShadowMap::GenerateShadow(Renderer& renderer, WindowManager& window_manager,
                                               std::vector<std::unique_ptr<Model>>& modelPtrs,
-                                              Shader& shader,
+                                              Shader& shader, glm::vec3 position, float far,
                                               std::array<glm::mat4, 6> vpMatrices) const {
     window_manager.SetViewport(m_width, m_height);
     renderer.Clear(GL_DEPTH_BUFFER_BIT);
     // glCullFace(GL_FRONT); //TODO: Fix peter panning
 
-    // for (auto& modelPtr : modelPtrs) {
-    //     modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW_DIRECTIONAL);
-    // }
+    shader.SetUniform3f("u_lightPosition", position.x, position.y, position.z);
+    shader.SetUniform1f("u_farPlane", far);
+    for (int faceIdx = 0; faceIdx < 6; faceIdx++) {
+        shader.SetUniformMatrix4f(fmt::format("u_lightSpaceVpMatrices[{}]", faceIdx),
+                                  vpMatrices[faceIdx]);
+    }
+    for (auto& modelPtr : modelPtrs) {
+        modelPtr->Draw(renderer, shader, glm::mat4(1.0), 0, 0,
+                       RenderPassType::SHADOW_OMNIDIRECTIONAL);
+    }
 
     // glCullFace(GL_BACK);
 }

@@ -65,7 +65,8 @@ void PointLight::GenerateShadowMap(Renderer& renderer, WindowManager& window_man
         return;
 
     m_shadowMap.Bind();
-    m_shadowMap.GenerateShadow(renderer, window_manager, modelPtrs, shader, GetVpMatrices());
+    m_shadowMap.GenerateShadow(renderer, window_manager, modelPtrs, shader, m_position, far,
+                               GetVpMatrices());
     m_shadowMap.Unbind();
 }
 

@@ -19,6 +19,17 @@ void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window
                 }
                 break;
             }
+            case LightType::POINT: {
+                PointLight* pointLightPtr = static_cast<PointLight*>(lightPtr.get());
+                if (pointLightPtr->m_shouldRenderShadowMap) {
+                    OmniDirectionalShadowMapCount++;
+                    omniDirectionalShadowShader.Bind();
+                    pointLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs,
+                                                     omniDirectionalShadowShader);
+                    omniDirectionalShadowShader.Unbind();
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -55,12 +66,10 @@ void LightsManager::ActivateShadowMaps(Shader& shader) {
                 PointLight* pointLightPtr = static_cast<PointLight*>(lightPtr.get());
                 if (pointLightPtr->m_shouldRenderShadowMap) {
                     pointLightPtr->m_shadowMap.ActivateShadowTexture(shadowMapSlot);
-                    // shader.SetUniformMatrix4f(
-                    //     fmt::format("u_lightSpaceVpMatrices[{}]", omniDirectionalShadowMapIdx),
-                    //     pointLightPtr->GetVpMatrix());
-                    shader.SetUniform1i(
-                        fmt::format("u_shadowMaps[{}]", omniDirectionalShadowMapIdx),
-                        shadowMapSlot);
+                    // TODO: Set cube map uniforms
+                    // shader.SetUniform1i(
+                    //     fmt::format("u_shadowMaps[{}]", omniDirectionalShadowMapIdx),
+                    //     shadowMapSlot);
                     lightVsShadowMapIndices[lightIdx] = omniDirectionalShadowMapIdx;
                     omniDirectionalShadowMapIdx++;
                     shadowMapSlot++;

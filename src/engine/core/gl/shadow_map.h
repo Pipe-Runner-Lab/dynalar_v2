@@ -54,5 +54,5 @@ public:
     void ActivateShadowTexture(int slot = 0) const;
     void GenerateShadow(Renderer& renderer, WindowManager& window_manager,
                         std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader,
-                        std::array<glm::mat4, 6> vpMatrices) const;
+                        glm::vec3 position, float far, std::array<glm::mat4, 6> vpMatrices) const;
 };
