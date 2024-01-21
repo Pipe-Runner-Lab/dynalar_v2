@@ -5,6 +5,7 @@
 
 class PointLight : public BaseLight {
     friend class BaseScene;
+    friend struct LightsManager;
 
 private:
     float m_diffuseIntensity;

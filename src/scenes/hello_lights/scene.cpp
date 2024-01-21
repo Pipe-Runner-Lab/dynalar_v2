@@ -10,8 +10,10 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
 
     AddShader(std::make_unique<Shader>("assets/shaders/vertex/light_3d.vert",
                                        "assets/shaders/fragment/light_3d.frag"));
-    AddShader(std::make_unique<Shader>("assets/shaders/vertex/simple_shadow.vert",
-                                       "assets/shaders/fragment/simple_shadow.frag"));
+    AddShader(std::make_unique<Shader>("assets/shaders/vertex/directional_shadow.vert",
+                                       "assets/shaders/fragment/directional_shadow.frag"));
+    AddShader(std::make_unique<Shader>("assets/shaders/vertex/omnidirectional_shadow.vert",
+                                       "assets/shaders/fragment/omnidirectional_shadow.frag"));
 
     AddModel(std::make_unique<Plane>("Ground Plane", glm::vec3(0, 0, 0), glm::vec3(-90, 0, 0),
                                      glm::vec3(10, 10, 1), glm::vec4(0.4, 0.3, 0.15, 1.0)));
@@ -70,14 +72,10 @@ void HelloLightsScene::OnUpdate() {
 }
 
 void HelloLightsScene::OnRender() {
-    m_lightsManager.directionalShadowMapCount = 1;
-
     // 1. render shadow maps
-    m_shaderPtrs[1]->Bind();
     m_lightsManager.GenerateShadowMaps(*m_renderContext.rendererPtr,
                                        *m_renderContext.windowManagerPtr, m_modelPtrs,
-                                       *m_shaderPtrs[1]);
-    m_shaderPtrs[1]->Unbind();
+                                       *m_shaderPtrs[1], *m_shaderPtrs[2]);
 
     // 2. render scene
     m_shaderPtrs[0]->Bind();
@@ -95,7 +93,7 @@ void HelloLightsScene::OnRender() {
 
     for (auto &modelPtr : m_modelPtrs) {
         modelPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix,
-                       m_lightsManager.directionalShadowMapCount);
+                       m_lightsManager.reservedTextureSlotCount);
     }
 
     // 3. render light models

@@ -2,15 +2,20 @@
 
 void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window_manager,
                                        std::vector<std::unique_ptr<Model>>& modelPtrs,
-                                       Shader& shader) {
+                                       Shader& directionalShadowShader,
+                                       Shader& omniDirectionalShadowShader) {
     directionalShadowMapCount = 0;
+    OmniDirectionalShadowMapCount = 0;
     for (auto& lightPtr : lightPtrs) {
         switch (lightPtr->type) {
             case LightType::DIRECTIONAL: {
                 DirectionalLight* dirLightPtr = static_cast<DirectionalLight*>(lightPtr.get());
                 if (dirLightPtr->m_shouldRenderShadowMap) {
                     directionalShadowMapCount++;
-                    dirLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs, shader);
+                    directionalShadowShader.Bind();
+                    dirLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs,
+                                                   directionalShadowShader);
+                    directionalShadowShader.Unbind();
                 }
                 break;
             }
@@ -24,16 +29,40 @@ void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window
 
 void LightsManager::ActivateShadowMaps(Shader& shader) {
     int shadowMapSlot = 0;
+    int directionalShadowMapIdx = 0;
+    int omniDirectionalShadowMapIdx = 0;
     int lightIdx = 0;
     for (auto& lightPtr : lightPtrs) {
         switch (lightPtr->type) {
             case LightType::DIRECTIONAL: {
                 DirectionalLight* dirLightPtr = static_cast<DirectionalLight*>(lightPtr.get());
-                shader.SetUniformMatrix4f(fmt::format("u_lightSpaceVpMatrices[{}]", shadowMapSlot),
-                                          dirLightPtr->GetVpMatrix());
                 if (dirLightPtr->m_shouldRenderShadowMap) {
                     dirLightPtr->m_shadowMap.ActivateShadowTexture(shadowMapSlot);
-                    lightVsShadowMapIndices[lightIdx] = shadowMapSlot;
+                    shader.SetUniformMatrix4f(
+                        fmt::format("u_lightSpaceVpMatrices[{}]", directionalShadowMapIdx),
+                        dirLightPtr->GetVpMatrix());
+                    shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", directionalShadowMapIdx),
+                                        shadowMapSlot);
+                    lightVsShadowMapIndices[lightIdx] = directionalShadowMapIdx;
+                    directionalShadowMapIdx++;
+                    shadowMapSlot++;
+                } else {
+                    lightVsShadowMapIndices[lightIdx] = -1;
+                }
+                break;
+            }
+            case LightType::POINT: {
+                PointLight* pointLightPtr = static_cast<PointLight*>(lightPtr.get());
+                if (pointLightPtr->m_shouldRenderShadowMap) {
+                    pointLightPtr->m_shadowMap.ActivateShadowTexture(shadowMapSlot);
+                    // shader.SetUniformMatrix4f(
+                    //     fmt::format("u_lightSpaceVpMatrices[{}]", omniDirectionalShadowMapIdx),
+                    //     pointLightPtr->GetVpMatrix());
+                    shader.SetUniform1i(
+                        fmt::format("u_shadowMaps[{}]", omniDirectionalShadowMapIdx),
+                        shadowMapSlot);
+                    lightVsShadowMapIndices[lightIdx] = omniDirectionalShadowMapIdx;
+                    omniDirectionalShadowMapIdx++;
                     shadowMapSlot++;
                 } else {
                     lightVsShadowMapIndices[lightIdx] = -1;
@@ -48,9 +77,11 @@ void LightsManager::ActivateShadowMaps(Shader& shader) {
         lightIdx++;
     }
 
-    for (int i = 0; i < directionalShadowMapCount; i++) {
-        shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", i), i);
-    }
+    reservedTextureSlotCount = shadowMapSlot;
+
+    // for (int i = 0; i < directionalShadowMapCount; i++) {
+    //     shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", i), i);
+    // }
 }
 
 void LightsManager::IncreaseLightCount(LightType type) {

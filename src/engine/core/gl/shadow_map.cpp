@@ -52,7 +52,6 @@ void DirectionalShadowMap::GenerateShadow(Renderer& renderer, WindowManager& win
     renderer.Clear(GL_DEPTH_BUFFER_BIT);
     // glCullFace(GL_FRONT); //TODO: Fix peter panning
 
-    shader.SetUniform1i("u_shadowMapType", 0);  // 0 for directional shadow map
     for (auto& modelPtr : modelPtrs) {
         modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW);
     }
@@ -109,10 +108,9 @@ void OmniDirectionalShadowMap::GenerateShadow(Renderer& renderer, WindowManager&
     renderer.Clear(GL_DEPTH_BUFFER_BIT);
     // glCullFace(GL_FRONT); //TODO: Fix peter panning
 
-    shader.SetUniform1i("u_shadowMapType", 1);  // 1 for omni directional shadow map
-    for (auto& modelPtr : modelPtrs) {
-        modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW);
-    }
+    // for (auto& modelPtr : modelPtrs) {
+    //     modelPtr->Draw(renderer, shader, vpMatrix, 0, 0, RenderPassType::SHADOW);
+    // }
 
     // glCullFace(GL_BACK);
 }
