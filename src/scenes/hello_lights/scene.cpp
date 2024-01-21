@@ -70,7 +70,7 @@ void HelloLightsScene::OnUpdate() {
 }
 
 void HelloLightsScene::OnRender() {
-    m_lightsManager.shadowMapCount = 1;
+    m_lightsManager.directionalShadowMapCount = 1;
 
     // 1. render shadow maps
     m_shaderPtrs[1]->Bind();
@@ -95,7 +95,7 @@ void HelloLightsScene::OnRender() {
 
     for (auto &modelPtr : m_modelPtrs) {
         modelPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix,
-                       m_lightsManager.shadowMapCount);
+                       m_lightsManager.directionalShadowMapCount);
     }
 
     // 3. render light models

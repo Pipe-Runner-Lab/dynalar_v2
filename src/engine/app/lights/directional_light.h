@@ -14,7 +14,7 @@ private:
 
     // for shadow mapping
     bool m_shouldRenderShadowMap = true;
-    ShadowMap m_shadowMap;
+    DirectionalShadowMap m_shadowMap;
     glm::vec3 m_position;
     float width = 20.0f;
     float height = 20.0f;

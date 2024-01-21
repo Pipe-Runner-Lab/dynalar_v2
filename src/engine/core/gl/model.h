@@ -17,7 +17,7 @@
 #include "shader.h"
 #include "texture.h"
 
-enum class RenderPassType { COMPLETE, SHADOW };
+enum class RenderPassType { NORMAL, SHADOW };
 
 /**
  * Note: Rotation is right-handed
@@ -115,12 +115,14 @@ public:
         return *this;
     }
 
-    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, int reservedTextureSlots = 0,
-              RenderPassType renderPassType = RenderPassType::COMPLETE);
+    void Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
+              int reserved2DTextureSlots = 0, int reservedCubeTextureSlots = 0,
+              RenderPassType renderPassType = RenderPassType::NORMAL);
 
     void ShadowPass(Renderer &renderer, Shader &shader);
 
-    void Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots = 0);
+    void Draw(Renderer &renderer, Shader &shader, int reserved2DTextureSlots = 0,
+              int reservedCubeTextureSlots = 0);
 
     inline glm::mat4 &GetModelMatrix() {
         m_modelMatrix = glm::mat4(1.0f);

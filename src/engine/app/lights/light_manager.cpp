@@ -3,13 +3,13 @@
 void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window_manager,
                                        std::vector<std::unique_ptr<Model>>& modelPtrs,
                                        Shader& shader) {
-    shadowMapCount = 0;
+    directionalShadowMapCount = 0;
     for (auto& lightPtr : lightPtrs) {
         switch (lightPtr->type) {
             case LightType::DIRECTIONAL: {
                 DirectionalLight* dirLightPtr = static_cast<DirectionalLight*>(lightPtr.get());
                 if (dirLightPtr->m_shouldRenderShadowMap) {
-                    shadowMapCount++;
+                    directionalShadowMapCount++;
                     dirLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs, shader);
                 }
                 break;
@@ -48,7 +48,7 @@ void LightsManager::ActivateShadowMaps(Shader& shader) {
         lightIdx++;
     }
 
-    for (int i = 0; i < shadowMapCount; i++) {
+    for (int i = 0; i < directionalShadowMapCount; i++) {
         shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", i), i);
     }
 }
@@ -62,7 +62,7 @@ void LightsManager::IncreaseLightCount(LightType type) {
 }
 
 void LightsManager::Bind(Shader& shader) {
-    shader.SetUniform1i("u_numShadowMaps", shadowMapCount);
+    shader.SetUniform1i("u_numShadowMaps", directionalShadowMapCount);
 
     int lightIndices[4] = {0, 0, 0, 0};
     int lightIdx = 0;

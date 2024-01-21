@@ -160,7 +160,8 @@ Model::Model(Model &&other)
 Model::~Model() {
 }
 
-void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, int reservedTextureSlots,
+void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix,
+                 int reserved2DTextureSlots, int reservedCubeTextureSlots,
                  RenderPassType renderPassType) {
     glm::mat4 &modelMatrix = GetModelMatrix();
 
@@ -174,10 +175,11 @@ void Model::Draw(Renderer &renderer, Shader &shader, glm::mat4 &vpMatrix, int re
     shader.SetUniformMatrix4f("u_mMatrix", modelMatrix);
     shader.SetUniformBool("u_debugNormals", debugNormals);
 
-    Draw(renderer, shader, reservedTextureSlots);
+    Draw(renderer, shader, reserved2DTextureSlots);
 }
 
-void Model::Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots) {
+void Model::Draw(Renderer &renderer, Shader &shader, int reserved2DTextureSlots,
+                 int reservedCubeTextureSlots) {
     bool hasMaterial = m_materialPtrs.size() > 0;
 
     if (hasMaterial && m_materialPtrs.size() != m_meshesPtr->size()) {
@@ -194,7 +196,7 @@ void Model::Draw(Renderer &renderer, Shader &shader, int reservedTextureSlots) {
         }
 
         if (hasMaterial) {
-            m_materialPtrs[meshIdx]->Bind(shader, reservedTextureSlots);
+            m_materialPtrs[meshIdx]->Bind(shader, reserved2DTextureSlots);
         }
 
         m_meshesPtr->at(meshIdx).Draw(renderer);

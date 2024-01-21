@@ -9,10 +9,8 @@
 #include "renderer.h"
 #include "shader.h"
 
-class ShadowMap {
+class DirectionalShadowMap {
     friend class DirectionalLight;
-    friend class PointLight;
-    friend class SpotLight;
 
 private:
     unsigned int m_depthMapFBO;
@@ -22,8 +20,8 @@ private:
     int m_height;
 
 public:
-    ShadowMap(int width = 2048, int height = 2048);
-    ~ShadowMap();
+    DirectionalShadowMap(int width = 2048, int height = 2048);
+    ~DirectionalShadowMap();
 
     void Bind() const;
     void Unbind() const;
@@ -33,4 +31,8 @@ public:
     void GenerateShadow(Renderer& renderer, WindowManager& window_manager,
                         std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader,
                         glm::mat4 vpMatrix) const;
+};
+
+class OmniDirectionalShadowMap {
+    friend class PointLight;
 };

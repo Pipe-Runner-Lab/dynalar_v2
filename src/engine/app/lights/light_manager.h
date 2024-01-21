@@ -8,7 +8,7 @@ struct LightsManager {
     unsigned int lightCounts[4] = {0, 0, 0, 0};
     std::vector<int> lightVsShadowMapIndices;
     std::vector<std::unique_ptr<BaseLight>> lightPtrs;
-    int shadowMapCount = 0;
+    int directionalShadowMapCount = 0;
 
     void GenerateShadowMaps(Renderer &renderer, WindowManager &window_manager,
                             std::vector<std::unique_ptr<Model>> &modelPtrs, Shader &shader);
