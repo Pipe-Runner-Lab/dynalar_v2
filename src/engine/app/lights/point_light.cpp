@@ -59,6 +59,16 @@ void PointLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {
     }
 }
 
+void PointLight::GenerateShadowMap(Renderer& renderer, WindowManager& window_manager,
+                                   std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader) {
+    if (!m_shouldRenderShadowMap)
+        return;
+
+    m_shadowMap.Bind();
+    m_shadowMap.GenerateShadow(renderer, window_manager, modelPtrs, shader, GetVpMatrices());
+    m_shadowMap.Unbind();
+}
+
 void PointLight::RenderEditorProperties() {
     ImGui::Text("Type: PointLight Light");
     BaseLight::RenderEditorProperties();
