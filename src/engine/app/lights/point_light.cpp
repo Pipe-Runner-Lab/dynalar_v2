@@ -36,6 +36,7 @@ void PointLight::Bind(Shader& shader, int idx, int shadowMapSlot) {
     shader.SetUniform1f(fmt::format("u_pointLights[{}].quadratic", idx), m_quadratic);
 
     shader.SetUniform1i(fmt::format("u_pointLights[{}].shadowMapSlot", idx), shadowMapSlot);
+    shader.SetUniform1f(fmt::format("u_pointLights[{}].farPlane", idx), far);
 }
 
 void PointLight::Unbind(Shader& shader, int idx) {

@@ -66,10 +66,9 @@ void LightsManager::ActivateShadowMaps(Shader& shader) {
                 PointLight* pointLightPtr = static_cast<PointLight*>(lightPtr.get());
                 if (pointLightPtr->m_shouldRenderShadowMap) {
                     pointLightPtr->m_shadowMap.ActivateShadowTexture(shadowMapSlot);
-                    // TODO: Set cube map uniforms
-                    // shader.SetUniform1i(
-                    //     fmt::format("u_shadowMaps[{}]", omniDirectionalShadowMapIdx),
-                    //     shadowMapSlot);
+                    shader.SetUniform1i(
+                        fmt::format("u_shadowCubeMaps[{}]", omniDirectionalShadowMapIdx),
+                        shadowMapSlot);
                     lightVsShadowMapIndices[lightIdx] = omniDirectionalShadowMapIdx;
                     omniDirectionalShadowMapIdx++;
                     shadowMapSlot++;
