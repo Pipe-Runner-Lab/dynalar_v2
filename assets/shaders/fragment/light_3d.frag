@@ -29,7 +29,7 @@ struct DirectionalLight{
   float diffuseIntensity;
   float specularIntensity;
   vec3 direction;
-  int shadowMapSlot;
+  int shadowMapIdx;
 };
 
 struct PointLight{
@@ -41,7 +41,7 @@ struct PointLight{
   float constant;
   float linear;
   float quadratic;
-  int shadowMapSlot;
+  int shadowMapIdx;
   float farPlane;
 };
 
@@ -57,7 +57,7 @@ struct SpotLight{
   float quadratic;
   float innerCutoff;
   float outerCutoff;
-  int shadowMapSlot;
+  int shadowMapIdx;
 };
 
 out vec4 pixelColor;
@@ -87,14 +87,14 @@ uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
 uniform sampler2D u_shadowMaps[MAX_SHADOW_MAPS];// for directional shadows
 uniform samplerCube u_shadowCubeMaps[MAX_SHADOW_MAPS];// for omnidirectional shadows
 
-float ComputeDirectionalShadow(int shadowMapSlot,vec3 lightDir,vec3 normal){
-  if(shadowMapSlot<0){
+float ComputeDirectionalShadow(int shadowMapIdx,vec3 lightDir,vec3 normal){
+  if(shadowMapIdx<0){
     return 0.;
   }
   
   float bias=max(BIAS_FACTOR*10*(1.-dot(normal,lightDir)),BIAS_FACTOR);// dynamic bias
   
-  vec3 projCoords=v_lightSpaceFragPositions[shadowMapSlot].xyz/v_lightSpaceFragPositions[shadowMapSlot].w;
+  vec3 projCoords=v_lightSpaceFragPositions[shadowMapIdx].xyz/v_lightSpaceFragPositions[shadowMapIdx].w;
   projCoords=projCoords*.5+.5;// transform to [0,1] range from [-1,1]
   float currentDepth=projCoords.z;
   
@@ -104,24 +104,24 @@ float ComputeDirectionalShadow(int shadowMapSlot,vec3 lightDir,vec3 normal){
   }
   
   // PCF (using a 3x3 kernel/filter)
-  vec2 texelSize=1./textureSize(u_shadowMaps[shadowMapSlot],0);// texture size on mipmap lvl 0
+  vec2 texelSize=1./textureSize(u_shadowMaps[shadowMapIdx],0);// texture size on mipmap lvl 0
   float shadow=0.;
   for(int x=-1;x<=1;++x){
     for(int y=-1;y<=1;++y){
       vec2 offset=vec2(x,y)*texelSize;
-      float pcfDepth=texture(u_shadowMaps[shadowMapSlot],projCoords.xy+offset).r;
+      float pcfDepth=texture(u_shadowMaps[shadowMapIdx],projCoords.xy+offset).r;
       shadow+=currentDepth-bias>pcfDepth?1.:0.;
     }
   }
   shadow/=9.;
   
-  // float closestDepth=texture(u_shadowMaps[shadowMapSlot],projCoords.xy).r;
+  // float closestDepth=texture(u_shadowMaps[shadowMapIdx],projCoords.xy).r;
   // float shadow=(currentDepth-bias>closestDepth?1.:0.);// adjusted shadow map depth
   return shadow;
 }
 
-float ComputeOmniDirectionalShadow(int shadowMapSlot,vec3 lightDir,vec3 lightPosition,vec3 normal,float farPlane){
-  if(shadowMapSlot<0){
+float ComputeOmniDirectionalShadow(int shadowMapIdx,vec3 lightDir,vec3 lightPosition,vec3 normal,float farPlane){
+  if(shadowMapIdx<0){
     return 0.;
   }
   
@@ -131,8 +131,7 @@ float ComputeOmniDirectionalShadow(int shadowMapSlot,vec3 lightDir,vec3 lightPos
   
   float shadow=0.;
   float currentDepth=length(fragToLight);
-  float closestDepth=texture(u_shadowCubeMaps[shadowMapSlot],fragToLight).r;// [0, 1]
-  // float closestDepth=.5; // for debugging
+  float closestDepth=texture(u_shadowCubeMaps[shadowMapIdx],fragToLight).r;// [0, 1]
   closestDepth*=farPlane;// bring back to [0, farPlane]
   shadow=(currentDepth-bias>closestDepth?1.:0.);// adjusted shadow map depth
   return shadow;
@@ -187,7 +186,7 @@ vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 
   vec3 reflectDir=reflect(-lightDir,normal);
   float specularFactor=pow(max(dot(viewDir,reflectDir),0.),u_material.metalness);
   
-  float shadow=ComputeDirectionalShadow(directionalLight.shadowMapSlot,lightDir,normal);
+  float shadow=ComputeDirectionalShadow(directionalLight.shadowMapIdx,lightDir,normal);
   
   return(ComputeAmbientComponent(directionalLight.color,directionalLight.ambientIntensity)+(1-shadow)*(
     ComputeDiffuseComponent(directionalLight.color,directionalLight.diffuseIntensity,diffuseFactor)+
@@ -205,7 +204,7 @@ vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 
     float distance=length(pointLight.position-v_fragPos);
     float attenuation=ComputeAttenuation(pointLight.constant,pointLight.linear,pointLight.quadratic,distance);
     
-    float shadow=ComputeOmniDirectionalShadow(pointLight.shadowMapSlot,lightDir,pointLight.position,normal,pointLight.farPlane);
+    float shadow=ComputeOmniDirectionalShadow(pointLight.shadowMapIdx,lightDir,pointLight.position,normal,pointLight.farPlane);
     // float shadow=0.;
     
     return(ComputeAmbientComponent(pointLight.color,pointLight.ambientIntensity)+

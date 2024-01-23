@@ -12,7 +12,6 @@ private:
     std::vector<int> lightVsShadowMapIndices;
     unsigned int lightCounts[4] = {0, 0, 0, 0};
     int directionalShadowMapCount = 0;
-    int OmniDirectionalShadowMapCount = 0;
 
 public:
     void GenerateShadowMaps(Renderer &renderer, WindowManager &window_manager,

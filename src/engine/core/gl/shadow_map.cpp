@@ -81,9 +81,7 @@ OmniDirectionalShadowMap::OmniDirectionalShadowMap(int width, int height)
     GL_CALL(glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, borderColor));
 
     Bind();
-    // TODO: Need to verify this part
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                                   GL_TEXTURE_CUBE_MAP_POSITIVE_X, m_depthCubeMap, 0));
+    GL_CALL(glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthCubeMap, 0));
     GL_CALL(glDrawBuffer(GL_NONE));
     GL_CALL(glReadBuffer(GL_NONE));
     Unbind();
@@ -123,7 +121,9 @@ void OmniDirectionalShadowMap::GenerateShadow(Renderer& renderer, WindowManager&
                                   vpMatrices[faceIdx]);
     }
     for (auto& modelPtr : modelPtrs) {
-        modelPtr->Draw(renderer, shader, glm::mat4(1.0), 0, 0,
+        int unusedTextureSlot = 0;
+        glm::mat4 unusedVpMatrix = glm::mat4(1.0);
+        modelPtr->Draw(renderer, shader, unusedVpMatrix, unusedTextureSlot, unusedTextureSlot,
                        RenderPassType::SHADOW_OMNIDIRECTIONAL);
     }
 

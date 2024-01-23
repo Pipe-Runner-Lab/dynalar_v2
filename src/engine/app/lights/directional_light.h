@@ -28,7 +28,7 @@ public:
     DirectionalLight(std::string name, const glm::vec3 color, float ambientIntensity,
                      float diffuseIntensity, float specularIntensity, glm::vec3 direction);
 
-    void Bind(Shader& shader, int idx = 0, int shadowMapSlot = -1) override;
+    void Bind(Shader& shader, int idx = 0, int shadowMapIdx = -1) override;
     void Unbind(Shader& shader, int idx = 0) override;
 
     void Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) override;

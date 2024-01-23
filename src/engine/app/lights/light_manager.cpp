@@ -5,7 +5,6 @@ void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window
                                        Shader& directionalShadowShader,
                                        Shader& omniDirectionalShadowShader) {
     directionalShadowMapCount = 0;
-    OmniDirectionalShadowMapCount = 0;
     for (auto& lightPtr : lightPtrs) {
         switch (lightPtr->type) {
             case LightType::DIRECTIONAL: {
@@ -22,7 +21,6 @@ void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window
             case LightType::POINT: {
                 PointLight* pointLightPtr = static_cast<PointLight*>(lightPtr.get());
                 if (pointLightPtr->m_shouldRenderShadowMap) {
-                    OmniDirectionalShadowMapCount++;
                     omniDirectionalShadowShader.Bind();
                     pointLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs,
                                                      omniDirectionalShadowShader);
@@ -86,10 +84,6 @@ void LightsManager::ActivateShadowMaps(Shader& shader) {
     }
 
     reservedTextureSlotCount = shadowMapSlot;
-
-    // for (int i = 0; i < directionalShadowMapCount; i++) {
-    //     shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", i), i);
-    // }
 }
 
 void LightsManager::IncreaseLightCount(LightType type) {
@@ -101,7 +95,7 @@ void LightsManager::IncreaseLightCount(LightType type) {
 }
 
 void LightsManager::Bind(Shader& shader) {
-    shader.SetUniform1i("u_numShadowMaps", directionalShadowMapCount);
+    shader.SetUniform1i("u_numDirectionalShadowMaps", directionalShadowMapCount);
 
     int lightIndices[4] = {0, 0, 0, 0};
     int lightIdx = 0;
@@ -122,25 +116,15 @@ void LightsManager::Bind(Shader& shader) {
 }
 
 void LightsManager::Unbind(Shader& shader) {
-    shader.SetUniform1i("u_numShadowMaps", 0);
+    shader.SetUniform1i("u_numDirectionalShadowMaps", 0);
 
     shader.SetUniform1i("u_numAmbientLights", 0);
     shader.SetUniform1i("u_numDirectionalLights", 0);
     shader.SetUniform1i("u_numPointLights", 0);
     shader.SetUniform1i("u_numSpotLights", 0);
 
-    int pointLightIdx = 0;
+    int lightIndices[4] = {0, 0, 0, 0};
     for (auto& lightPtr : lightPtrs) {
-        switch (lightPtr->type) {
-            case LightType::AMBIENT:
-                lightPtr->Unbind(shader);
-                break;
-            case LightType::POINT:
-                lightPtr->Unbind(shader, pointLightIdx);
-                pointLightIdx++;
-                break;
-            default:
-                break;
-        }
+        lightPtr->Unbind(shader, lightIndices[(int)lightPtr->type]++);
     }
 }
