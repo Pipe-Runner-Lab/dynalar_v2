@@ -8,20 +8,21 @@ Make sure `cmake` and `GCC` are installed. We are using `GDB` debugger.
 
 ```bash
 sudo apt update
-sudo apt install cmake
-sudo apt-get install build-essential gdb
+sudo apt install cmake build-essential gdb g++
 ```
 
-Vcpkg is used to manage dependencies. [Install](https://vcpkg.io/en/getting-started) it and install the dependencies.
+Vcpkg is used to manage dependencies. [Install](https://vcpkg.io/en/getting-started) it and install the dependencies. We are using manifest mode and thus the dependencies are already listed in the `vcpkg.json` file. To install the dependencies, run the following command:
 
 ```bash
-vcpkg install glfw3 glew opengl glm
+vcpkg install
 ```
 
-Other than the packages vckpg suggests to install, the following would also be needed:
+alternatively, you can also just use the [Vcpkg extension](https://marketplace.visualstudio.com/items?itemName=JackBoosY.vcpkg-cmake-tools) in VSCode. It will automatically install the dependencies.
+
+Other than the packages vckpg suggests to install, the following would also be needed (on Linux):
 
 ```bash
-sudo apt install libglfw3-dev
+sudo apt install libglfw3-dev libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 ```
 
 ## Apple
