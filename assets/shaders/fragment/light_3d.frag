@@ -5,7 +5,8 @@ const int MAX_POINT_LIGHTS=4;
 const int MAX_SPOT_LIGHTS=4;
 const int MAX_TEXTURES=10;
 const int MAX_SHADOW_MAPS=10;
-const float BIAS_FACTOR=.00009;
+const float DIRECTIONAL_BIAS_FACTOR=.00009;
+const float OMNIDIRECTIONAL_BIAS_FACTOR=.07;
 
 struct MeshBaseMaterial{
   vec3 albedo;
@@ -87,12 +88,21 @@ uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
 uniform sampler2D u_shadowMaps[MAX_SHADOW_MAPS];// for directional shadows
 uniform samplerCube u_shadowCubeMaps[MAX_SHADOW_MAPS];// for omnidirectional shadows
 
+vec3 sampleOffsetDirections[20]=vec3[]
+(
+  vec3(1,1,1),vec3(1,-1,1),vec3(-1,-1,1),vec3(-1,1,1),
+  vec3(1,1,-1),vec3(1,-1,-1),vec3(-1,-1,-1),vec3(-1,1,-1),
+  vec3(1,1,0),vec3(1,-1,0),vec3(-1,-1,0),vec3(-1,1,0),
+  vec3(1,0,1),vec3(-1,0,1),vec3(1,0,-1),vec3(-1,0,-1),
+  vec3(0,1,1),vec3(0,-1,1),vec3(0,-1,-1),vec3(0,1,-1)
+);
+
 float ComputeDirectionalShadow(int shadowMapIdx,vec3 lightDir,vec3 normal){
   if(shadowMapIdx<0){
     return 0.;
   }
   
-  float bias=max(BIAS_FACTOR*10*(1.-dot(normal,lightDir)),BIAS_FACTOR);// dynamic bias
+  float bias=max(DIRECTIONAL_BIAS_FACTOR*10*(1.-dot(normal,lightDir)),DIRECTIONAL_BIAS_FACTOR);// dynamic bias
   
   vec3 projCoords=v_lightSpaceFragPositions[shadowMapIdx].xyz/v_lightSpaceFragPositions[shadowMapIdx].w;
   projCoords=projCoords*.5+.5;// transform to [0,1] range from [-1,1]
@@ -125,16 +135,23 @@ float ComputeOmniDirectionalShadow(int shadowMapIdx,vec3 lightDir,vec3 lightPosi
     return 0.;
   }
   
+  const int numSamples=20;
+  float diskRadius=.02;
+  
   vec3 fragToLight=v_fragPos-lightPosition;
   
-  float bias=max(BIAS_FACTOR*10*(1.-dot(normal,lightDir)),BIAS_FACTOR);// dynamic bias
+  float bias=max(OMNIDIRECTIONAL_BIAS_FACTOR*10*(1.-dot(normal,lightDir)),OMNIDIRECTIONAL_BIAS_FACTOR);// dynamic bias
   
   float shadow=0.;
   float currentDepth=length(fragToLight);
-  float closestDepth=texture(u_shadowCubeMaps[shadowMapIdx],fragToLight).r;// [0, 1]
-  closestDepth*=farPlane;// bring back to [0, farPlane]
-  shadow=(currentDepth-bias>closestDepth?1.:0.);// adjusted shadow map depth
-  return shadow;
+  
+  for(int i=0;i<numSamples;++i)
+  {
+    float closestDepth=texture(u_shadowCubeMaps[shadowMapIdx],fragToLight+sampleOffsetDirections[i]*diskRadius).r;// [0, 1]
+    closestDepth*=farPlane;// bring back to [0, farPlane]
+    shadow+=(currentDepth-bias>closestDepth?1.:0.);// adjusted shadow map depth
+  }
+  return shadow/float(numSamples);
 }
 
 float ComputeAttenuation(float constant,float linear,float quadratic,float distance){
