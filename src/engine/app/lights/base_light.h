@@ -52,7 +52,7 @@ public:
         return m_ambientIntensity;
     };
 
-    virtual void Bind(Shader& shader, int idx = 0, int shadowMapSlot = -1) = 0;
+    virtual void Bind(Shader& shader, int idx = 0, int shadowMapIdx = -1) = 0;
     virtual void Unbind(Shader& shader, int idx = 0) = 0;
     virtual void Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {
         if (m_lightModelPtr == nullptr || !m_render_model)

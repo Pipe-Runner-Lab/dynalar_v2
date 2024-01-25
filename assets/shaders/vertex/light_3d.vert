@@ -21,7 +21,7 @@ uniform mat4 u_mMatrix=mat4(1.);
 uniform bool u_debugNormals=false;
 
 // shadows
-uniform int u_numShadowMaps=0;
+uniform int u_numDirectionalShadowMaps=0;
 uniform mat4 u_lightSpaceVpMatrices[MAX_SHADOW_MAPS];
 
 void main(){
@@ -30,7 +30,7 @@ void main(){
   v_normal=mat3(transpose(inverse(u_mMatrix)))*normal;// normal in world space
   v_fragPos=(u_mMatrix*vec4(pos,1.)).xyz;
   
-  for(int i=0;i<u_numShadowMaps;i++){
+  for(int i=0;i<u_numDirectionalShadowMaps;i++){
     v_lightSpaceFragPositions[i]=u_lightSpaceVpMatrices[i]*vec4(v_fragPos,1.f);
   }
   

@@ -11,6 +11,7 @@
 
 class DirectionalShadowMap {
     friend class DirectionalLight;
+    friend class SpotLight;
 
 private:
     unsigned int m_depthMapFBO;
@@ -35,4 +36,24 @@ public:
 
 class OmniDirectionalShadowMap {
     friend class PointLight;
+    friend class SpotLight;
+
+private:
+    unsigned int m_depthMapFBO;
+    unsigned int m_depthCubeMap;
+
+    int m_width;
+    int m_height;
+
+public:
+    OmniDirectionalShadowMap(int width = 1024, int height = 1024);
+    ~OmniDirectionalShadowMap();
+
+    void Bind() const;
+    void Unbind() const;
+
+    void ActivateShadowTexture(int slot = 0) const;
+    void GenerateShadow(Renderer& renderer, WindowManager& window_manager,
+                        std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader,
+                        glm::vec3 position, float far, std::array<glm::mat4, 6> vpMatrices) const;
 };

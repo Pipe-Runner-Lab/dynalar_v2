@@ -25,7 +25,7 @@ SpotLight::SpotLight(std::string name, const glm::vec3 color, float ambientInten
       m_quadratic(quadratic) {
 }
 
-void SpotLight::Bind(Shader& shader, int idx, int shadowMapSlot) {
+void SpotLight::Bind(Shader& shader, int idx, int shadowMapIdx) {
     shader.SetUniform3f(fmt::format("u_spotLights[{}].position", idx), m_position.x, m_position.y,
                         m_position.z);
     shader.SetUniform3f(fmt::format("u_spotLights[{}].direction", idx), m_direction.x,
@@ -44,7 +44,8 @@ void SpotLight::Bind(Shader& shader, int idx, int shadowMapSlot) {
     shader.SetUniform1f(fmt::format("u_spotLights[{}].linear", idx), m_linear);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].quadratic", idx), m_quadratic);
 
-    shader.SetUniform1i(fmt::format("u_spotLights[{}].shadowMapSlot", idx), shadowMapSlot);
+    shader.SetUniform1i(fmt::format("u_spotLights[{}].shadowMapIdx", idx), shadowMapIdx);
+    shader.SetUniform1f(fmt::format("u_pointLights[{}].farPlane", idx), far);
 }
 
 void SpotLight::Unbind(Shader& shader, int idx) {
@@ -62,7 +63,8 @@ void SpotLight::Unbind(Shader& shader, int idx) {
     shader.SetUniform1f(fmt::format("u_spotLights[{}].linear", idx), 0.0f);
     shader.SetUniform1f(fmt::format("u_spotLights[{}].quadratic", idx), 0.0f);
 
-    shader.SetUniform1i(fmt::format("u_spotLights[{}].shadowMapSlot", idx), -1);
+    shader.SetUniform1i(fmt::format("u_spotLights[{}].shadowMapIdx", idx), -1);
+    shader.SetUniform1f(fmt::format("u_pointLights[{}].farPlane", idx), 0.0f);
 }
 
 void SpotLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {
@@ -70,6 +72,16 @@ void SpotLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {
         m_lightModelPtr->m_position = m_position;
         m_lightModelPtr->Draw(renderer, shader, vpMatrix);
     }
+}
+
+void SpotLight::GenerateShadowMap(Renderer& renderer, WindowManager& window_manager,
+                                  std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader) {
+    if (!m_shouldRenderShadowMap)
+        return;
+
+    m_shadowMap.Bind();
+    m_shadowMap.GenerateShadow(renderer, window_manager, modelPtrs, shader, GetVpMatrix());
+    m_shadowMap.Unbind();
 }
 
 void SpotLight::RenderEditorProperties() {
@@ -84,4 +96,13 @@ void SpotLight::RenderEditorProperties() {
     ImGui::SliderFloat("Quadratic", &m_quadratic, 0.0f, 1.0f);
     ImGui::SliderFloat("Inner Cutoff Angle", &m_innerCutoff, 0.0f, 90.0f);
     ImGui::SliderFloat("Outer Cutoff Angle", &m_outerCutoff, 0.0f, 90.0f);
+
+    // shadow
+    ImGui::Separator();
+    ImGui::Text("Shadow Properties");
+    ImGui::Text(
+        fmt::format("Shadow Map Size: {} x {}", m_shadowMap.m_width, m_shadowMap.m_height).c_str());
+    ImGui::Checkbox("Render Shadow Map", &m_shouldRenderShadowMap);
+    ImGui::DragFloat("Near", &near, 0.1f);
+    ImGui::DragFloat("Far", &far, 0.1f);
 }

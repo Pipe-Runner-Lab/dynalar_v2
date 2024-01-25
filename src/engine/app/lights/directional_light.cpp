@@ -18,7 +18,7 @@ DirectionalLight::DirectionalLight(std::string name, const glm::vec3 color, floa
       m_direction(direction) {
 }
 
-void DirectionalLight::Bind(Shader& shader, int idx, int shadowMapSlot) {
+void DirectionalLight::Bind(Shader& shader, int idx, int shadowMapIdx) {
     shader.SetUniform3f(fmt::format("u_directionalLights[{}].direction", idx), m_direction.x,
                         m_direction.y, m_direction.z);
     shader.SetUniform3f(fmt::format("u_directionalLights[{}].color", idx), m_color.r, m_color.g,
@@ -29,7 +29,7 @@ void DirectionalLight::Bind(Shader& shader, int idx, int shadowMapSlot) {
                         m_diffuseIntensity);
     shader.SetUniform1f(fmt::format("u_directionalLights[{}].specularIntensity", idx),
                         m_specularIntensity);
-    shader.SetUniform1i(fmt::format("u_directionalLights[{}].shadowMapSlot", idx), shadowMapSlot);
+    shader.SetUniform1i(fmt::format("u_directionalLights[{}].shadowMapIdx", idx), shadowMapIdx);
 }
 
 void DirectionalLight::Unbind(Shader& shader, int idx) {
@@ -38,7 +38,7 @@ void DirectionalLight::Unbind(Shader& shader, int idx) {
     shader.SetUniform1f(fmt::format("u_directionalLights[{}].ambientIntensity", idx), 0.0f);
     shader.SetUniform1f(fmt::format("u_directionalLights[{}].diffuseIntensity", idx), 0.0f);
     shader.SetUniform1f(fmt::format("u_directionalLights[{}].specularIntensity", idx), 0.0f);
-    shader.SetUniform1i(fmt::format("u_directionalLights[{}].shadowMapSlot", idx), -1);
+    shader.SetUniform1i(fmt::format("u_directionalLights[{}].shadowMapIdx", idx), -1);
 }
 
 void DirectionalLight::RenderEditorProperties() {

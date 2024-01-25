@@ -17,7 +17,7 @@
 #include "shader.h"
 #include "texture.h"
 
-enum class RenderPassType { NORMAL, SHADOW };
+enum class RenderPassType { NORMAL, SHADOW_DIRECTIONAL, SHADOW_OMNIDIRECTIONAL };
 
 /**
  * Note: Rotation is right-handed

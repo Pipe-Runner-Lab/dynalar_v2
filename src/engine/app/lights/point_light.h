@@ -5,6 +5,7 @@
 
 class PointLight : public BaseLight {
     friend class BaseScene;
+    friend struct LightsManager;
 
 private:
     float m_diffuseIntensity;
@@ -15,6 +16,12 @@ private:
     float m_constant;
     float m_linear;
     float m_quadratic;
+
+    // shadow map
+    bool m_shouldRenderShadowMap = true;
+    OmniDirectionalShadowMap m_shadowMap;
+    float near = 0.1f;
+    float far = 100.0f;
 
 public:
     PointLight(const glm::vec3 color, float ambientIntensity, float diffuseIntensity,
@@ -28,6 +35,30 @@ public:
     void Unbind(Shader& shader, int idx = 0) override;
 
     void Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) override;
+
+    // for shadow mapping
+    void GenerateShadowMap(Renderer& renderer, WindowManager& window_manager,
+                           std::vector<std::unique_ptr<Model>>& modelPtrs, Shader& shader);
+
+    inline std::array<glm::mat4, 6> GetVpMatrices() {
+        float aspect = (float)m_shadowMap.m_width / (float)m_shadowMap.m_height;
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
+        std::array<glm::mat4, 6> shadowTransforms = {
+            shadowProj * glm::lookAt(m_position, m_position + glm::vec3(1.0f, 0.0f, 0.0f),
+                                     glm::vec3(0.0f, -1.0f, 0.0f)),
+            shadowProj * glm::lookAt(m_position, m_position + glm::vec3(-1.0f, 0.0f, 0.0f),
+                                     glm::vec3(0.0f, -1.0f, 0.0f)),
+            shadowProj * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 1.0f, 0.0f),
+                                     glm::vec3(0.0f, 0.0f, 1.0f)),
+            shadowProj * glm::lookAt(m_position, m_position + glm::vec3(0.0f, -1.0f, 0.0f),
+                                     glm::vec3(0.0f, 0.0f, -1.0f)),
+            shadowProj * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, 1.0f),
+                                     glm::vec3(0.0f, -1.0f, 0.0f)),
+            shadowProj * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, -1.0f),
+                                     glm::vec3(0.0f, -1.0f, 0.0f)),
+        };
+        return shadowTransforms;
+    }
 
     /* ---------------------------- EDITOR PROPERTIES --------------------------- */
 public:

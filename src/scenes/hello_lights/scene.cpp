@@ -10,8 +10,11 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
 
     AddShader(std::make_unique<Shader>("assets/shaders/vertex/light_3d.vert",
                                        "assets/shaders/fragment/light_3d.frag"));
-    AddShader(std::make_unique<Shader>("assets/shaders/vertex/simple_shadow.vert",
-                                       "assets/shaders/fragment/simple_shadow.frag"));
+    AddShader(std::make_unique<Shader>("assets/shaders/vertex/directional_shadow.vert",
+                                       "assets/shaders/fragment/directional_shadow.frag"));
+    AddShader(std::make_unique<Shader>("assets/shaders/vertex/omnidirectional_shadow.vert",
+                                       "assets/shaders/fragment/omnidirectional_shadow.frag",
+                                       "assets/shaders/geometry/omnidirectional_shadow.geom"));
 
     AddModel(std::make_unique<Plane>("Ground Plane", glm::vec3(0, 0, 0), glm::vec3(-90, 0, 0),
                                      glm::vec3(10, 10, 1), glm::vec4(0.4, 0.3, 0.15, 1.0)));
@@ -51,15 +54,18 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
 
     // set up lights
     AddLight(std::make_unique<AmbientLight>(glm::vec3(1, 1, 1), 0.034f));
-    // AddLight(std::make_unique<PointLight>("Point Light 1", glm::vec3(1, 1, 1), 0.0f, 0.5f, 0.4f,
-    //                                       glm::vec3(-2.6, 6.2, 2.9)));
-    // AddLight(std::make_unique<SpotLight>("Spot Light 1", glm::vec3(0.93, 0.95, 0.45), 0.0f, 0.5f,
-    //                                      0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
-    //                                      25.0f));
     AddLight(std::make_unique<DirectionalLight>("Directional Light 1", glm::vec3(1, 1, 1), 0.0f,
                                                 0.5f, 0.4f, glm::vec3(1, -1, -1)));
     AddLight(std::make_unique<DirectionalLight>("Directional Light 2", glm::vec3(1, 0, 1), 0.0f,
                                                 0.5f, 0.4f, glm::vec3(1, -1, -0.5)));
+    AddLight(std::make_unique<PointLight>("Point Light 1", glm::vec3(0, 1, 1), 0.0f, 0.5f, 0.4f,
+                                          glm::vec3(2.5, 6.3, -0.4), 1.0, 0.55, 0.0));
+    AddLight(std::make_unique<PointLight>("Point Light 2", glm::vec3(1, 0, 0), 0.0f, 0.5f, 0.4f,
+                                          glm::vec3(-7.3, 6.3, -0.4), 1.0, 0.55, 0.0));
+
+    AddLight(std::make_unique<SpotLight>("Spot Light 1", glm::vec3(0.93, 0.95, 0.45), 0.0f, 0.5f,
+                                         0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
+                                         25.0f));
 }
 
 void HelloLightsScene::OnUpdate() {
@@ -70,23 +76,16 @@ void HelloLightsScene::OnUpdate() {
 }
 
 void HelloLightsScene::OnRender() {
-    m_lightsManager.directionalShadowMapCount = 1;
-
     // 1. render shadow maps
-    m_shaderPtrs[1]->Bind();
     m_lightsManager.GenerateShadowMaps(*m_renderContext.rendererPtr,
                                        *m_renderContext.windowManagerPtr, m_modelPtrs,
-                                       *m_shaderPtrs[1]);
-    m_shaderPtrs[1]->Unbind();
+                                       *m_shaderPtrs[1], *m_shaderPtrs[2]);
 
     // 2. render scene
     m_shaderPtrs[0]->Bind();
 
-    // 2.1 set light uniforms
+    // 2.1 set light uniforms and activate shadow map
     m_lightsManager.Bind(*m_shaderPtrs[0]);
-
-    // 2.2 activate shadow map slots
-    m_lightsManager.ActivateShadowMaps(*m_shaderPtrs[0]);
 
     Camera &activeCamera = GetActiveCamera();
     glm::mat4 vpMatrix = activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();
@@ -95,7 +94,7 @@ void HelloLightsScene::OnRender() {
 
     for (auto &modelPtr : m_modelPtrs) {
         modelPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix,
-                       m_lightsManager.directionalShadowMapCount);
+                       m_lightsManager.reservedTextureSlotCount);
     }
 
     // 3. render light models
@@ -103,5 +102,6 @@ void HelloLightsScene::OnRender() {
         lightPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix);
     }
 
+    m_lightsManager.Unbind(*m_shaderPtrs[0]);
     m_shaderPtrs[0]->Unbind();
 }
