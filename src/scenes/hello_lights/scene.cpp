@@ -54,14 +54,14 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
 
     // set up lights
     AddLight(std::make_unique<AmbientLight>(glm::vec3(1, 1, 1), 0.034f));
-    // AddLight(std::make_unique<DirectionalLight>("Directional Light 1", glm::vec3(1, 1, 1), 0.0f,
-    //                                             0.5f, 0.4f, glm::vec3(1, -1, -1)));
+    AddLight(std::make_unique<DirectionalLight>("Directional Light 1", glm::vec3(1, 1, 1), 0.0f,
+                                                0.5f, 0.4f, glm::vec3(1, -1, -1)));
     // AddLight(std::make_unique<DirectionalLight>("Directional Light 2", glm::vec3(1, 0, 1), 0.0f,
     //                                             0.5f, 0.4f, glm::vec3(1, -1, -0.5)));
     AddLight(std::make_unique<PointLight>("Point Light 1", glm::vec3(0, 1, 1), 0.0f, 0.5f, 0.4f,
                                           glm::vec3(2.5, 6.3, -0.4), 1.0, 0.55, 0.0));
-    AddLight(std::make_unique<PointLight>("Point Light 2", glm::vec3(1, 0, 0), 0.0f, 0.5f, 0.4f,
-                                          glm::vec3(-7.3, 6.3, -0.4), 1.0, 0.55, 0.0));
+    // AddLight(std::make_unique<PointLight>("Point Light 2", glm::vec3(1, 0, 0), 0.0f, 0.5f, 0.4f,
+    //                                       glm::vec3(-7.3, 6.3, -0.4), 1.0, 0.55, 0.0));
 
     // AddLight(std::make_unique<SpotLight>("Spot Light 1", glm::vec3(0.93, 0.95, 0.45), 0.0f, 0.5f,
     //                                      0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
@@ -84,11 +84,8 @@ void HelloLightsScene::OnRender() {
     // 2. render scene
     m_shaderPtrs[0]->Bind();
 
-    // 2.1 set light uniforms
+    // 2.1 set light uniforms and activate shadow map
     m_lightsManager.Bind(*m_shaderPtrs[0]);
-
-    // 2.2 activate shadow map slots
-    m_lightsManager.ActivateShadowMaps(*m_shaderPtrs[0]);
 
     Camera &activeCamera = GetActiveCamera();
     glm::mat4 vpMatrix = activeCamera.GetProjectionMatrix() * activeCamera.GetViewMatrix();

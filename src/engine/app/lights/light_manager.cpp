@@ -86,6 +86,13 @@ void LightsManager::ActivateShadowMaps(Shader& shader) {
     reservedTextureSlotCount = shadowMapSlot;
 }
 
+void LightsManager::DeactivateShadowMaps(Shader& shader) {
+    for (int i = 0; i < 10; i++) {
+        shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", i), 0);
+        shader.SetUniform1i(fmt::format("u_shadowCubeMaps[{}]", i), 0);
+    }
+}
+
 void LightsManager::IncreaseLightCount(LightType type) {
     lightCounts[(int)type]++;
     lightVsShadowMapIndices.push_back(-1);  // -1 means no shadow map
@@ -95,6 +102,8 @@ void LightsManager::IncreaseLightCount(LightType type) {
 }
 
 void LightsManager::Bind(Shader& shader) {
+    ActivateShadowMaps(shader);
+
     shader.SetUniform1i("u_numDirectionalShadowMaps", directionalShadowMapCount);
 
     int lightIndices[4] = {0, 0, 0, 0};
@@ -116,6 +125,8 @@ void LightsManager::Bind(Shader& shader) {
 }
 
 void LightsManager::Unbind(Shader& shader) {
+    DeactivateShadowMaps(shader);
+
     shader.SetUniform1i("u_numDirectionalShadowMaps", 0);
 
     shader.SetUniform1i("u_numAmbientLights", 0);

@@ -18,11 +18,12 @@ public:
                             std::vector<std::unique_ptr<Model>> &modelPtrs,
                             Shader &directionalShadowShader, Shader &omniDirectionalShadowShader);
 
-    void ActivateShadowMaps(Shader &shader);
-
     void IncreaseLightCount(LightType type);
 
     void Bind(Shader &shader);
-
     void Unbind(Shader &shader);
+
+private:
+    void ActivateShadowMaps(Shader &shader);
+    void DeactivateShadowMaps(Shader &shader);
 };
