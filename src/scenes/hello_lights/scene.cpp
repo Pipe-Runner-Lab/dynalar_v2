@@ -102,5 +102,6 @@ void HelloLightsScene::OnRender() {
         lightPtr->Draw(*m_renderContext.rendererPtr, *m_shaderPtrs[0], vpMatrix);
     }
 
+    m_lightsManager.Unbind(*m_shaderPtrs[0]);
     m_shaderPtrs[0]->Unbind();
 }
