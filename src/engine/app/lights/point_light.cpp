@@ -51,6 +51,7 @@ void PointLight::Unbind(Shader& shader, int idx) {
     shader.SetUniform1f(fmt::format("u_pointLights[{}].quadratic", idx), 0.0f);
 
     shader.SetUniform1i(fmt::format("u_pointLights[{}].shadowMapIdx", idx), -1);
+    shader.SetUniform1f(fmt::format("u_pointLights[{}].farPlane", idx), 0.0f);
 }
 
 void PointLight::Draw(Renderer& renderer, Shader& shader, glm::mat4& vpMatrix) {
@@ -80,4 +81,13 @@ void PointLight::RenderEditorProperties() {
     ImGui::SliderFloat("Constant", &m_constant, 0.0f, 1.0f);
     ImGui::SliderFloat("Linear", &m_linear, 0.0f, 1.0f);
     ImGui::SliderFloat("Quadratic", &m_quadratic, 0.0f, 1.0f);
+
+    // shadow
+    ImGui::Separator();
+    ImGui::Text("Shadow Properties");
+    ImGui::Text(
+        fmt::format("Shadow Map Size: {} x {}", m_shadowMap.m_width, m_shadowMap.m_height).c_str());
+    ImGui::Checkbox("Render Shadow Map", &m_shouldRenderShadowMap);
+    ImGui::DragFloat("Near", &near, 0.1f);
+    ImGui::DragFloat("Far", &far, 0.1f);
 }

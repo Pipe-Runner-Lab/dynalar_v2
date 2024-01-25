@@ -28,6 +28,16 @@ void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window
                 }
                 break;
             }
+            case LightType::SPOT: {
+                SpotLight* spotLightPtr = static_cast<SpotLight*>(lightPtr.get());
+                if (spotLightPtr->m_shouldRenderShadowMap) {
+                    directionalShadowShader.Bind();
+                    spotLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs,
+                                                    directionalShadowShader);
+                    directionalShadowShader.Unbind();
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -69,6 +79,23 @@ void LightsManager::ActivateShadowMaps(Shader& shader) {
                         shadowMapSlot);
                     lightVsShadowMapIndices[lightIdx] = omniDirectionalShadowMapIdx;
                     omniDirectionalShadowMapIdx++;
+                    shadowMapSlot++;
+                } else {
+                    lightVsShadowMapIndices[lightIdx] = -1;
+                }
+                break;
+            }
+            case LightType::SPOT: {
+                SpotLight* spotLightPtr = static_cast<SpotLight*>(lightPtr.get());
+                if (spotLightPtr->m_shouldRenderShadowMap) {
+                    spotLightPtr->m_shadowMap.ActivateShadowTexture(shadowMapSlot);
+                    shader.SetUniformMatrix4f(
+                        fmt::format("u_lightSpaceVpMatrices[{}]", directionalShadowMapIdx),
+                        spotLightPtr->GetVpMatrix());
+                    shader.SetUniform1i(fmt::format("u_shadowMaps[{}]", directionalShadowMapIdx),
+                                        shadowMapSlot);
+                    lightVsShadowMapIndices[lightIdx] = directionalShadowMapIdx;
+                    directionalShadowMapIdx++;
                     shadowMapSlot++;
                 } else {
                     lightVsShadowMapIndices[lightIdx] = -1;

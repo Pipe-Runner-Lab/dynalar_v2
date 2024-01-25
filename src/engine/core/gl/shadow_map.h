@@ -11,6 +11,7 @@
 
 class DirectionalShadowMap {
     friend class DirectionalLight;
+    friend class SpotLight;
 
 private:
     unsigned int m_depthMapFBO;
