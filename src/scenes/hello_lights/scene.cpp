@@ -54,18 +54,22 @@ HelloLightsScene::HelloLightsScene(RenderContext &renderContext)
 
     // set up lights
     AddLight(std::make_unique<AmbientLight>(glm::vec3(1, 1, 1), 0.034f));
-    // AddLight(std::make_unique<DirectionalLight>("Directional Light 1", glm::vec3(1, 1, 1), 0.0f,
-    //                                             0.5f, 0.4f, glm::vec3(1, -1, -1)));
-    // AddLight(std::make_unique<DirectionalLight>("Directional Light 2", glm::vec3(1, 0, 1), 0.0f,
-    //                                             0.5f, 0.4f, glm::vec3(1, -1, -0.5)));
-    // AddLight(std::make_unique<PointLight>("Point Light 1", glm::vec3(0, 1, 1), 0.0f, 0.5f, 0.4f,
-    //                                       glm::vec3(2.5, 6.3, -0.4), 1.0, 0.55, 0.0));
-    // AddLight(std::make_unique<PointLight>("Point Light 2", glm::vec3(1, 0, 0), 0.0f, 0.5f, 0.4f,
-    //                                       glm::vec3(-7.3, 6.3, -0.4), 1.0, 0.55, 0.0));
+    AddLight(std::make_unique<DirectionalLight>("Directional Light 1", glm::vec3(1, 1, 1), 0.0f,
+                                                0.5f, 0.4f, glm::vec3(1, -1, -1)));
+    AddLight(std::make_unique<DirectionalLight>("Directional Light 2", glm::vec3(1, 0, 1), 0.0f,
+                                                0.5f, 0.4f, glm::vec3(1, -1, -0.5)));
+    AddLight(std::make_unique<PointLight>("Point Light 1", glm::vec3(0, 1, 1), 0.0f, 0.5f, 0.4f,
+                                          glm::vec3(2.5, 6.3, -0.4), 1.0, 0.55, 0.0));
+    AddLight(std::make_unique<PointLight>("Point Light 2", glm::vec3(1, 0, 0), 0.0f, 0.5f, 0.4f,
+                                          glm::vec3(-7.3, 6.3, -0.4), 1.0, 0.55, 0.0));
 
     AddLight(std::make_unique<SpotLight>("Spot Light 1", glm::vec3(0.93, 0.95, 0.45), 0.0f, 0.5f,
                                          0.4f, glm::vec3(0, 7, 0), glm::vec3(0, -1, 0), 15.5f,
                                          25.0f));
+    AddLight(std::make_unique<SpotLight>(
+        "Torch", glm::vec3(1, 1, 1), 0.0f, 0.5f, 0.4f,
+        m_cameraPtrs[0]->GetPosition() + 2.0f * m_cameraPtrs[0]->GetFront(),
+        m_cameraPtrs[0]->GetFront(), 15.5f, 25.0f));
 }
 
 void HelloLightsScene::OnUpdate() {
@@ -73,6 +77,10 @@ void HelloLightsScene::OnUpdate() {
 
     // m_modelPtrs[3]->Rotate({0, 0.2f, 0});
     // m_modelPtrs[4]->Rotate({0, 0.2f, 0});
+    SpotLight *torchPtr = static_cast<SpotLight *>(m_lightsManager.lightPtrs[6].get());
+
+    torchPtr->SetPosition(m_cameraPtrs[0]->GetPosition() + 2.0f * m_cameraPtrs[0]->GetFront());
+    torchPtr->SetDirection(m_cameraPtrs[0]->GetFront());
 }
 
 void HelloLightsScene::OnRender() {
