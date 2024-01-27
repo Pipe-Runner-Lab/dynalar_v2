@@ -45,7 +45,6 @@ void SpotLight::Bind(Shader& shader, int idx, int shadowMapIdx) {
     shader.SetUniform1f(fmt::format("u_spotLights[{}].quadratic", idx), m_quadratic);
 
     shader.SetUniform1i(fmt::format("u_spotLights[{}].shadowMapIdx", idx), shadowMapIdx);
-    shader.SetUniform1f(fmt::format("u_pointLights[{}].farPlane", idx), far);
 }
 
 void SpotLight::Unbind(Shader& shader, int idx) {

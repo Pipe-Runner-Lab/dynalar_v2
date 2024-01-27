@@ -19,7 +19,7 @@ Shader::Shader(const std::string &vertexShaderFilePath, const std::string &fragm
     // TODO: Currently this is a workaround. Need to get rid of this.
     for (int i = 0; i < 32; i++) {
         GL_CALL(glActiveTexture(GL_TEXTURE0 + i));
-        GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
     }
 }
 
