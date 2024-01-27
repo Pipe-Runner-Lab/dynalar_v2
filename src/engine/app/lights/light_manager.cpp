@@ -31,6 +31,7 @@ void LightsManager::GenerateShadowMaps(Renderer& renderer, WindowManager& window
             case LightType::SPOT: {
                 SpotLight* spotLightPtr = static_cast<SpotLight*>(lightPtr.get());
                 if (spotLightPtr->m_shouldRenderShadowMap) {
+                    directionalShadowMapCount++;
                     directionalShadowShader.Bind();
                     spotLightPtr->GenerateShadowMap(renderer, window_manager, modelPtrs,
                                                     directionalShadowShader);

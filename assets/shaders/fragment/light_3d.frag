@@ -89,7 +89,7 @@ uniform SpotLight u_spotLights[MAX_SPOT_LIGHTS];
 uniform sampler2D u_shadowMaps[MAX_SHADOW_MAPS];// for directional shadows
 uniform samplerCube u_shadowCubeMaps[MAX_SHADOW_MAPS];// for omnidirectional shadows
 
-vec3 sampleOffsetDirections[20]=vec3[]
+const vec3 sampleOffsetDirections[20]=vec3[]
 (
   vec3(1,1,1),vec3(1,-1,1),vec3(-1,-1,1),vec3(-1,1,1),
   vec3(1,1,-1),vec3(1,-1,-1),vec3(-1,-1,-1),vec3(-1,1,-1),
@@ -155,35 +155,35 @@ float ComputeOmniDirectionalShadow(int shadowMapIdx,vec3 lightDir,vec3 lightPosi
   return shadow/float(numSamples);
 }
 
-float ComputeDirectionalPerspectiveShadow(int shadowMapIdx,vec3 lightDir,vec3 lightPosition,vec3 normal,float farPlane){
-  if(shadowMapIdx<0){
-    return 0.;
-  }
+// float ComputeDirectionalPerspectiveShadow(int shadowMapIdx,vec3 lightDir,vec3 lightPosition,vec3 normal,float farPlane){
+  //   if(shadowMapIdx<0){
+    //     return 0.;
+  //   }
   
-  vec3 fragToLight=v_fragPos-lightPosition;
+  //   vec3 fragToLight=v_fragPos-lightPosition;
   
-  // float bias=max(DIRECTIONAL_BIAS_FACTOR*10*(1.-dot(normal,lightDir)),DIRECTIONAL_BIAS_FACTOR);// dynamic bias
-  float bias=0.;
+  //   // float bias=max(DIRECTIONAL_BIAS_FACTOR*10*(1.-dot(normal,lightDir)),DIRECTIONAL_BIAS_FACTOR);// dynamic bias
+  //   float bias=0.;
   
-  float currentDepth=length(fragToLight);
+  //   float currentDepth=length(fragToLight);
   
-  // vec2 texelSize=1./textureSize(u_shadowMaps[shadowMapIdx],0);// texture size on mipmap lvl 0
-  // float shadow=0.;
-  // for(int x=-1;x<=1;++x){
-    //   for(int y=-1;y<=1;++y){
-      //     vec2 offset=vec2(x,y)*texelSize;
-      //     float pcfDepth=texture(u_shadowMaps[shadowMapIdx],fragToLight.xy+offset).r;
-      //     pcfDepth*=farPlane;// bring back to [0, farPlane]
-      //     shadow+=currentDepth-bias>pcfDepth?1.:0.;
-    //   }
-  // }
-  // shadow/=9.;
+  //   // vec2 texelSize=1./textureSize(u_shadowMaps[shadowMapIdx],0);// texture size on mipmap lvl 0
+  //   // float shadow=0.;
+  //   // for(int x=-1;x<=1;++x){
+    //     //   for(int y=-1;y<=1;++y){
+      //       //     vec2 offset=vec2(x,y)*texelSize;
+      //       //     float pcfDepth=texture(u_shadowMaps[shadowMapIdx],fragToLight.xy+offset).r;
+      //       //     pcfDepth*=farPlane;// bring back to [0, farPlane]
+      //       //     shadow+=currentDepth-bias>pcfDepth?1.:0.;
+    //     //   }
+  //   // }
+  //   // shadow/=9.;
   
-  float closestDepth=texture(u_shadowMaps[shadowMapIdx],fragToLight.xy).r;
-  closestDepth*=farPlane;// bring back to [0, farPlane]
-  float shadow=(currentDepth-bias>closestDepth?1.:0.);// adjusted shadow map depth
-  return shadow;
-}
+  //   float closestDepth=texture(u_shadowMaps[shadowMapIdx],fragToLight.xy).r;
+  //   closestDepth*=farPlane;// bring back to [0, farPlane]
+  //   float shadow=(currentDepth-bias>closestDepth?1.:0.);// adjusted shadow map depth
+  //   return shadow;
+// }
 
 float ComputeAttenuation(float constant,float linear,float quadratic,float distance){
   return 1./(constant+linear*distance+quadratic*distance*distance);
@@ -277,7 +277,7 @@ vec3 ComputeDirectionalLight(DirectionalLight directionalLight,vec3 normal,vec3 
     float epsilon=phi-gamma;
     float intensity=clamp((theta-gamma)/epsilon,0.,1.);
     
-    float shadow=ComputeDirectionalPerspectiveShadow(spotLight.shadowMapIdx,lightDir,spotLight.position,normal,spotLight.farPlane);
+    float shadow=ComputeDirectionalShadow(spotLight.shadowMapIdx,lightDir,normal);
     
     return(ComputeAmbientComponent(spotLight.color,spotLight.ambientIntensity)+
     (1-shadow)*(ComputeDiffuseComponent(spotLight.color,spotLight.diffuseIntensity,diffuseFactor*intensity)+

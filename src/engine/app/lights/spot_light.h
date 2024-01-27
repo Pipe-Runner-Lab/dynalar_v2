@@ -56,8 +56,10 @@ public:
     // for shadow mapping
     inline glm::mat4 GetVpMatrix() {
         float aspect = (float)m_shadowMap.m_width / (float)m_shadowMap.m_height;
+        // TODO: Why glm::vec3(0, 0, 1) works and glm::vec3(0, 1, 0) for light pointing straight
+        // down
         glm::mat4 viewMatrix =
-            glm::lookAt(m_position, m_position + m_direction, glm::vec3(0, 1, 0));
+            glm::lookAt(m_position, m_position + m_direction, glm::vec3(0, 0, 1));
         glm::mat4 m_projectionMatrix = glm::perspective(glm::radians(90.0f), aspect, near, far);
         return m_projectionMatrix * viewMatrix;
     }
