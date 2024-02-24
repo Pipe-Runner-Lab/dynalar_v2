@@ -1,5 +1,17 @@
 # Dynalar Rendering Engine
 
+A sandbox rendering engine written in C++ and OpenGL.
+
+![Demo image](docs/image.png)
+
+- [Dynalar Rendering Engine](#dynalar-rendering-engine)
+- [Setup](#setup)
+  - [Linux](#linux)
+  - [Apple](#apple)
+- [Important Links](#important-links)
+- [FAQ](#faq)
+- [TODO](#todo)
+
 # Setup
 
 ## Linux
